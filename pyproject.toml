@@ -1,0 +1,17 @@
+[project]
+name = "myapp"
+version = "0.1.0"
+description = "Simple Flask web app for AWS"
+requires-python = ">=3.11"
+
+dependencies = [
+    "flask",
+    "gunicorn",
+    "awsebcli",
+]
+
+[tool.uv]
+# optional, nice quality-of-life improvements
+index-url = "https://pypi.org/simple"
+python-preference = "system"
+
