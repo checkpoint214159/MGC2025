@@ -1,7 +1,0 @@
-how2 elastic beanstalk
-
-1. install eb into ur env
-2. eb create some-env-name, there will be a bunch of init steps where you configure access, ssh keys elastic
-3. wait 10 hours (2 mins) to instantiate the eb env
-4. if you make changes, run eb deploy
-5. eb terminate to kill everything
