@@ -13,24 +13,16 @@ app = FastAPI()
 # So, we point it to the 'templates' folder inside the 'app' directory.
 templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
 
-# -----------------------------------------------------
-# 3. Define Routes (GET and POST)
-# -----------------------------------------------------
 
-# GET Route: Home Page
-@app.get("/")
-async def home(request: Request):
-    # FastAPI views require 'request' object to render templates
+@app.get("/login")
+async def login(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "result": None})
 
 # POST Route: Process Form Submission
 @app.post("/process")
 async def process_form(request: Request, user_input: str = Form(...)):
-    # The form field 'user_input' is captured directly from the form data
-    
     processed_result = f"You entered: '{user_input}'. Thanks for the data!"
-    
-    # Return the index page with the result passed to the template
+
     return templates.TemplateResponse(
         "index.html", 
         {"request": request, "result": processed_result}
