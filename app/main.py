@@ -1,17 +1,41 @@
-# app/main.py
+# app/main.py (FASTAPI IMPLEMENTATION)
 
-from flask import Flask, render_template
+import os
+from fastapi import FastAPI, Request, Form
+from fastapi.templating import Jinja2Templates
 
-# The Flask application object is now named 'app'
-app = Flask(__name__)
+# 1. Initialize the FastAPI application object
+app = FastAPI()
 
-# Flask looks for the 'templates' folder relative to THIS file's location,
-# which is now inside the 'app' directory. This is why the template lookup works.
+# 2. Configure Jinja2 Templates
+# FastAPI expects the template directory path to be relative 
+# to the execution root, which is one level up from app/
+# So, we point it to the 'templates' folder inside the 'app' directory.
+templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
 
-@app.route('/')
-def home():
-    return render_template('index.html') 
+# -----------------------------------------------------
+# 3. Define Routes (GET and POST)
+# -----------------------------------------------------
 
-if __name__ == '__main__':
-    # You would typically run the application using 'app'
-    app.run()
+# GET Route: Home Page
+@app.get("/")
+async def home(request: Request):
+    # FastAPI views require 'request' object to render templates
+    return templates.TemplateResponse("index.html", {"request": request, "result": None})
+
+# POST Route: Process Form Submission
+@app.post("/process")
+async def process_form(request: Request, user_input: str = Form(...)):
+    # The form field 'user_input' is captured directly from the form data
+    
+    processed_result = f"You entered: '{user_input}'. Thanks for the data!"
+    
+    # Return the index page with the result passed to the template
+    return templates.TemplateResponse(
+        "index.html", 
+        {"request": request, "result": processed_result}
+    )
+
+# Note: The '__init__.py' file is still needed for module imports, 
+# but the if __name__ == '__main__': block is no longer used, as Uvicorn 
+# executes the application directly.
