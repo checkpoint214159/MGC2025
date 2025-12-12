@@ -9,7 +9,11 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/deepseek": "^1.0.31",
+    "@ai-sdk/react": "^2.0.109",
+    "ai": "^5.0.108",
     "next": "16.0.8",
+    "next-auth": "^4.24.13",
     "react": "19.2.1",
     "react-dom": "19.2.1"
   },
