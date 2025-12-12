@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useState } from 'react';
 import { useSession } from 'next-auth/react'; 
 import { useRouter } from 'next/navigation';
 import { useChat } from '@ai-sdk/react';
@@ -8,7 +9,8 @@ import { useChat } from '@ai-sdk/react';
 export default function ChatComponent() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const { messages, input, handleInputChange, handleSubmit } = useChat();
+  const [input, setInput] = useState("");
+	const { messages, sendMessage } = useChat();
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -43,12 +45,24 @@ export default function ChatComponent() {
       </div>
 
       {/* Input Form at the bottom */}
-      <form onSubmit={handleSubmit} className="fixed bottom-0 left-0 right-0 w-full max-w-md mx-auto p-4 bg-white border-t">
+      <form onSubmit={async (e) => {
+					e.preventDefault();
+					if (!input.trim()) return;
+ 
+					try {
+						await sendMessage({ text: input });
+						setInput("");
+					} catch (error) {
+						console.error("Failed to send message:", error);
+						// TODO: Show user-friendly error message
+						// You could add a toast notification here
+					}
+				}} className="fixed bottom-0 left-0 right-0 w-full max-w-md mx-auto p-4 bg-white border-t">
         <input
           className="w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           value={input}
           placeholder="Ask me anything code related..."
-          onChange={handleInputChange}
+          onChange={(e) => setInput(e.target.value)}
         />
         <button 
           type="submit" 

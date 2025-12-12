@@ -11,9 +11,12 @@
   "dependencies": {
     "@ai-sdk/deepseek": "^1.0.31",
     "@ai-sdk/react": "^2.0.109",
+    "@auth/prisma-adapter": "^2.11.1",
+    "@prisma/client": "^7.1.0",
+    "@prisma/extension-accelerate": "^3.0.1",
     "ai": "^5.0.108",
-    "next": "16.0.8",
-    "next-auth": "^4.24.13",
+    "next": "^16.0.10",
+    "next-auth": "^4.24.7",
     "react": "19.2.1",
     "react-dom": "19.2.1"
   },
@@ -24,6 +27,8 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.8",
+    "nodemon": "^3.1.11",
+    "prisma": "^7.1.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
