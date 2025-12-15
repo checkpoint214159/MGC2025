@@ -44,8 +44,6 @@ export default function Sidebar() {
           {isExpanded && <span className="ml-3 whitespace-nowrap">Home</span>}
         </button>
 
-        {/* -------------------- SECTIONS -------------------- */}
-
         <SidebarSection 
             isExpanded={isExpanded} 
             title="Projects" 
