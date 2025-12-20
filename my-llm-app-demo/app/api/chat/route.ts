@@ -1,6 +1,5 @@
 import { streamText, convertToModelMessages } from "ai";
 
-// Set a longer duration to prevent timeouts during long LLM generations
 export const maxDuration = 30;
 
 export async function POST(req: Request) {

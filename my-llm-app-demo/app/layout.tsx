@@ -1,5 +1,4 @@
-// /app/layout.tsx 
-
+import { SessionProvider } from "next-auth/react"
 import './globals.css'; // Assuming this is where your Tailwind CSS is imported
 
 export default function RootLayout({
@@ -14,7 +13,7 @@ export default function RootLayout({
                   1. The (app)/layout.tsx (which includes the Sidebar/AuthProvider)
                   2. OR The (auth)/layout.tsx (which includes the simple auth wrapper)
                 */}
-                {children}
+                <SessionProvider>{children}</SessionProvider>
             </body>
         </html>
     );

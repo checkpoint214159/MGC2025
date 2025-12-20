@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
+    /**
+     * Handles validation and posting to database
+     * uses prisma ORM, since I am a db newbie and refuse to learn sql to do allat
+     * better for use case too, since vercel offers it off the shelf
+     */
     try {
         const { email, username, password } = await request.json();
 
@@ -10,7 +15,6 @@ export async function POST(request: Request) {
             where: {
                 OR: [
                     { email: email },
-                    { user_id: username },
                 ],
             },
         });
@@ -19,8 +23,6 @@ export async function POST(request: Request) {
             let message = "Registration failed: ";
             if (existingUser.email === email) {
                 message += "This email address is already registered.";
-            } else if (existingUser.user_id === username) {
-                message += "This username is already taken.";
             }
             
             // Return a 409 status with the specific error message in the body
@@ -32,12 +34,19 @@ export async function POST(request: Request) {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = await prisma.account.create({
+        const newUser = await prisma.user.create({
             data: {
-                email: email,
-                user_id: username,
-                password: hashedPassword,
+                name: username,
+                account: {
+                    create: {
+                        email: email,
+                        password: hashedPassword,
+                    }
+                }
             },
+            include: {
+                account: true
+            }
         });
         
         const accounts = await prisma.account.findMany({
@@ -45,6 +54,7 @@ export async function POST(request: Request) {
                 id: true,
                 email: true,
                 user_id: true,
+                password: true,
             },
         });
 
@@ -53,7 +63,6 @@ export async function POST(request: Request) {
         return NextResponse.json(
             {
                 message: "Account created successfully",
-                user: { id: newUser.id, email: newUser.email },
             },
             { status: 201 },
         );

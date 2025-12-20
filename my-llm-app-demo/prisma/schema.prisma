@@ -9,7 +9,25 @@ datasource db {
 
 model Account {
   id       String @id @default(cuid())
+  
   email    String @unique
-  user_id  String @unique
   password String
+
+  user_id String @unique
+  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id        String  @id @default(cuid())
+  name      String
+  age       Int?
+  sex       String?
+  treatment String?
+
+  // widget array from the LLM
+  dashboardConfig Json? @default("[]")
+
+  account   Account?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
