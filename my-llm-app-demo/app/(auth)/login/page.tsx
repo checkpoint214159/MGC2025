@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const router = useRouter();
@@ -13,18 +13,22 @@ export default function LoginPage() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+        
+        try {
+            const result = await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
+                callbackUrl: "/",
+            });
 
-        const result = await signIn("credentials", {
-            username,
-            password,
-            redirect: false,
-            callbackUrl: "/",
-        });
-
-        if (result?.error) {
-            setError("Login failed. Please check your username and password.");
-        } else {
-            router.push("/");
+            if (result?.error) {
+                setError("Login failed. Please check your email and password.");
+            } else {
+                router.push("/");
+            }
+        } catch (error) {
+            setError("Something went wrong")
         }
     };
 
@@ -49,16 +53,16 @@ export default function LoginPage() {
                 <form onSubmit={handleLogin} className="space-y-4">
                     <div>
                         <label
-                            htmlFor="username"
+                            htmlFor="email"
                             className="block text-sm font-medium text-gray-700"
                         >
-                            Username
+                            Email
                         </label>
                         <input
-                            id="username"
+                            id="email"
                             type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                         />

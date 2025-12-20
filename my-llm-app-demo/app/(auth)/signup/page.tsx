@@ -1,7 +1,6 @@
 "use client"; // Must be a Client Component to use hooks like useState and signIn
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
@@ -28,12 +27,10 @@ export default function SignUpPage() {
         });
 
         const data = await response.json();
-        if (response.ok) { // Status 200-299, e.g., 201 Created
-            // If successful, redirect the user to the login page (or homepage)
+        if (response.ok) {
             console.log("Sign up successful:", data);
-            router.push("/login"); // Direct user to log in after signing up
+            router.push("/login");
         } else {
-            // Handle non-200 status codes (e.g., 409 Conflict, 500 Server Error)
             const errorMessage = data.message || "Sign up failed.";
             setError(errorMessage);
         }
