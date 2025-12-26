@@ -3,38 +3,16 @@
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import DashboardRenderer from "@/component/recovery/DashboardRenderer";
+import DashboardRenderer from "@/components/recovery/DashboardRenderer";
 
-const COLORECTAL_PATIENT_CONFIG = [
-  {
-    id: "check-1",
-    type: "EXERCISE_TRACKER",
-    props: {
-      name: "Diaphragmatic Breathing",
-      goal: "Promote internal healing and prevent lung congestion.",
-      reps: "10 deep breaths every hour",
-      precaution: "Stop if you feel dizzy or lightheaded.",
-      intensityColor: "blue"
-    },
-  },
-  {
-    id: "check-2",
-    type: "EXERCISE_TRACKER",
-    props: {
-      name: "Assisted Walking",
-      goal: "Prevent blood clots (DVT) and wake up the bowels.",
-      reps: "5 minute walk around the room",
-      precaution: "Always have a caregiver present for the first 48 hours.",
-      intensityColor: "orange"
-    },
-  }
-];
 
 export default function DashboardPage() {
     const router = useRouter();
-    const { data: session, status, update } = useSession();
+    const { data: session, status } = useSession();
 
-    // 2. AUTHENTICATION PROTECTION
+    const userConfig = session?.user?.dashboardConfig.widgets || [];
+
+    // authenticate + get info
     useEffect(() => {
         if (status === "unauthenticated") {
             router.push("/login");
@@ -54,13 +32,8 @@ export default function DashboardPage() {
         );
     }
 
-    if (!session?.user?.dashboardConfig) {
-        return null; // This avoids flickering before the redirect hits
-    }
-
     return (
         <div className="p-8 max-w-5xl mx-auto pb-20">
-            {/* 3. PERSONALIZED HEADER */}
             <header className="mb-10">
                 <h1 className="text-3xl font-bold text-gray-900">
                     Welcome back, {session?.user?.name || "Patient"}
@@ -70,7 +43,6 @@ export default function DashboardPage() {
                 </p>
             </header>
 
-            {/* 4. THE DYNAMIC ENGINE */}
             <section>
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-semibold text-gray-800">Your Tasks</h2>
@@ -79,7 +51,7 @@ export default function DashboardPage() {
                     </span>
                 </div>
 
-                <DashboardRenderer config={COLORECTAL_PATIENT_CONFIG} />
+                <DashboardRenderer config={userConfig} />
             </section>
             
             {/* Optional: Keep your chat as a "Help" button in the corner */}

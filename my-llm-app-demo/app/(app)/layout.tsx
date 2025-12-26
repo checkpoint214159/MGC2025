@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import { AuthProvider } from "../providers";
-import Sidebar from '@/component/layout/Sidebar'; 
+import Sidebar from '@/components/layout/Sidebar'; 
 import { auth } from "@/auth"
 import { redirect } from "next/navigation";
 

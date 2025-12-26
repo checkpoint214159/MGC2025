@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
-import SidebarSection from '@/component/layout/SidebarSection'; 
-import { HomeIcon, GearIcon, DesktopIcon, FileTextIcon } from '@radix-ui/react-icons';
+import SidebarSection from '@/components/layout/SidebarSection'; 
+import { HomeIcon, GearIcon, DesktopIcon, PersonIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
 
 export default function Sidebar() {
@@ -30,12 +30,10 @@ export default function Sidebar() {
     >
       <div className={`flex flex-col h-full ${isExpanded ? "items-start" : "items-center"}`}>
         
-        {/* Header/Logo Placeholder */}
         <div className={`mb-8 p-1 ${isExpanded ? 'text-lg font-bold' : 'text-xl'}`}>
           {isExpanded ? 'LLM App' : 'App'}
         </div>
 
-        {/* Home Link (Always visible) */}
         <button
           onClick={() => handleNavigation('/')}
           className="flex items-center w-full p-2 rounded-lg hover:bg-gray-700 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -44,11 +42,19 @@ export default function Sidebar() {
           {isExpanded && <span className="ml-3 whitespace-nowrap">Home</span>}
         </button>
 
-        <SidebarSection 
+        <button
+          onClick={() => handleNavigation('/profile')}
+          className="flex items-center w-full p-2 rounded-lg hover:bg-gray-700 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <PersonIcon className="w-6 h-6 shrink-0" />
+          {isExpanded && <span className="ml-3 whitespace-nowrap">Profile</span>}
+        </button>
+
+        {/* <SidebarSection 
             isExpanded={isExpanded} 
-            title="Projects" 
+            title="Profile" 
             defaultOpen={true} // Default section opened
-            icon={DesktopIcon}
+            icon={PersonIcon}
             links={[
                 { name: 'Model V1', path: '/projects/v1' },
                 { name: 'Training Data', path: '/projects/data' },
@@ -65,7 +71,7 @@ export default function Sidebar() {
                 { name: 'Logs', path: '/reports/logs' },
             ]}
             onNavigate={handleNavigation}
-        />
+        /> */}
         
         {/* Footer/Settings Link (Always visible) */}
         <button
