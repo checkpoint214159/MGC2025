@@ -40,12 +40,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 if (!token.treatment || trigger === "update") {
                     const dbUser = await prisma.user.findUnique({
                         where: { id: token.id as string },
-                        select: { treatment: true, dashboardConfig: true }
+                        select: { 
+                            treatment: true,
+                            dashboardConfig: true,
+                            name: true,
+                         }
                     });
 
                     if (dbUser) {
                         token.treatment = dbUser.treatment;
                         token.dashboardConfig = dbUser.dashboardConfig;
+                        token.name = dbUser.name;
                     }
                 }
             }

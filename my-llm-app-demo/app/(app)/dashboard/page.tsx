@@ -1,7 +1,7 @@
 // app/(app)/dashboard/page.tsx
 "use client";
 
-import DashboardRenderer from "@/component/recovery/DashboardRenderer";
+import DashboardRenderer from "@/components/recovery/DashboardRenderer";
 
 // FILLER DATA: Simulating what the LLM would eventually output
 const KNEE_PATIENT_CONFIG = [

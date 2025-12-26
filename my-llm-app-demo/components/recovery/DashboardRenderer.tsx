@@ -1,8 +1,10 @@
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react"
 import { COMPONENT_REGISTRY, ROUTE_MAP, WidgetConfig } from "./registry";
 
 export default function DashboardRenderer({ config }: { config: WidgetConfig[] }) {
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

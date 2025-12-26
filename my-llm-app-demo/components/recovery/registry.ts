@@ -1,4 +1,5 @@
-import RecoveryExercise from "@/component/ui/RecoveryExercise";
+import RecoveryExercise from "@/components/ui/RecoveryExercise";
+import NutritionPlan from "@/components/ui/NutritionPlan";
 
 export interface WidgetConfig {
   id: string;
@@ -8,6 +9,7 @@ export interface WidgetConfig {
 
 export const COMPONENT_REGISTRY: Record<string, React.ElementType> = {
   EXERCISE_TRACKER: RecoveryExercise,
+  NUTRITION_PLAN: NutritionPlan,
   // ADD_MORE: YourNextComponent
 };
 

@@ -5,6 +5,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
+      name: string;
       treatment?: string | null;
       dashboardConfig?: any;
     } & DefaultSession["user"];
@@ -20,5 +21,6 @@ declare module "next-auth/jwt" {
     id: string;
     treatment?: string | null;
     dashboardConfig?: any;
+    name: string;
   }
 }

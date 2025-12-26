@@ -1,6 +1,6 @@
 "use client";
 
-import RecoveryExercise from "@/component/ui/RecoveryExercise";
+import RecoveryExercise from "@/components/ui/RecoveryExercise";
 
 // This page would ideally fetch the FULL list of exercises 
 // based on the patient's surgery type
