@@ -4,13 +4,14 @@ import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import DashboardRenderer from "@/components/recovery/DashboardRenderer";
+import { DashboardConfig } from "@/components/recovery/registry";
 
 
 export default function DashboardPage() {
     const router = useRouter();
     const { data: session, status } = useSession();
 
-    const userConfig = session?.user?.dashboardConfig.widgets || [];
+    const userConfig = (session?.user?.dashboardConfig as unknown as DashboardConfig)
 
     // authenticate + get info
     useEffect(() => {
@@ -38,9 +39,6 @@ export default function DashboardPage() {
                 <h1 className="text-3xl font-bold text-gray-900">
                     Welcome back, {session?.user?.name || "Patient"}
                 </h1>
-                <p className="text-gray-500 mt-2">
-                    Here is your personalized recovery plan for today.
-                </p>
             </header>
 
             <section>

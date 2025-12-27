@@ -7,7 +7,7 @@ interface ExerciseProps {
   isPreview?: boolean;
 }
 
-export default function RecoveryExercise({ 
+export default function RecoveryExerciseRenderer({ 
   name, 
   goal, 
   reps, 
@@ -49,6 +49,19 @@ export default function RecoveryExercise({
           Tap to start session →
         </span>
       )}
+
+      <input
+        type="checkbox"
+        id="complete"
+        className="w-5 h-5 rounded border-gray-400 text-green-600 focus:ring-green-500"
+        onChange={(e) => console.log("Task is done:", e.target.checked)}
+      />
+      <label htmlFor="complete" className="text-sm font-medium text-green-800">
+        Mark as completed today
+      </label>
+
     </div>
+    
+    
   );
 }
