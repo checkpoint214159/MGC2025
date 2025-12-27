@@ -1,39 +1,36 @@
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react"
-import { COMPONENT_REGISTRY, ROUTE_MAP, WidgetConfig } from "./registry";
+import { DashboardConfig } from "@/components/recovery/registry";
+import ExercisePreviewCard from "@/components/ui/ExercisePreviewCard";
+import NutritionPreviewCard from "@/components/ui/NutritionPreviewCard";
 
-export default function DashboardRenderer({ config }: { config: WidgetConfig[] }) {
+export default function DashboardRenderer({ config }: { config: DashboardConfig }) {
+  if (!config || !config.modules) {
+    return (
+      <div className="p-6 border-2 border-dashed border-slate-200 rounded-xl text-center">
+        <p className="text-slate-500 italic">No recovery plan found. Please generate one to begin.</p>
+      </div>
+    );
+  }
   const router = useRouter();
-  const { data: session, status } = useSession();
-
+  const { modules } = config;
+  
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {config.map((widget) => {
-        const Component = COMPONENT_REGISTRY[widget.type];
-        const targetPath = ROUTE_MAP[widget.type]
-        
-        if (!Component) {
-            console.warn(`No component found for type: ${widget.type}`);
-            return null;
-        }
+    <div className="grid gap-6">
+      {/* explicitly render for now */}
+      
+      {modules.exercise && (
+        <ExercisePreviewCard 
+          data={modules.exercise} 
+          onClick={() => router.push('/recovery/fitness')} 
+        />
+      )}
 
-        return (
-          <div 
-            key={widget.id}
-            onClick={() => targetPath && router.push(targetPath)}
-            className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] group"
-          >
-            <Component {...widget.props} isPreview={true} />
-            
-            {targetPath && (
-              <div className="mt-2 text-sm text-blue-600 font-medium flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                View Details 
-                <span className="ml-1">→</span>
-              </div>
-            )}
-          </div>
-        );
-      })}
+      {modules.nutrition && (
+        <NutritionPreviewCard 
+          data={modules.nutrition} 
+          onClick={() => router.push('/recovery/nutrition')}
+        />
+      )}
     </div>
   );
 }

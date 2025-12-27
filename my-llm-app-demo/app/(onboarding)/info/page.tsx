@@ -39,7 +39,7 @@ export default function OnboardingPage() {
 
     try {
       // 1. Send data to your API route
-      const response = await fetch("/api/generate-dashboard", {
+      const response = await fetch("/api/generate", {
         method: "POST",
         body: JSON.stringify(userData),
       });
