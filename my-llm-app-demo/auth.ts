@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import { prisma } from "@/lib/prisma";
 const bcrypt = require("bcryptjs");
 import Credentials from "next-auth/providers/credentials";
+import { State } from "@/app/api/state/generate/schema";
 
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -35,22 +36,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (user) {
                 token.id = user.id;
             }
-            
+
             if (token?.id) {
-                if (!token.treatment || trigger === "update") {
-                    const dbUser = await prisma.user.findUnique({
-                        where: { id: token.id as string },
-                        select: { 
-                            treatment: true,
-                            dashboardConfig: true,
-                            name: true,
-                         }
-                    });
+                if (!token.userProfile || trigger === "update") {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    const [stateRecord, dbUser] = await Promise.all([
+                        prisma.state.findUnique({
+                            where: { userId_dateCreated: {
+                                userId: token.id as string,
+                                dateCreated: today,
+                            } }
+                        }),
+                        prisma.user.findUnique({
+                            where: { id: token.id as string } // Fixed: Use token.id
+                        })
+                    ]);
+
+                    if (stateRecord) {
+                        token.hasTodayState = true;
+                    }
 
                     if (dbUser) {
-                        token.treatment = dbUser.treatment;
-                        token.dashboardConfig = dbUser.dashboardConfig;
-                        token.name = dbUser.name;
+                        token.userProfile = dbUser.profile
+                        token.name = dbUser.name
                     }
                 }
             }
@@ -59,8 +69,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         async session({ session, token }) {
             if (session.user) {
                 session.user.id = token.id as string;
-                session.user.treatment = token.treatment as string;
-                session.user.dashboardConfig = token.dashboardConfig;
+                session.hasTodayState = token.hasTodayState as boolean;
+                // technically really bad, this profile is sensitive info kinda
+                session.user.profile = token.userProfile as string;
             }
             return session;
         }

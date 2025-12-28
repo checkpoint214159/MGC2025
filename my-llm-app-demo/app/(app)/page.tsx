@@ -1,37 +1,64 @@
-"use client";
+"use client"
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { fetchTargetStateAction } from "@/lib/actions"
+import { State } from "@/lib/state/schema";
 import DashboardRenderer from "@/components/recovery/DashboardRenderer";
-import { DashboardConfig } from "@/components/recovery/registry";
 
 
 export default function DashboardPage() {
     const router = useRouter();
-    const { data: session, status } = useSession();
+    const [TargetState, setTargetState] = useState<State | null>(null);
+    const { data: session, status, update } = useSession();
+    const [loading, setLoading] = useState(false);
 
-    const userConfig = (session?.user?.dashboardConfig as unknown as DashboardConfig)
-
-    // authenticate + get info
     useEffect(() => {
-        if (status === "unauthenticated") {
-            router.push("/login");
+        const checkState = async () => {
+            if (status === "unauthenticated") {
+                router.push("/login");
+            }
+            if (status === "authenticated") {
+                console.log('session use profile?', !session?.user?.profile)
+                if (!session?.user?.profile) {
+                    router.push("/info");
+                }
+                if (!TargetState) {
+                    try {
+                        const response = await fetchTargetStateAction();
+                        if (response.success) {
+                            // This triggers a re-render so DashboardRenderer gets the data
+                            setTargetState(response.data?.target as State); 
+                            
+                            // Only update session if the flag was missing
+                            if (!session.hasTodayState) {
+                                await update({});
+                            }
+                        }
+                    } catch (error) {
+                        console.error("State fetching failed", error);
+                    } finally {
+                        setLoading(false);
+                    }
+                } else {
+                    setLoading(false);
+                }
+            }
         }
-        if (status === "authenticated" && !session?.user?.treatment) {
-            router.push("/info");
-        }
-    }, [status, session, router]);
 
-    if (status === "loading") {
+        checkState()
+    }, [status, session, router, update]);
+
+    if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="animate-pulse text-blue-600 font-medium">
-                    Initializing your recovery plan...
-                </div>
-            </div>
+        <div className="flex flex-col items-center justify-center min-h-screen p-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+            <h2 className="text-xl font-semibold">Retrieving goodies...</h2>
+        </div>
         );
     }
+  
 
     return (
         <div className="p-8 max-w-5xl mx-auto pb-20">
@@ -49,7 +76,7 @@ export default function DashboardPage() {
                     </span>
                 </div>
 
-                <DashboardRenderer config={userConfig} />
+                <DashboardRenderer config={TargetState} />
             </section>
             
             {/* Optional: Keep your chat as a "Help" button in the corner */}

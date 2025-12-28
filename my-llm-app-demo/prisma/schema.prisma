@@ -5,6 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Account {
@@ -23,9 +24,7 @@ model User {
   age       Int?
   sex       String?
   treatment String?
-
-  // widget array from the LLM
-  dashboardConfig Json? @default("[]")
+  profile   String? // LLM generated profile
 
   account   Account?
   createdAt DateTime @default(now())
@@ -35,11 +34,14 @@ model User {
 }
 
 model State {
-  id        Int  @id @default(autoincrement())
+  id          Int  @id @default(autoincrement())
+  dateCreated DateTime @default(now()) @db.Date
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  target      Json? @default("{}")
+  state       Json? @default("{}")
 
-  userId    String
-  user      User @relation(fields:[userId], references:[id])
+  userId      String
+  user        User @relation(fields:[userId], references:[id])
+
+  @@unique([userId, dateCreated])
 }
