@@ -9,44 +9,19 @@ import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import { Checkbox } from "@radix-ui/react-checkbox";
 import { Flame, Plus } from "lucide-react";
-import { Grid, Box, Section } from "@radix-ui/themes";
 
-interface MacroGoal {
-  target: number;
-  unit: string;
-  label: string;
-}
-
-interface MicroGoal {
-  name: string;
-  target: number;
-  unit: string;
-  importance: string;
-}
-
-interface NutritionPlanProps {
-  title: string;
-  goalCalories: number;
-  macros: Record<string, MacroGoal>; // Dictionary of macros
-  micros: MicroGoal[];               // Array of micros
-  checklists: { id: string; name: string; calories: number }[];
-}
 
 export default function NutritionPlan() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [items, setItems] = useState<any[]>([]);
-  const [manualCalories, setManualCalories] = useState<number>(0);
+  const [checklistItems, setChecklistItems] = useState<any[]>([]);
+  const [manualAdjustments, setManualAdjustments] = useState({
+    calories: 0,
+    protein: 0,
+    carbs: 0,
+    fats: 0
+  });
   const [tempInput, setTempInput] = useState<string>("");
-
-  useEffect(() => {
-    const config = session?.user?.dashboardConfig as DashboardConfig;
-    const checklists = config?.modules?.nutrition?.checklists;
-    
-    if (checklists) {
-      setItems(checklists.map(item => ({ ...item, completed: false })));
-    }
-  }, [session]);
 
   if (status === "loading") return <p>Loading...</p>;
   if (!session) return <p>Access Denied</p>;
@@ -56,24 +31,29 @@ export default function NutritionPlan() {
   // console.log('userConfig', userConfig)
   // console.log('nutritionModule', nutritionModule)
   
-  const checklistCals = items
-    .filter(item => item.completed)
-    .reduce((total, item) => total + item.calories, 0);
-
-  const totalConsumed = checklistCals + manualCalories;
-  const goalCalories = nutritionModule?.goalCalories;
-  const progressPercentage = goalCalories
-    ? Math.min((totalConsumed / goalCalories ) * 100, 100)
-    : 0;  // god i just love js syntax. just so much clearer than java right
-    // me when im sarcastic
-
-  const manualCaloriesAdd = () => {
-    const val = parseInt(tempInput);
-    if (!isNaN(val)) {
-      setManualCalories(prev => prev + val);
-      setTempInput("");
-    }
+  const handleManualUpdate = (nutrient: string, value: number) => {
+    setManualAdjustments(prev => ({
+      ...prev,
+      [nutrient]: prev[nutrient as keyof typeof prev] + value
+    }));
   };
+
+  const thing = checklistItems
+  .filter(item => item.completed)
+  .reduce((acc, item) => {
+    // Add checklist values to the accumulator
+    acc.calories += (item.calories || 0);
+    acc.protein += (item.macros?.protein || 0);
+    acc.carbs += (item.macros?.carbs || 0);
+    acc.fats += (item.macros?.fats || 0);
+    return acc;
+  }, { 
+    // START with the manual adjustments as the base values
+    calories: manualAdjustments.calories,
+    protein: manualAdjustments.protein,
+    carbs: manualAdjustments.carbs,
+    fats: manualAdjustments.fats
+  });
 
   // Determine progress bar color based on percentage
   const getProgressBarColor = (progress: number) => {
@@ -171,12 +151,27 @@ export default function NutritionPlan() {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* MACROS (Takes up 2/3 of the space on desktop) */}
-        <div className="md:col-span-2 space-y-4">
-          <h3 className="font-bold text-lg">Macronutrients</h3>
-          <div className="grid grid-cols-3 gap-4">
-              {/* Map your Macros here */}
+        <div className="bg-white p-4 rounded-xl border border-dashed border-gray-300">
+          <h4 className="text-sm font-bold mb-3">Quick Add (Manual)</h4>
+          <div className="grid grid-cols-2 gap-2">
+            {['calories', 'protein', 'carbs', 'fats'].map((nutrient) => (
+              <div key={nutrient} className="flex flex-col gap-1">
+                <label className="text-[10px] uppercase font-bold text-gray-400">{nutrient}</label>
+                <input 
+                  type="number"
+                  placeholder="+ Add"
+                  className="border rounded p-1 text-sm"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleManualUpdate(nutrient, parseInt(e.currentTarget.value) || 0);
+                      e.currentTarget.value = ""; // Clear after enter
+                    }
+                  }}
+                />
+              </div>
+            ))}
           </div>
+          <p className="text-[10px] text-gray-400 mt-2 italic">Type value and press Enter to add to totals</p>
         </div>
 
         {/* MICROS (Takes up 1/3 of the space on desktop) */}

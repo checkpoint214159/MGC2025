@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, SessionProvider } from "next-auth/react";
+import { ProfileSchema } from "@/lib/profile/schema"
+
+
 
 export default function OnboardingPage() {
   const { data: session, status, update } = useSession();
@@ -31,28 +34,19 @@ export default function OnboardingPage() {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const userData = {
+    const result = ProfileSchema.safeParse({
       age: formData.get("age"),
       sex: formData.get("sex"),
       treatment: formData.get("treatment"),
-    };
-
-    try {
-      // 1. Send data to your API route
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        body: JSON.stringify(userData),
-      });
+    });
     
-      if (response.ok) {
-        await update()
-        router.push("/");
-      }
-    } catch (error) {
-      console.error("Onboarding failed", error);
-    } finally {
-      setLoading(false);
+    if (!result.success) {
+      console.error(result.error);
+      return;
     }
+
+    await setProfile(result.data, session.user.id);
+    
   }
 
   if (loading) {
