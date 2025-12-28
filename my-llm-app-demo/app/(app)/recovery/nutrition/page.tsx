@@ -1,202 +1,40 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react"
-import { useEffect, useState } from "react";
-import { Progress } from "@/components/ui/progress";
-import { DashboardConfig } from "@/components/recovery/registry";
-import { Input } from "@/components/ui/input";
-import { motion, AnimatePresence } from "framer-motion";
-import { Checkbox } from "@radix-ui/react-checkbox";
-import { Flame, Plus } from "lucide-react";
+import { auth } from "@/auth";
+import { fetchStateAction } from "@/lib/actions"
+import { State } from "@/lib/state/schema"
+import { NutritionDashboard } from "./NutritionWidget"
+import { NutritionModule } from "@/lib/state/schema";
 
 
-export default function NutritionPlan() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
-  const [checklistItems, setChecklistItems] = useState<any[]>([]);
-  const [manualAdjustments, setManualAdjustments] = useState({
-    calories: 0,
-    protein: 0,
-    carbs: 0,
-    fats: 0
-  });
-  const [tempInput, setTempInput] = useState<string>("");
-
-  if (status === "loading") return <p>Loading...</p>;
+export default async function NutritionPage() {
+  const session = await auth()
   if (!session) return <p>Access Denied</p>;
 
-  const userConfig = session.user.dashboardConfig as DashboardConfig
-  const nutritionModule = userConfig?.modules?.nutrition;
-  // console.log('userConfig', userConfig)
-  // console.log('nutritionModule', nutritionModule)
+  const fetch = await fetchStateAction();
+  const target = fetch?.data?.target as State
+  const nutritionTarget = target.modules.nutrition as NutritionModule
+
+  const state = fetch?.data?.state as State
+  const nutritionState = state.modules.nutrition as NutritionModule
+
+  console.log('nutritionState', nutritionState)
+
+  /*
+  28/12/2025
+  Opt to render into 3 buckets, calorie count, macro and micro.
+  Note calorie is still a type of macro, we just want it to look bigger
+  **/
   
-  const handleManualUpdate = (nutrient: string, value: number) => {
-    setManualAdjustments(prev => ({
-      ...prev,
-      [nutrient]: prev[nutrient as keyof typeof prev] + value
-    }));
-  };
-
-  const thing = checklistItems
-  .filter(item => item.completed)
-  .reduce((acc, item) => {
-    // Add checklist values to the accumulator
-    acc.calories += (item.calories || 0);
-    acc.protein += (item.macros?.protein || 0);
-    acc.carbs += (item.macros?.carbs || 0);
-    acc.fats += (item.macros?.fats || 0);
-    return acc;
-  }, { 
-    // START with the manual adjustments as the base values
-    calories: manualAdjustments.calories,
-    protein: manualAdjustments.protein,
-    carbs: manualAdjustments.carbs,
-    fats: manualAdjustments.fats
-  });
-
-  // Determine progress bar color based on percentage
-  const getProgressBarColor = (progress: number) => {
-    if (progress < 50) return "#ef4444"; // red-500
-    if (progress < 80) return "#f59e0b"; // amber-500
-    return "#22c55e"; // green-500
-  };
-
-  // const handleCheck = (id: string, checked: boolean) => {
-  //   setFoodItems(prevItems =>
-  //     prevItems.map(item =>
-  //       item.id === id ? { ...item, completed: checked } : item
-  //     )
-  //   );
-  //   // In a real app, you'd send this update to your backend here
-  //   // e.g., useMutation from TanStack Query
-  // };
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white p-6 rounded-lg shadow-md border border-gray-100 space-y-6"
-    >
-      <h1 className="text-xl font-semibold mb-4 text-gray-800">Your Daily Nutrition</h1>
-
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <h3 className="text-xl font-semibold mb-4 text-gray-800">Calories</h3>
-        
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <p className="text-sm font-medium text-gray-600">
-              Consumed: <span className="font-bold text-gray-800">{totalConsumed}</span> / {goalCalories} kcal
-            </p>
-            <span className={`text-sm font-semibold px-2 py-0.5 rounded-md ${
-              progressPercentage >= 100 ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-            }`}>
-              {Math.round(progressPercentage)}%
-            </span>
-          </div>
-          <Progress 
-            value={progressPercentage} 
-            className="h-2"
-            indicatorColor={getProgressBarColor(progressPercentage)} // Custom prop for dynamic color
-          />
-        </div>
+    <div className="p-6 max-w-5xl mx-auto space-y-8">
+      <header>
+        <h1 className="text-2xl font-bold text-slate-900">Nutrition Recovery</h1>
+        <p className="text-slate-500 italic">Fueling your tissue repair and hydration.</p>
+      </header>
       
-        <div className="space-y-4 mb-8">
-          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Recommended Actions</h4>
-          {items.map(item => (
-            <div key={item.id} className="flex items-center space-x-3 bg-slate-50 p-3 rounded-lg">
-              <Checkbox 
-                  id={item.id} 
-                  checked={item.completed} 
-                  onCheckedChange={(checked) => {
-                      setItems(items.map(i => i.id === item.id ? {...i, completed: !!checked} : i))
-                  }}
-              />
-              <label htmlFor={item.id} className="flex-1 text-sm font-medium text-slate-700">
-                {item.name}
-              </label>
-              <span className="text-xs font-bold text-slate-400">+{item.calories}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="pt-4 border-t border-slate-100">
-          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Log Additional Food</h4>
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Flame className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-              <Input 
-                type="number" 
-                placeholder="Enter calories..." 
-                className="pl-9"
-                value={tempInput}
-                onChange={(e) => setTempInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && manualCaloriesAdd()}
-              />
-            </div>
-            <button 
-              onClick={manualCaloriesAdd}
-              className="bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-800 transition-colors"
-            >
-              <Plus className="h-5 w-5" />
-            </button>
-          </div>
-          {manualCalories > 0 && (
-              <p className="text-xs text-slate-400 mt-2">
-                  Manually logged: {manualCalories} kcal today
-              </p>
-          )}
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-4 rounded-xl border border-dashed border-gray-300">
-          <h4 className="text-sm font-bold mb-3">Quick Add (Manual)</h4>
-          <div className="grid grid-cols-2 gap-2">
-            {['calories', 'protein', 'carbs', 'fats'].map((nutrient) => (
-              <div key={nutrient} className="flex flex-col gap-1">
-                <label className="text-[10px] uppercase font-bold text-gray-400">{nutrient}</label>
-                <input 
-                  type="number"
-                  placeholder="+ Add"
-                  className="border rounded p-1 text-sm"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleManualUpdate(nutrient, parseInt(e.currentTarget.value) || 0);
-                      e.currentTarget.value = ""; // Clear after enter
-                    }
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-          <p className="text-[10px] text-gray-400 mt-2 italic">Type value and press Enter to add to totals</p>
-        </div>
-
-        {/* MICROS (Takes up 1/3 of the space on desktop) */}
-        <div className="space-y-4">
-          <h3 className="font-bold text-lg">Micronutrients</h3>
-          <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
-            <div className="space-y-3">
-              {nutritionModule?.micros.map((micro) => (
-                <div key={micro.name} className="flex justify-between items-end border-b border-gray-200 pb-2 last:border-0">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{micro.name}</p>
-                    <p className="text-[10px] text-gray-500 italic">{micro.importance}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-sm font-mono font-bold">
-                      {micro.target}
-                    </span>
-                    <span className="text-[10px] ml-1 text-gray-400">{micro.unit}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
+      <NutritionDashboard 
+        target={nutritionTarget} 
+        state={nutritionState} 
+      />
+    </div>
   );
 }

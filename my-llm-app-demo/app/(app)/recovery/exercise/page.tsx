@@ -1,48 +1,49 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react"
-import { DashboardConfig } from "@/components/recovery/registry";
-import RecoveryExerciseRenderer from "./ExerciseWidget";
+import { auth } from "@/auth";
+import {fetchStateAction} from "@/lib/actions"
+import RecoveryExerciseRenderer from "./ExerciseWidget"
+import { State } from "@/lib/state/schema";
 
 
-export default function FitnessPage() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
-
-  if (status === "loading") return <p>Loading...</p>;
+export default async function FitnessPage() {
+  const session = await auth()
   if (!session) return <p>Access Denied</p>;
 
-  const userConfig = session.user.dashboardConfig as DashboardConfig
-  console.log(userConfig)
-  const exerciseModule = userConfig?.modules?.exercise;
+  const fetch = await fetchStateAction();
 
-  // if (status !== "loading" && !exerciseModule) {
-  //   return (
-  //     <div className="p-8 text-center">
-  //       <p className="text-slate-500">No exercises found in your plan.</p>
-  //       <button onClick={() => router.push('/')} className="text-blue-600 underline">
-  //         Go Back
-  //       </button>
-  //     </div>
-  //   );
-  // }
+  const target = fetch?.data?.target as State
+  const exerciseTarget = target.modules.exercise
+
+  const state = fetch?.data?.state as State
+  const exerciseState = state.modules.exercise
+  
+  // console.log('state?', state.modules.exercise.tasks[0].props)
+  // console.log('exerciseTarget?', exerciseTarget.tasks[0].props)
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <header className="mb-8">
         <h1 className="text-2xl font-bold text-slate-900">Exercise Detail</h1>
-        <p className="text-slate-500">{exerciseModule?.summary}</p>
+        <p className="text-slate-500">{exerciseTarget?.summary}</p>
       </header>
 
-      {/* 3. The Layout Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {exerciseModule?.tasks.map((task) => (
-          <div key={task.id} className="border rounded-xl p-4 bg-white shadow-sm">
-            {/* Pass the task props to your renderer */}
-            <RecoveryExerciseRenderer {...task.props} isPreview={false} />
-          </div>
-        ))}
+        {exerciseTarget.tasks.map((task) => {
+          // Find the corresponding tracking state for this specific task
+          const taskProgress = exerciseState.tasks.find(
+            (s: any) => s.id === task.id
+          );
+          console.log('taskProgress in FitnessPage', taskProgress)
+
+          return (
+            <div key={task.id} className="border rounded-xl p-4 bg-white shadow-sm">
+              <RecoveryExerciseRenderer 
+                task={task} 
+                currentValue={taskProgress?.props.value || 0}
+                isPreview={false} 
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );

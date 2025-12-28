@@ -11,7 +11,6 @@ export default function DashboardRenderer({ config }: { config: State | null }) 
       </div>
     );
   }
-  console.log('config??', config.modules.exercise)
   const { modules } = config;
   
   return (
