@@ -1,157 +1,88 @@
-"use client";
-
+"use client"
 import { useState } from "react";
+import CalorieWidget from "./CalorieWidget";
+import MacroWidget from "./MacroWidget";
+import MicroWidget from "./MicroWidget";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Progress } from "@/components/ui/progress";
-import { motion, AnimatePresence } from "framer-motion";
-import { Input } from "@/components/ui/input";
-import { Plus, Flame } from "lucide-react";
+import { NutritionModule } from "@/lib/state/schema"
 
-interface MacroGoal {
-  target: number;
-  unit: string;
-  label: string;
-}
 
-interface MicroGoal {
-  name: string;
-  target: number;
-  unit: string;
-  importance: string;
-}
+export default function NutritionDashboard(target: NutritionModule, state: NutritionModule) {
+  const [completedIds, setCompletedIds] = useState<string[]>([]);
 
-interface NutritionPlanProps {
-  title: string;
-  goalCalories: number;
-  macros: Record<string, MacroGoal>; // Dictionary of macros
-  micros: MicroGoal[];               // Array of micros
-  checklists: { id: string; name: string; calories: number }[];
-}
-
-export default function NutritionPlan({ 
-  title, 
-  goalCalories, 
-  macros, 
-  micros = [], 
-  checklists = [] 
-}: NutritionPlanProps) {
-  const [items, setItems] = useState(
-    checklists.map(item => ({ ...item, completed: false }))
-  );
-
-  // manual tracking
-  const [manualCalories, setManualCalories] = useState<number>(0);
-  const [tempInput, setTempInput] = useState<string>("");
-
-  // from checklist of calories
-  const checklistCals = items
-    .filter(item => item.completed)
-    .reduce((total, item) => total + item.calories, 0);
-
-  console.log('goalcalories', goalCalories)
-  const totalConsumed = checklistCals + manualCalories;
-  const progressPercentage = Math.min((totalConsumed / goalCalories) * 100, 100);
-
-  const handleManualAdd = () => {
-    const val = parseInt(tempInput);
-    if (!isNaN(val)) {
-      setManualCalories(prev => prev + val);
-      setTempInput(""); // Reset input
-    }
-  };
-
-  // Determine progress bar color based on percentage
-  const getProgressBarColor = (progress: number) => {
-    if (progress < 50) return "#ef4444"; // red-500
-    if (progress < 80) return "#f59e0b"; // amber-500
-    return "#22c55e"; // green-500
-  };
-
-  // const handleCheck = (id: string, checked: boolean) => {
-  //   setFoodItems(prevItems =>
-  //     prevItems.map(item =>
-  //       item.id === id ? { ...item, completed: checked } : item
-  //     )
-  //   );
-  //   // In a real app, you'd send this update to your backend here
-  //   // e.g., useMutation from TanStack Query
+  const getAggregatedValue = (taskId: string) => {
+    const base = state.tasks.find(t => t.id === taskId)?.value || 0;
+  }
+  // 2. Helper to calculate total value for any specific task (e.g., 'protein')
+  // const getAggregatedValue = (taskId: string) => {
+  //   // Start with whatever is already manually in the state
+  //   const baseValue = initialStates.find(t => t.id === taskId)?.value || 0; // TODO: seperate target and goal type?
+    
+  //   // Add impact from checked items
+  //   const checklistBonus = target.checklists
+  //     .filter(item => completedIds.includes(item.id))
+  //     .reduce((sum, item) => sum + (item.impact[taskId] || 0), 0);
+      
+  //   return baseValue + checklistBonus;
   // };
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white p-6 rounded-lg shadow-md border border-gray-100"
-    >
-      <h3 className="text-xl font-semibold mb-4 text-gray-800">Your Daily Nutrition</h3>
+  // we let calorie be its own thing
+  const calorieTask = target.tasks.find(t => t.id === "calories");
+  const macroTasks = target.tasks.filter(t => t.props.type === "macro" && t.id !== "calories");
+  const microTasks = target.tasks.filter(t => t.props.type === "micro");
 
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <p className="text-sm font-medium text-gray-600">
-            Consumed: <span className="font-bold text-gray-800">{totalConsumed}</span> / {goalCalories} kcal
-          </p>
-          <span className={`text-sm font-semibold px-2 py-0.5 rounded-md ${
-             progressPercentage >= 100 ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-          }`}>
-            {Math.round(progressPercentage)}%
-          </span>
-        </div>
-        <Progress 
-          value={progressPercentage} 
-          className="h-2"
-          indicatorColor={getProgressBarColor(progressPercentage)} // Custom prop for dynamic color
+  return (
+    <div className="space-y-8">
+      {/* Top Section: Calories (Big overarching number) */}
+      <CalorieWidget 
+        task={calorieTask} 
+        currentValue={getAggregatedValue("calories")} 
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Left: Macros */}
+        <MacroWidget 
+          tasks={macroTasks} 
+          getCurrentValue={getAggregatedValue} 
+        />
+        
+        {/* Right: Micros */}
+        <MicroWidget 
+          tasks={microTasks} 
+          getCurrentValue={getAggregatedValue} 
         />
       </div>
 
-      {/* Checklist Section */}
-      <div className="space-y-4 mb-8">
-        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Recommended Actions</h4>
-        {items.map(item => (
-          <div key={item.id} className="flex items-center space-x-3 bg-slate-50 p-3 rounded-lg">
-            <Checkbox 
-                id={item.id} 
-                checked={item.completed} 
+      {/* Bottom Section: Checklists */}
+      <section className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Recommended Actions</h3>
+        <div className="space-y-3">
+          {target.checklists.map(item => (
+            <div key={item.id} className="flex items-start gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100 transition-colors">
+              <Checkbox 
+                id={item.id}
+                checked={completedIds.includes(item.id)}
                 onCheckedChange={(checked) => {
-                    setItems(items.map(i => i.id === item.id ? {...i, completed: !!checked} : i))
+                  setCompletedIds(prev => checked ? [...prev, item.id] : prev.filter(id => id !== item.id))
                 }}
-            />
-            <label htmlFor={item.id} className="flex-1 text-sm font-medium text-slate-700">
-              {item.name}
-            </label>
-            <span className="text-xs font-bold text-slate-400">+{item.calories}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Manual Entry Section */}
-      <div className="pt-4 border-t border-slate-100">
-        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Log Additional Food</h4>
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Flame className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-            <Input 
-              type="number" 
-              placeholder="Enter calories..." 
-              className="pl-9"
-              value={tempInput}
-              onChange={(e) => setTempInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleManualAdd()}
-            />
-          </div>
-          <button 
-            onClick={handleManualAdd}
-            className="bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-800 transition-colors"
-          >
-            <Plus className="h-5 w-5" />
-          </button>
+              />
+              <div className="flex-1">
+                <label htmlFor={item.id} className="font-bold text-slate-800 cursor-pointer">{item.name}</label>
+                <p className="text-xs text-slate-500 mt-1">{item.metadata.message}</p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {Object.entries(item.impact).map(([key, val]) => (
+                    val !== 0 && (
+                      <span key={key} className="text-[10px] bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-600">
+                        +{val}{key === 'calories' ? 'kcal' : 'g'} {key}
+                      </span>
+                    )
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-        {manualCalories > 0 && (
-            <p className="text-xs text-slate-400 mt-2">
-                Manually logged: {manualCalories} kcal today
-            </p>
-        )}
-      </div>
-    </motion.div>
+      </section>
+    </div>
   );
 }

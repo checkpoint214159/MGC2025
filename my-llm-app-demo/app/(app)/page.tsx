@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { fetchTargetStateAction } from "@/lib/actions"
-import { State } from "@/lib/state/schema";
+import { fetchStateAction } from "@/lib/actions"
+import { TargetState } from "@/lib/state/schema";
 import DashboardRenderer from "@/components/recovery/DashboardRenderer";
 
 
@@ -26,10 +26,10 @@ export default function DashboardPage() {
                 }
                 if (!TargetState) {
                     try {
-                        const response = await fetchTargetStateAction();
+                        const response = await fetchStateAction();
                         if (response.success) {
                             // This triggers a re-render so DashboardRenderer gets the data
-                            setTargetState(response.data?.target as State); 
+                            setTargetState(response.data?.target as TargetState); 
                             
                             // Only update session if the flag was missing
                             if (!session.hasTodayState) {

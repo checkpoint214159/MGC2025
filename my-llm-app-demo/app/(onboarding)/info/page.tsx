@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, SessionProvider } from "next-auth/react";
 import { ProfileSchema } from "@/lib/profile/schema"
-
+import { setProfileAction } from "@/lib/actions"
 
 
 export default function OnboardingPage() {
@@ -45,8 +45,9 @@ export default function OnboardingPage() {
       return;
     }
 
-    await setProfile(result.data, session.user.id);
-    
+    await setProfileAction(result.data, session.user.id);
+    await update()
+    router.push("/")
   }
 
   if (loading) {
