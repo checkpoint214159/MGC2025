@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import {fetchStateAction} from "@/lib/actions"
 import RecoveryExerciseRenderer from "./ExerciseWidget"
-import { State } from "@/lib/state/schema";
+import { StateSchema, ExerciseModule, ExerciseProgress } from "@/lib/state/schema";
 
 
 export default async function FitnessPage() {
@@ -10,12 +10,22 @@ export default async function FitnessPage() {
 
   const fetch = await fetchStateAction();
 
-  const target = fetch?.data?.target as State
-  const exerciseTarget = target.modules.exercise
+  const state = StateSchema.parse(fetch.data)
+  const exerciseModule: ExerciseModule = state.exercise
+  const moduleId: string = exerciseModule.id
 
-  const state = fetch?.data?.state as State
-  const exerciseState = state.modules.exercise
-  
+  const fail = () => {
+    return (
+      <div className="p-6 border-2 border-dashed border-slate-200 rounded-xl text-center">
+        <p className="text-slate-500 italic">No progress found. Contact ben and ask him why its all joever</p>
+      </div>
+    );
+  }
+  if (!exerciseModule.progress){
+    return fail()
+  }
+  const exerciseProgress: ExerciseProgress = exerciseModule.progress
+
   // console.log('state?', state.modules.exercise.tasks[0].props)
   // console.log('exerciseTarget?', exerciseTarget.tasks[0].props)
 
@@ -23,22 +33,25 @@ export default async function FitnessPage() {
     <div className="p-8 max-w-5xl mx-auto">
       <header className="mb-8">
         <h1 className="text-2xl font-bold text-slate-900">Exercise Detail</h1>
-        <p className="text-slate-500">{exerciseTarget?.summary}</p>
+        <p className="text-slate-500">{exerciseModule?.summary}</p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {exerciseTarget.tasks.map((task) => {
-          // Find the corresponding tracking state for this specific task
-          const taskProgress = exerciseState.tasks.find(
-            (s: any) => s.id === task.id
+        {exerciseModule.plan.map((part) => {
+          const progressEntry = exerciseProgress.trackables.find(
+            (t) => t.id === part.id
           );
-          console.log('taskProgress in FitnessPage', taskProgress)
-
+          if (!progressEntry){
+            return fail()
+          }
+          const trackable = progressEntry;
+          
           return (
-            <div key={task.id} className="border rounded-xl p-4 bg-white shadow-sm">
+            <div key={part.id} className="border rounded-xl p-4 bg-white shadow-sm">
               <RecoveryExerciseRenderer 
-                task={task} 
-                currentValue={taskProgress?.props.value || 0}
+                task={part} 
+                trackable={trackable}
+                moduleId={moduleId}
                 isPreview={false} 
               />
             </div>

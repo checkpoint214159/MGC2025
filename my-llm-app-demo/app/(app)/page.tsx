@@ -4,13 +4,16 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { fetchStateAction } from "@/lib/actions"
-import { TargetState } from "@/lib/state/schema";
+import { State } from "@/lib/state/schema";
 import DashboardRenderer from "@/components/recovery/DashboardRenderer";
 
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export default function DashboardPage() {
     const router = useRouter();
-    const [TargetState, setTargetState] = useState<State | null>(null);
+    const [state, setState] = useState<State | null>(null);
     const { data: session, status, update } = useSession();
     const [loading, setLoading] = useState(false);
 
@@ -24,12 +27,13 @@ export default function DashboardPage() {
                 if (!session?.user?.profile) {
                     router.push("/info");
                 }
-                if (!TargetState) {
+                if (!state) {
                     try {
                         const response = await fetchStateAction();
+                        console.log('response?>', response)
                         if (response.success) {
                             // This triggers a re-render so DashboardRenderer gets the data
-                            setTargetState(response.data?.target as TargetState); 
+                            setState(response.data as unknown as State); 
                             
                             // Only update session if the flag was missing
                             if (!session.hasTodayState) {
@@ -40,6 +44,7 @@ export default function DashboardPage() {
                         console.error("State fetching failed", error);
                     } finally {
                         setLoading(false);
+                        sleep(5000)
                     }
                 } else {
                     setLoading(false);
@@ -76,7 +81,7 @@ export default function DashboardPage() {
                     </span>
                 </div>
 
-                <DashboardRenderer config={TargetState} />
+                <DashboardRenderer config={state} />
             </section>
             
             {/* Optional: Keep your chat as a "Help" button in the corner */}
