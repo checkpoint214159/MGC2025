@@ -11,22 +11,21 @@ export default function DashboardRenderer({ config }: { config: State | null }) 
       </div>
     );
   }
-  const { modules } = config;
   
   return (
     <div className="grid gap-6">
       {/* explicitly render for now */}
       
-      {modules.exercise && (
+      {config.exercise && (
         <ExercisePreviewCard 
-          data={modules.exercise} 
+          data={config.exercise} 
           onClick={() => redirect('/recovery/exercise')} 
         />
       )}
 
-      {modules.nutrition && (
+      {config.nutrition && (
         <NutritionPreviewCard 
-          data={modules.nutrition} 
+          data={config.nutrition} 
           onClick={() => redirect('/recovery/nutrition')}
         />
       )}

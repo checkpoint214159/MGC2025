@@ -23,7 +23,7 @@ export default function ExercisePreviewCard({ data, onClick }: { data: any, onCl
       {/* Mini Stats Row */}
       <div className="mt-4 flex gap-4">
         <div className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded">
-          {data.tasks.length} Movements
+          {data.plan.length} Movements
         </div>
         <div className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
           Active Recovery

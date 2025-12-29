@@ -1,25 +1,31 @@
 "use client"
 
 import {useState} from "react";
-import { ExerciseTarget } from "@/lib/state/schema"
-import {updateTaskAction} from "@/lib/actions"
+import { ExercisePlan, ExerciseTrackable } from "@/lib/state/schema"
+import { updateProgressAction } from "@/lib/actions"
 import { Progress } from "@/components/ui/progress"
 import { motion, AnimatePresence } from "framer-motion";
 
 interface RendererProps {
-  task: ExerciseTarget;
-  currentValue: number;
+  task: ExercisePlan;
+  trackable: ExerciseTrackable;
+  moduleId: string;
   isPreview?: boolean;
 }
 
 
 export default function RecoveryExerciseRenderer({ 
   task, 
-  currentValue,
+  trackable,
+  moduleId,
   isPreview = false 
 }: RendererProps) {
-  const { id, props } = task;
-  const { name, goal, intensity, unit, precaution } = props;
+  const { id, meta } = task
+  const { name, intensity, unit, precaution } = meta
+  
+  const trackableId = trackable.id
+  const { goal, value } = trackable.trackable.count  // right now only uses count
+  const currentValue = value
   
   const [localValue, setLocalValue] = useState(Number(currentValue) || 0);
   const [isSaving, setIsSaving] = useState(false);
@@ -28,9 +34,15 @@ export default function RecoveryExerciseRenderer({
 
   async function handleSave() {
     setIsSaving(true);
-    const result = await updateTaskAction(task.id, localValue, 'exercise'); // oh yeah hardcoding
+    const result = await updateProgressAction(moduleId, 'exercise', [
+      { 
+        id: trackableId, 
+        trackable: { count: { goal: goal, value: localValue } } 
+      }
+    ]);
     
     if (!result.success) {
+        console.log('error', result.error)
         alert("Failed to save progress. Please check your connection.");
     }
     setIsSaving(false);
