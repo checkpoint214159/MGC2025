@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import {fetchStateAction} from "@/lib/actions"
 import RecoveryExerciseRenderer from "./ExerciseWidget"
-import { StateSchema, ExerciseModule, ExerciseProgress } from "@/lib/state/schema";
+import { StateSchema, ExerciseModule, ExerciseProgress, ExercisePlan } from "@/lib/state/schema";
 
 
 export default async function FitnessPage() {
@@ -9,7 +9,6 @@ export default async function FitnessPage() {
   if (!session) return <p>Access Denied</p>;
 
   const fetch = await fetchStateAction();
-
   const state = StateSchema.parse(fetch.data)
   const exerciseModule: ExerciseModule = state.exercise
   const moduleId: string = exerciseModule.id
@@ -37,19 +36,19 @@ export default async function FitnessPage() {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {exerciseModule.plan.map((part) => {
+        {exerciseModule.plan.map((part: ExercisePlan) => {
           const progressEntry = exerciseProgress.trackables.find(
             (t) => t.id === part.id
           );
           if (!progressEntry){
             return fail()
           }
-          const trackable = progressEntry;
+          const trackable: ExercisePlan = progressEntry;
           
           return (
             <div key={part.id} className="border rounded-xl p-4 bg-white shadow-sm">
               <RecoveryExerciseRenderer 
-                task={part} 
+                plan={part} 
                 trackable={trackable}
                 moduleId={moduleId}
                 isPreview={false} 

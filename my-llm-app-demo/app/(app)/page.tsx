@@ -30,7 +30,6 @@ export default function DashboardPage() {
                 if (!state) {
                     try {
                         const response = await fetchStateAction();
-                        console.log('response?>', response)
                         if (response.success) {
                             // This triggers a re-render so DashboardRenderer gets the data
                             setState(response.data as unknown as State); 
