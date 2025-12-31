@@ -31,6 +31,13 @@ export default function OnboardingPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    if (!session?.user?.id) {
+      console.error("No active session found");
+      router.push("/login");
+      return;
+    }
+
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
