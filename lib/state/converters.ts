@@ -1,9 +1,5 @@
-import { 
-  ExercisePlan,
-  NutritionPlan, NutritionChecklist,
-  NutritionModule,
-  State
-} from "./schema";
+import { ExercisePlan } from "./schemas/exercise";
+import { NutritionPlan, NutritionChecklist } from "./schemas/nutrition"
 
 export function createInitialProgress(plan: (ExercisePlan | NutritionPlan)[]): any {
   return plan.map(part => {
