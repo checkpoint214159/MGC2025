@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { fetchStateAction } from "@/lib/actions"
-import { State } from "@/lib/state/schema";
+import { State } from "@/lib/state/schemas/state";
 import DashboardRenderer from "@/components/recovery/DashboardRenderer";
 
 function sleep(ms: number) {
