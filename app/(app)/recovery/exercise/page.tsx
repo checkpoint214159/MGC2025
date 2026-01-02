@@ -1,7 +1,8 @@
 import { auth } from "@/auth";
 import {fetchStateAction} from "@/lib/actions"
 import RecoveryExerciseRenderer from "./ExerciseWidget"
-import { StateSchema, ExerciseModule, ExerciseProgress, ExercisePlan } from "@/lib/state/schema";
+import { ExerciseModule, ExerciseProgress, ExercisePlan } from "@/lib/state/schemas/exercise";
+import { StateSchema } from "@/lib/state/schemas/state";
 
 
 export default async function FitnessPage() {

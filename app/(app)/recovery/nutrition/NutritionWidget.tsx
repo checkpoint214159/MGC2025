@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react";
-import { NutritionPlan } from "@/lib/state/schema";
+import { NutritionPlan } from "@/lib/state/schemas/nutrition";
 import { updateProgressAction } from "@/lib/actions";
 import { NUTRITION_THEMES } from "@/lib/state/ui";
 import { Progress } from "@/components/ui/progress";

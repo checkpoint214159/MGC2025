@@ -1,8 +1,8 @@
 import { auth } from "@/auth";
 import { fetchStateAction } from "@/lib/actions"
-import { State, StateSchema } from "@/lib/state/schema"
+import { State, StateSchema } from "@/lib/state/schemas/state"
 import NutritionDashboard from "./NutritionWidget"
-import { NutritionModule } from "@/lib/state/schema";
+import { NutritionModule } from "@/lib/state/schemas/nutrition";
 
 
 export default async function NutritionPage() {

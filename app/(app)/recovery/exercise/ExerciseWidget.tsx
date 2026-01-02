@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react";
-import { ExercisePlan, ExerciseMetrics } from "@/lib/state/schema"
+import { ExercisePlan, ExerciseMetrics } from "@/lib/state/schemas/exercise"
 import { updateProgressAction } from "@/lib/actions"
 import { Progress } from "@/components/ui/progress"
 import { motion, AnimatePresence } from "framer-motion";

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { State } from "@/lib/state/schema";
+import { State } from "@/lib/state/schemas/state";
 import ExercisePreviewCard from "@/components/ui/ExercisePreviewCard";
 import NutritionPreviewCard from "@/components/ui/NutritionPreviewCard";
 

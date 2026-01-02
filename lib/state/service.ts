@@ -1,8 +1,7 @@
 // router used to generate new state.
-import { StateBlueprint, StateSchema, State, StateBlueprintSchema } from './schema';
+import { StateBlueprint, StateSchema, State, StateBlueprintSchema } from './schemas/state';
 import { prisma } from "@/lib/prisma";
 import { createInitialProgress, createInitialChecklistState } from "@/lib/state/converters"
-import { CodeSandboxLogoIcon } from '@radix-ui/react-icons';
 import { isDeepStrictEqual } from "util";
 
 const EXAMPLE_WIDGET_OUTPUT: StateBlueprint = {
@@ -12,7 +11,8 @@ const EXAMPLE_WIDGET_OUTPUT: StateBlueprint = {
         {
           "id": "ankles dd-mm-yy",
           "meta": {
-            "name": "ankles",
+            "type": "ankles",
+            "name": "ankles recovery",
             "intensity": "blue",
             "precaution": "Avoid if you feel sharp calf pain."
           },
@@ -25,7 +25,8 @@ const EXAMPLE_WIDGET_OUTPUT: StateBlueprint = {
         {
           "id": "mobility dd-mm-yy",
           "meta": {
-            "name": "mobility",
+            "type": "mobility",
+            "name": "mobility recovery",
             "intensity": "orange",
             "precaution": "Must have a caregiver present."
           },
