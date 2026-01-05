@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { fetchStateAction } from "@/lib/actions"
+import { fetchStateAction } from "@/lib/actions";
 import { State } from "@/lib/state/schemas/state";
 import DashboardRenderer from "@/components/recovery/DashboardRenderer";
+import { useAppDate } from "@/context/DateContext";
+import { DevDateSwitcher } from "@/components/DevDateSwitcher";
 
 function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -13,6 +15,7 @@ function sleep(ms: number) {
 
 export default function DashboardPage() {
     const router = useRouter();
+    const { normalizedDate, isSimulated } = useAppDate(); // Get date from context
     const [state, setState] = useState<State | null>(null);
     const { data: session, status, update } = useSession();
     const [loading, setLoading] = useState(false);
@@ -21,38 +24,46 @@ export default function DashboardPage() {
         const checkState = async () => {
             if (status === "unauthenticated") {
                 router.push("/login");
+                return;
             }
+
             if (status === "authenticated") {
-                console.log('session use profile?', !session?.user?.profile)
                 if (!session?.user?.profile) {
                     router.push("/info");
+                    return;
                 }
-                if (!state) {
-                    try {
-                        const response = await fetchStateAction();
-                        if (response.success) {
-                            // This triggers a re-render so DashboardRenderer gets the data
-                            setState(response.data as unknown as State); 
-                            
-                            // Only update session if the flag was missing
-                            if (!session.hasTodayState) {
-                                await update({});
-                            }
+
+                // IMPORTANT: We now fetch state whenever normalizedDate changes.
+                // We reset the local state to null to force a refresh if the date changes.
+                setLoading(true);
+                try {
+                    // Make sure fetchStateAction is updated to accept a date argument,
+                    // or it uses cookies internally to see the simulated date.
+                    const response = await fetchStateAction(); 
+                    
+                    if (response.success) {
+                        setState(response.data as unknown as State);
+                        
+                        // We check the session flag. Note: 'hasTodayState' logic 
+                        // might need a tweak if you're viewing historical data.
+                        if (!session.hasTodayState && !isSimulated) {
+                            await update({});
                         }
-                    } catch (error) {
-                        console.error("State fetching failed", error);
-                    } finally {
-                        setLoading(false);
-                        sleep(5000)
+                    } else {
+                        setState(null); // No data for this specific date
                     }
-                } else {
+                } catch (error) {
+                    console.error("State fetching failed", error);
+                } finally {
                     setLoading(false);
                 }
             }
-        }
+        };
 
-        checkState()
-    }, [status, session, router, update]);
+        checkState();
+        // Added normalizedDate to the dependency array. 
+        // When you change the date in the switcher, this effect re-runs!
+    }, [status, session, router, update, normalizedDate, isSimulated]);
 
     if (loading) {
         return (
@@ -66,10 +77,22 @@ export default function DashboardPage() {
 
     return (
         <div className="p-8 max-w-5xl mx-auto pb-20">
-            <header className="mb-10">
-                <h1 className="text-3xl font-bold text-gray-900">
-                    Welcome back, {session?.user?.name || "Patient"}
-                </h1>
+            <header className="mb-10 flex justify-between items-start">
+                <div>
+                    <h1 className="text-3xl font-bold text-gray-900">
+                        Welcome back, {session?.user?.name || "Patient"}
+                    </h1>
+                    {/* Display the selected date from context */}
+                    <p className={`text-sm mt-1 font-medium ${isSimulated ? 'text-orange-600' : 'text-gray-500'}`}>
+                        Showing data for: {normalizedDate.toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        })}
+                        {isSimulated && " (Simulated)"}
+                    </p>
+                </div>
             </header>
 
             <section>
@@ -80,16 +103,23 @@ export default function DashboardPage() {
                     </span>
                 </div>
 
-                <DashboardRenderer config={state} />
+                {state ? (
+                    <DashboardRenderer config={state} />
+                ) : (
+                    <div className="text-center p-20 border-2 border-dashed rounded-xl">
+                        <p className="text-gray-400">No records found for this date.</p>
+                    </div>
+                )}
             </section>
             
-            {/* Optional: Keep your chat as a "Help" button in the corner */}
             <button 
                 onClick={() => router.push('/chat')}
-                className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all"
+                className="fixed bottom-6 left-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all z-40"
             >
                 💬 Ask Assistant
             </button>
+
+            <DevDateSwitcher />
         </div>
     );
 }

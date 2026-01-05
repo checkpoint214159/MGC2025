@@ -1,19 +1,31 @@
 import { SessionProvider } from "next-auth/react"
-import './globals.css'; // Assuming this is where your Tailwind CSS is imported
+import { cookies } from 'next/headers';
+import { DateProvider } from '@/context/DateContext';
+import './globals.css';
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    // 1. Get the sticky note (cookie) from the browser
+    const cookieStore = await cookies();
+    const simulatedDate = cookieStore.get('dev-simulated-date')?.value;
+    // 2. Determine the initial date for the whole app
+    const initialDate = simulatedDate || new Date().toISOString();
+
     return (
         <html lang="en">
             <body>
-                {/* This {children} prop will be filled by EITHER:
-                  1. The (app)/layout.tsx (which includes the Sidebar/AuthProvider)
-                  2. OR The (auth)/layout.tsx (which includes the simple auth wrapper)
+                {/* We pass the server-fetched date into the DateProvider.
+                  Now the Client-side context starts with the EXACT same date
+                  the server used to fetch the Session or Prisma data.
                 */}
-                <SessionProvider>{children}</SessionProvider>
+                <DateProvider initialDate={initialDate}>
+                    <SessionProvider>
+                        {children}
+                    </SessionProvider>
+                </DateProvider>
             </body>
         </html>
     );
