@@ -3,6 +3,7 @@ import { StateBlueprint, StateSchema, State, StateBlueprintSchema } from './sche
 import { prisma } from "@/lib/prisma";
 import { createInitialProgress, createInitialChecklistState } from "@/lib/state/converters"
 import { isDeepStrictEqual } from "util";
+import { getNormalizedAppDate } from "@/lib/date-utils"
 
 const EXAMPLE_WIDGET_OUTPUT: StateBlueprint = {
     "exercise": {
@@ -110,11 +111,10 @@ const schema = StateSchema
 export async function getOrGenerateFullState(userId: string) {
   // TODO: make it conditional whether we check for existence of progress, and whether
   // we make it too
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
+    const date = await getNormalizedAppDate(); // Use the utility we made earlier
 
     const existing = await prisma.state.findUnique({
-        where: { userId_dateCreated: { userId, dateCreated: today } },
+        where: { userId_dateCreated: { userId, dateCreated: date } },
         include: {
             exercise: { include: { progress: true } },
             nutrition: { include: { progress: true } }
@@ -123,11 +123,11 @@ export async function getOrGenerateFullState(userId: string) {
 
     if (existing) return existing;
 
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+    const prev_date = new Date(date);
+    prev_date.setDate(prev_date.getDate() - 1);
     
     const prevRecord = await prisma.state.findUnique({
-        where: { userId_dateCreated: { userId, dateCreated: yesterday } },
+        where: { userId_dateCreated: { userId, dateCreated: prev_date } },
         include: { exercise: { include: { progress: true } }, nutrition: { include: { progress: true } } }
     });
 
@@ -139,7 +139,7 @@ export async function getOrGenerateFullState(userId: string) {
     return await prisma.state.create({
         data: {
             userId,
-            dateCreated: today,
+            dateCreated: date,
             exercise: {
                 create: {
                     summary: generatedPlan.exercise.summary,

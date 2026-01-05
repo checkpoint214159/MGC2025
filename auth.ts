@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import { prisma } from "@/lib/prisma";
 const bcrypt = require("bcryptjs");
 import Credentials from "next-auth/providers/credentials";
+import { getNormalizedAppDate } from "@/lib/date-utils"
 
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -39,8 +40,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
             if (token?.id) {
                 if (!token.userProfile || trigger === "update") {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
+                    const today = await getNormalizedAppDate();
+
                     console.log("Querying for:", { id: token.id, date: today });
                     const [stateRecord, dbUser] = await Promise.all([
                         prisma.state.findUnique({
