@@ -88,3 +88,12 @@ model NutritionProgress {
   trackables  Json
   checklistState Json?
 }
+
+model Interaction {
+  
+}
+
+
+model QuestionHistory {
+  id          String          @id @default(cuid())
+}

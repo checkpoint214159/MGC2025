@@ -96,7 +96,7 @@ export default function OnboardingPage() {
           type="submit" 
           className="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
         >
-          Generate My Plan
+          Submit
         </button>
       </form>
     </div>
