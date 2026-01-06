@@ -9,19 +9,33 @@ const BaseQuestionSchema = z.object({
     intent: z.string(),
     reasoning: z.string(),
     urgency: z.boolean().default(false)
-  })
+  }),
+
 });
+
+const BaseAnswerSchema = z.object({
+  id: z.string(),
+  answerText: z.string()
+})
 
 const AnswerResponsePair = z.object({
   id: z.string(),
-  question: BaseQuestionSchema,
-  answer: 
+  question: BaseQuestionSchema.optional(),
+  answer: BaseAnswerSchema.optional(),
 })
 
-const BaseQuestionFieldSchema = z.object({
+
+const BaseChainSchema = z.object({
   id: z.string(),
-  
+  chain: z.array(AnswerResponsePair),
 })
+
+const BaseChatSchema = z.object({
+  id: z.string(),
+  chat: z.array(BaseChainSchema)
+})
+
+
 
 export const BaseRAGSchema = z.object({
   content: z.string(),
