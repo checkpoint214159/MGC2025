@@ -29,7 +29,6 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  states    State[]
 }
 
 model State {
@@ -37,12 +36,21 @@ model State {
   userId       String
   dateCreated  DateTime @db.Date @default(now())
 
-  user      User @relation(fields:[userId], references:[id])
+  isActive      Boolean?
+
+  user      User @relation(fields:[userId], references:[id], onDelete: Cascade)
   
+  causalStateId String?  @unique
+  causalState   State?   @relation("StateHistory", fields: [causalStateId], references: [id])
+  nextState     State?   @relation("StateHistory") // Back-relation for Prisma
+  
+  causalXId     String?  @unique
+  causalX       External? @relation(fields: [causalXId], references: [id])
+
   exercise     ExerciseModule?
   nutrition    NutritionModule?
 
-  @@unique([userId, dateCreated])
+  @@unique([userId, dateCreated, isActive])
 }
 
 // --- EXERCISE ---
@@ -60,7 +68,7 @@ model ExerciseModule {
 model ExerciseProgress {
   id          String         @id @default(cuid())
   moduleId    String         @unique
-  module      ExerciseModule @relation(fields: [moduleId], references: [id])
+  module      ExerciseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   
   summary     String?
   trackables  Json
@@ -70,7 +78,7 @@ model ExerciseProgress {
 model NutritionModule {
   id          String    @id @default(cuid())
   stateId     String    @unique
-  state       State @relation(fields: [stateId], references: [id])
+  state       State @relation(fields: [stateId], references: [id], onDelete: Cascade)
   
   summary     String?
   plan       Json      
@@ -82,18 +90,58 @@ model NutritionModule {
 model NutritionProgress {
   id          String          @id @default(cuid())
   moduleId    String         @unique
-  module      NutritionModule @relation(fields: [moduleId], references: [id])
+  module      NutritionModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   
   summary     String?
   trackables  Json
   checklistState Json?
 }
 
-model Interaction {
-  
-}
 
-
-model QuestionHistory {
+model External {
+  // TODO: add other fields, right now only houses threadContext
   id          String          @id @default(cuid())
+  dateCreated DateTime @db.Date @default(now())
+
+  // here maybe some field for doctor input / update / advice / check-in
+  // doctorMessage String?
+
+  threadContext Json   // redundancy but safety. we aren't looking at mutable threads 
+  
+  messageCount Int?
+  threadCount  Int?
+
+  state        State?
 }
+
+model Thread {
+  // MUTABLE. should not be directly consumed by immutables like External
+  // since this will lead to versioning issues
+  id        String   @id @default(cuid())
+  userId    String
+  title     String?  // e.g., "Post-Op Onboarding" or "Daily Symptom Log"
+  type      String   // 'onboarding', 'chat', 'doctor_note'
+  
+  user      User     @relation(fields: [userId], references: [id])
+  messages  Message[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  creationSource    String   // e.g created by what component, by onboarding? chat?  etc
+  threadId  String
+  role      String   // 'user' | 'assistant' | 'system'
+  content   String   
+  
+  context  Json?    
+  
+  // explainability?
+  reasoning String?  
+
+  thread    Thread   @relation(fields: [threadId], references: [id])
+  createdAt DateTime @default(now())
+
+}
+
