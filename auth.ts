@@ -45,9 +45,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     console.log("Querying for:", { id: token.id, date: today });
                     const [stateRecord, dbUser] = await Promise.all([
                         prisma.state.findUnique({
-                            where: { userId_dateCreated: {
+                            where: { userId_dateCreated_isActive: {
                                 userId: token.id as string,
                                 dateCreated: today,
+                                isActive: true,
                             } }
                         }),
                         prisma.user.findUnique({

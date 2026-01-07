@@ -2,8 +2,10 @@
 
 import { auth } from "@/auth";
 import { getOrGenerateFullState, updateModuleProgress } from "@/lib/state/service";
-import { ProfileInput } from "@/lib/profile/schema";
+import { Biometrics, ProfileInput } from "@/lib/profile/schema";
 import { setProfile } from "@/lib/profile/generate"
+import { getExistingOnboardingData, setBiometric, updateThread } from "./llm/service";
+import { Message } from "./external/schemas/message";
 
 
 export async function setProfileAction(data: ProfileInput, userId: string) {
@@ -11,15 +13,11 @@ export async function setProfileAction(data: ProfileInput, userId: string) {
 }
 
 export async function fetchStateAction() {
-    // try {
-        const session = await auth();
-        if (!session?.user?.id) throw new Error("Unauthorized");
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
 
-        const data = await getOrGenerateFullState(session.user.id);
-        return { success: true, data: data };
-    // } catch (e) {
-    //     return { success: false, error: "Failed to fetch state" };
-    // }
+  const data = await getOrGenerateFullState(session.user.id);
+  return { success: true, data: data };
 }
 
 export async function updateProgressAction(
@@ -34,4 +32,21 @@ export async function updateProgressAction(
   } catch (e: any) {
     return { success: false, error: e.message };
   }
+}
+
+export async function updateBiometricsAction(userId: string, bio: Biometrics) {
+  return setBiometric(userId, bio)
+}
+
+export async function getOnBoardingAction(userId: string) {
+  return getExistingOnboardingData(userId)
+}
+
+export async function updateThreadAction({ userId, threadId, threadType, messages }: {
+  userId: string;
+  threadId: string | null;
+  threadType: string | null;
+  messages: Message[];
+}) {
+  return updateThread(userId, threadId, threadType, messages)
 }

@@ -7,6 +7,12 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  user
+  assistant
+  system
+}
+
 model Account {
   id       String @id @default(cuid())
   
@@ -20,15 +26,30 @@ model Account {
 model User {
   id        String  @id @default(cuid())
   name      String
-  age       Int?
-  sex       String?
-  treatment String?
+  
+  biometric Biometrics?
   profile   String? // LLM generated profile
 
   account   Account?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  states    State[]
+  threads   Thread[]
+}
+
+// update this on the fly
+model Biometrics {
+  id        String  @id @default(cuid())
+  age       Int
+  sex       String
+  treatment String
+  surgeryDate  DateTime
+  // weightKg  Decimal
+  // heightCm  Decimal
+
+  userId    String  @unique
+  user      User @relation(fields:[userId], references:[id], onDelete: Cascade)
 }
 
 model State {
@@ -42,6 +63,7 @@ model State {
   
   causalStateId String?  @unique
   causalState   State?   @relation("StateHistory", fields: [causalStateId], references: [id])
+  nextStateId   String?  @unique
   nextState     State?   @relation("StateHistory") // Back-relation for Prisma
   
   causalXId     String?  @unique
@@ -132,7 +154,7 @@ model Message {
   id        String   @id @default(cuid())
   creationSource    String   // e.g created by what component, by onboarding? chat?  etc
   threadId  String
-  role      String   // 'user' | 'assistant' | 'system'
+  role      Role   // 'user' | 'assistant' | 'system'
   content   String   
   
   context  Json?    

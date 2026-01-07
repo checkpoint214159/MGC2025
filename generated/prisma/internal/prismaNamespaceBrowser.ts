@@ -53,11 +53,15 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Account: 'Account',
   User: 'User',
+  Biometrics: 'Biometrics',
   State: 'State',
   ExerciseModule: 'ExerciseModule',
   ExerciseProgress: 'ExerciseProgress',
   NutritionModule: 'NutritionModule',
-  NutritionProgress: 'NutritionProgress'
+  NutritionProgress: 'NutritionProgress',
+  External: 'External',
+  Thread: 'Thread',
+  Message: 'Message'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -89,9 +93,6 @@ export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeo
 export const UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  age: 'age',
-  sex: 'sex',
-  treatment: 'treatment',
   profile: 'profile',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -100,10 +101,26 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const BiometricsScalarFieldEnum = {
+  id: 'id',
+  age: 'age',
+  sex: 'sex',
+  treatment: 'treatment',
+  surgeryDate: 'surgeryDate',
+  userId: 'userId'
+} as const
+
+export type BiometricsScalarFieldEnum = (typeof BiometricsScalarFieldEnum)[keyof typeof BiometricsScalarFieldEnum]
+
+
 export const StateScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  dateCreated: 'dateCreated'
+  dateCreated: 'dateCreated',
+  isActive: 'isActive',
+  causalStateId: 'causalStateId',
+  nextStateId: 'nextStateId',
+  causalXId: 'causalXId'
 } as const
 
 export type StateScalarFieldEnum = (typeof StateScalarFieldEnum)[keyof typeof StateScalarFieldEnum]
@@ -149,6 +166,43 @@ export const NutritionProgressScalarFieldEnum = {
 } as const
 
 export type NutritionProgressScalarFieldEnum = (typeof NutritionProgressScalarFieldEnum)[keyof typeof NutritionProgressScalarFieldEnum]
+
+
+export const ExternalScalarFieldEnum = {
+  id: 'id',
+  dateCreated: 'dateCreated',
+  threadContext: 'threadContext',
+  messageCount: 'messageCount',
+  threadCount: 'threadCount'
+} as const
+
+export type ExternalScalarFieldEnum = (typeof ExternalScalarFieldEnum)[keyof typeof ExternalScalarFieldEnum]
+
+
+export const ThreadScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  type: 'type',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ThreadScalarFieldEnum = (typeof ThreadScalarFieldEnum)[keyof typeof ThreadScalarFieldEnum]
+
+
+export const MessageScalarFieldEnum = {
+  id: 'id',
+  creationSource: 'creationSource',
+  threadId: 'threadId',
+  role: 'role',
+  content: 'content',
+  context: 'context',
+  reasoning: 'reasoning',
+  createdAt: 'createdAt'
+} as const
+
+export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
 
 
 export const SortOrder = {

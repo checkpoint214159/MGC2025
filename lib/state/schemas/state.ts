@@ -13,6 +13,11 @@ export const StateSchema = z.object({
   id: z.string(),
   userId: z.string(),
   dateCreated: z.coerce.date(),
+
+  causalStateId: z.string().optional(),
+  causalXId: z.string().optional(),
+  nextStateId: z.string().optional(),
+
   exercise: ExerciseModuleSchema,
   nutrition: NutritionModuleSchema,
 });
