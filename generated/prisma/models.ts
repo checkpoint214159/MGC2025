@@ -10,9 +10,13 @@
  */
 export type * from './models/Account'
 export type * from './models/User'
+export type * from './models/Biometrics'
 export type * from './models/State'
 export type * from './models/ExerciseModule'
 export type * from './models/ExerciseProgress'
 export type * from './models/NutritionModule'
 export type * from './models/NutritionProgress'
+export type * from './models/External'
+export type * from './models/Thread'
+export type * from './models/Message'
 export type * from './commonInputTypes'

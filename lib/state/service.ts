@@ -1,4 +1,7 @@
-// router used to generate new state.
+/**
+ * Houses functionality to get, set and update progress of State.
+ * Also to convert state
+ */
 import { StateBlueprint, StateSchema, State, StateBlueprintSchema } from './schemas/state';
 import { prisma } from "@/lib/prisma";
 import { createInitialProgress, createInitialChecklistState } from "@/lib/state/converters"
@@ -111,10 +114,10 @@ const schema = StateSchema
 export async function getOrGenerateFullState(userId: string) {
   // TODO: make it conditional whether we check for existence of progress, and whether
   // we make it too
-    const date = await getNormalizedAppDate(); // Use the utility we made earlier
+    const date = await getNormalizedAppDate();
 
     const existing = await prisma.state.findUnique({
-        where: { userId_dateCreated: { userId, dateCreated: date } },
+        where: { userId_dateCreated_isActive: { userId, dateCreated: date, isActive: true } },
         include: {
             exercise: { include: { progress: true } },
             nutrition: { include: { progress: true } }
@@ -127,15 +130,12 @@ export async function getOrGenerateFullState(userId: string) {
     prev_date.setDate(prev_date.getDate() - 1);
     
     const prevRecord = await prisma.state.findUnique({
-        where: { userId_dateCreated: { userId, dateCreated: prev_date } },
+        where: { userId_dateCreated_isActive: { userId, dateCreated: date, isActive: true } },
         include: { exercise: { include: { progress: true } }, nutrition: { include: { progress: true } } }
     });
 
     const [ generatedPlan ] = await LLMGenerateState(prevRecord as any, null, userId);
 
-
-    // create everything in one transaction
-    // TODO this should be a seperate function? as in the messy accessing of nested things
     return await prisma.state.create({
         data: {
             userId,
@@ -175,11 +175,10 @@ export async function getOrGenerateFullState(userId: string) {
 type ModuleType = 'exercise' | 'nutrition';
 
 export async function getModule(userId: string, type: ModuleType) {
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
+  const date = await getNormalizedAppDate();
 
   const stateRecord = await prisma.state.findUnique({
-    where: { userId_dateCreated: { userId, dateCreated: today } },
+    where: { userId_dateCreated_isActive: { userId, dateCreated: date, isActive: true } },
     select: { id: true }
   });
 
@@ -215,7 +214,7 @@ export async function updateModuleProgress(
 ) {
   const delegateProgress = ProgressActions[type] as any;
 
-  // 1. Fetch current state
+  // 1. fetch current state
   const currentRecord = await delegateProgress.findUnique({
     where: { moduleId },
   });
@@ -228,7 +227,6 @@ export async function updateModuleProgress(
   const updatedTrackables = currentTrackables.map((existing) => {
     const update = updates.find((u) => u.id === existing.id);
     if (update) {
-      console.log('this has changes, updating:', existing.trackables, update.data)
       return { ...existing, data: update.data };
     }
     return existing;
@@ -243,8 +241,7 @@ export async function updateModuleProgress(
   if (invalidIds.length > 0) {
     throw new Error(`Invalid trackable IDs: ${invalidIds.join(", ")}`);
   }
-  
-  // 4. Save only if changed
+
   if (isDeepStrictEqual(currentTrackables, updatedTrackables)) return currentRecord;
 
   return await delegateProgress.update({

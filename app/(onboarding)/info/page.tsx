@@ -1,104 +1,190 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, SessionProvider } from "next-auth/react";
-import { ProfileSchema } from "@/lib/profile/schema"
-import { setProfileAction } from "@/lib/actions"
+import { BaseQuestion, BaseUserResponse } from "@/lib/llm/schemas/base"; // The Zod schema we built earlier
+import { Biometrics, Baseline, BiometricsSchema } from "@/lib/profile/schema";
+import { Thread, ThreadSchema } from "@/lib/external/schemas/thread";
+import { convertQuestionToMessage, convertResponseToMessage } from "@/lib/external/schemas/message";
+import { BiometricsForm } from "./BiometricsForm"
+import { DynamicQuestionCard } from "./QuestionCard"
+import { getInitialLLMQuestion, getNextLLMQuestion } from "@/lib/llm/service";
+import { 
+  updateBiometricsAction, 
+  getOnBoardingAction, 
+  updateThreadAction 
+} from "@/lib/actions";
 
 
-export default function OnboardingPage() {
+export default function OnboardingFlow() {
   const { data: session, status, update } = useSession();
-  const [loading, setLoading] = useState(false);
+
+  const [biometrics, setBiometrics] = useState<Biometrics | null>(null);
+  const [thread, setThread] = useState<Thread | null>()
+  
+  const [currentQuestion, setCurrentQuestion] = useState<BaseQuestion | null>(null);
+
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  
   const router = useRouter();
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
+  const loadPersistedData = useCallback(async () => {
+    if (!session?.user?.id) return;
 
-  if (status === "loading" || loading) {
+    try {
+      const data = await getOnBoardingAction(session.user.id);
+      
+      if (data.biometrics) {
+        setBiometrics(BiometricsSchema.parse(data.biometrics));
+      }
+      
+      if (data.activeThread) {
+        setThread(ThreadSchema.parse(data.activeThread))
+        // TODO wait we store msg as context?
+        // Find the last assistant message to reconstruct the current question
+        // const lastAssistantMsg = [...data.activeThread.messages]
+        //   .reverse()
+        //   .find(m => m.role === 'assistant');
+        
+        // if (lastAssistantMsg) {
+          // In a real app, you might want the LLM to re-generate the Question object 
+          // or store the Question object in the Message 'context' JSON field
+          // setCurrentQuestion(lastAssistantMsg.context as BaseQuestion);
+        // }
+      }
+    } catch (e) {
+      console.error("Failed to recover session", e);
+    } finally {
+      setIsInitializing(false);
+    }
+  }, [session?.user?.id]);
+
+  if (status === "unauthenticated") {
+    router.push("/login");
+    return;
+  }
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      loadPersistedData();
+    }
+  }, [status, loadPersistedData]);
+
+  // TODO: integrate baseline here
+  async function submitBio(bio: Biometrics) {
+    setBiometrics(bio)
+    setIsAiLoading(true)
+    
+    const userId = session?.user?.id!
+    const updatedBio = await updateBiometricsAction(userId, bio)
+    setBiometrics(BiometricsSchema.parse(updatedBio))
+
+    const newThread = await updateThreadAction({
+      userId: userId,
+      threadId: thread?.id ?? null,
+      threadType: 'onboarding',
+      messages: []
+    });
+
+    const q1 = await getInitialLLMQuestion(updatedBio) 
+    const q1Message = convertQuestionToMessage(q1, newThread.id, 'onboarding')
+
+    const updated = await updateThreadAction({
+      userId: userId,
+      threadId: newThread.id,
+      threadType: 'onboarding',
+      messages: [q1Message]
+    });
+    // inits thread object, replace this with a service call
+    
+    setThread(updated);
+    setCurrentQuestion(q1);
+    setIsAiLoading(false);
+  }
+
+
+  async function nextQuestion(answer: string) {
+    if (!thread || !biometrics || !session?.user?.id) return;
+    setIsAiLoading(true)
+    
+    const userId = session?.user?.id!
+    
+    const userMsg = convertResponseToMessage(answer, thread.id, 'onboarding')
+    let updated = await updateThreadAction({
+      userId: userId,
+      threadId: thread.id,
+      threadType: 'onboarding',
+      messages: [userMsg]
+    });
+    console.log('thread??', updated)
+    const nextQn = await getNextLLMQuestion(biometrics, updated) 
+    const nextMsg = convertQuestionToMessage(nextQn, updated.id, 'onboarding')
+    updated = await updateThreadAction({
+      userId: userId,
+      threadId: updated.id,
+      threadType: 'onboarding',
+      messages: [nextMsg]
+    });
+    
+    setThread(updated)
+    setCurrentQuestion(nextQn)
+    setIsAiLoading(false);
+  }
+
+  if (status === "loading" || isAiLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
         <h2 className="text-xl font-semibold">
-          {status === "loading" ? "Checking Session..." : "Analyzing Treatment Protocol..."}
+          {status === "loading" ? "Checking Session..." : "Interpreting your response..."}
         </h2>
       </div>
     );
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    if (!session?.user?.id) {
-      console.error("No active session found");
-      router.push("/login");
-      return;
-    }
-
-    setLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const result = ProfileSchema.safeParse({
-      age: formData.get("age"),
-      sex: formData.get("sex"),
-      treatment: formData.get("treatment"),
-    });
-    
-    if (!result.success) {
-      console.error(result.error);
-      return;
-    }
-
-    await setProfileAction(result.data, session.user.id);
-    await update()
-    router.push("/")
-  }
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-        <h2 className="text-xl font-semibold">Analyzing Treatment Protocol...</h2>
-        <p className="text-gray-500">Creating your personalized aftercare dashboard.</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-md w-full p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
-      <h1 className="text-2xl font-bold mb-6">Patient Onboarding</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Age</label>
-          <input name="age" type="number" required className="mt-1 w-full p-2 border rounded-md" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Sex</label>
-          <select name="sex" className="mt-1 w-full p-2 border rounded-md">
-            <option>Male</option>
-            <option>Female</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Treatment / Surgery</label>
-          <input 
-            name="treatment" 
-            placeholder="e.g. Colorectal Surgery" 
-            required 
-            className="mt-1 w-full p-2 border rounded-md" 
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6">
+      {!biometrics ? (
+        <BiometricsForm onComplete={submitBio} />
+      ) : (
+        <div className="w-full max-w-lg space-y-6">
+          {/* Progress / History visualizer */}
+          <div className="flex gap-1 justify-center">
+            {(thread?.messages ?? [])
+              .filter(m => m.role === 'assistant')
+              .map((_, i) => (
+                <div key={i} className="h-1 w-8 rounded bg-blue-600" />
+              ))
+            }
+          </div>
+
+          <DynamicQuestionCard 
+            question={currentQuestion} 
+            onAnswer={nextQuestion} 
+            loading={isAiLoading} 
           />
         </div>
-        <button 
-          type="submit" 
-          className="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-        >
-          Submit
-        </button>
-      </form>
+      )}
+    </div>
+  );
+}
+
+
+function LoadingScreen({ message }: { message: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+      <h2 className="text-xl font-semibold">{message}</h2>
+    </div>
+  );
+}
+
+function LoadingOverlay() {
+  return (
+    <div className="fixed inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-center justify-center">
+       <div className="animate-bounce text-blue-600 font-bold">AI is thinking...</div>
     </div>
   );
 }

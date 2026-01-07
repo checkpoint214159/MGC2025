@@ -28,6 +28,11 @@ export type Account = Prisma.AccountModel
  */
 export type User = Prisma.UserModel
 /**
+ * Model Biometrics
+ * 
+ */
+export type Biometrics = Prisma.BiometricsModel
+/**
  * Model State
  * 
  */
@@ -52,3 +57,18 @@ export type NutritionModule = Prisma.NutritionModuleModel
  * 
  */
 export type NutritionProgress = Prisma.NutritionProgressModel
+/**
+ * Model External
+ * 
+ */
+export type External = Prisma.ExternalModel
+/**
+ * Model Thread
+ * 
+ */
+export type Thread = Prisma.ThreadModel
+/**
+ * Model Message
+ * 
+ */
+export type Message = Prisma.MessageModel

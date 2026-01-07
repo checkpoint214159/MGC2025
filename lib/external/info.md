@@ -1,0 +1,1 @@
+This folder is used for the overall semantic of Externals: Basically anything that is outside of the otherwise closed-loop system of recurrent state generation. This includes things like dynamic user responses, chat histories, doctor feedback, etc etc.
