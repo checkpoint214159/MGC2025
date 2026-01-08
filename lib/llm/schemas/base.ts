@@ -2,19 +2,21 @@ import z from "zod"
 
 // TODO: union or merge this with a Message? seems a lot more practical...
 // but then again these are blueprints for our llm.
-export const BaseQuestionSchema = z.object({
-  id: z.string(),
-  questionText: z.string(),
-  inputType: z.enum(['text', 'slider', 'choice', 'date', 'terminateQuestioning']),
-  options: z.array(z.string()).optional(),
-  metadata: z.object({
+export const BaseQuestionMetadataSchema = z.object({
     intent: z.string(),
     reasoning: z.string().optional(),
     urgency: z.boolean().default(false),
     sliderMin: z.number().default(0),
     sliderMax: z.number().default(10),
     sliderLabels: z.array(z.string()).optional()
-  }),
+})
+
+export const BaseQuestionSchema = z.object({
+  id: z.string().optional().nullable(),
+  questionText: z.string(),
+  inputType: z.enum(['text', 'slider', 'choice', 'date', 'terminateQuestioning']),
+  options: z.array(z.string()).optional(),
+  metadata: BaseQuestionMetadataSchema, 
 });
 
 export const BaseUserResponseSchema = z.object({
@@ -28,8 +30,8 @@ export const BaseUserResponseSchema = z.object({
 //   answer: BaseUserResponseSchema.optional(),
 // })
 
-
 export type BaseQuestion = z.infer<typeof BaseQuestionSchema>
+export type BaseQuestionMetadata = z.infer<typeof BaseQuestionMetadataSchema>
 export type BaseUserResponse = z.infer<typeof BaseUserResponseSchema>
 
 

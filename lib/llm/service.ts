@@ -5,7 +5,7 @@ import { generateObject } from 'ai';
 import { BaseQuestionSchema, type BaseQuestion } from '@/lib/llm/schemas/base';
 import { Thread } from '@/lib/external/schemas/thread';
 import { Biometrics } from "@/lib/profile/schema";
-import { Message } from "@/lib/external/schemas/message";
+import { BaseMessage } from "@/lib/external/schemas/message";
 
 // The "Medical Brain" System Prompt
 const SYSTEM_PROMPT = `
@@ -126,7 +126,7 @@ export async function updateThread(
   userId: string,
   threadId: string | null,
   threadType: string | null = null,
-  messages: Message[] = [],
+  messages: BaseMessage[] = [],
 ) {
   const messageCreateData = messages.map((msg) => ({
     role: msg.role as MessageRole,
