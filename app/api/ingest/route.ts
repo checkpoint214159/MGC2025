@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
-import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { PineconeStore } from "@langchain/pinecone";
 import { Pinecone } from "@pinecone-database/pinecone";
 
-// Set max duration for Long-running jobs (like embedding 50 pages)
+// set max duration for long-running jobs (e.g. embedding 50 pages)
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
@@ -22,19 +22,18 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "No surgery type provided" }, { status: 400 });
         }
 
-        // 1. Load PDF
+        // 1. load pdf
         const loader = new PDFLoader(file);
         const docs = await loader.load();
 
-        // 2. Split Text (Chunking)
-        // Overlap is crucial for maintaining context across boundaries
+        // 2. split text (chunking), overlap crucial for maintaining context across boundaries
         const splitter = new RecursiveCharacterTextSplitter({
             chunkSize: 1000,
             chunkOverlap: 200,
         });
         const splitDocs = await splitter.splitDocuments(docs);
 
-        // 3. Add Metadata
+        // 3. add metadata
         const taggedDocs = splitDocs.map((doc: any) => {
             doc.metadata = {
                 ...doc.metadata,
@@ -45,7 +44,7 @@ export async function POST(req: NextRequest) {
             return doc;
         });
 
-        // 4. Embed & Store in Pinecone
+        // 4. embed & store in Pinecone
         const pinecone = new Pinecone({
             apiKey: process.env.PINECONE_API_KEY!,
         });
