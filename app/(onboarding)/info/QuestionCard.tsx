@@ -83,11 +83,11 @@ export function DynamicQuestionCard({ question, onAnswer, loading }: {
               className="w-full h-3 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
             
-            {/* <div className="flex justify-between text-[10px] font-bold text-slate-400 px-1 uppercase tracking-widest">
+            <div className="flex justify-between text-[10px] font-bold text-slate-400 px-1 uppercase tracking-widest">
               <span>{question.metadata.labels?.[0] ?? "Low"}</span>
               <span>{question.metadata.labels?.[1] ?? "Moderate"}</span>
               <span>{question.metadata.labels?.[2] ?? "High"}</span>
-            </div> */}
+            </div>
 
             <button 
               onClick={() => onAnswer(sliderValue.toString())}

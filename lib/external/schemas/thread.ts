@@ -1,5 +1,5 @@
 import z from "zod"
-import { MessageSchema } from "./message";
+import { BaseMessageSchema } from "./message";
 
 export const ThreadSchema = z.object({
   id: z.string(),
@@ -8,7 +8,7 @@ export const ThreadSchema = z.object({
   title: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-  messages: z.array(MessageSchema).optional()
+  messages: z.array(BaseMessageSchema).optional()
 });
 
 export const ThreadContextSchema = z.array(ThreadSchema)

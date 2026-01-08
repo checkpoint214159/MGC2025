@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, SessionProvider } from "next-auth/react";
-import { BaseQuestion, BaseUserResponse } from "@/lib/llm/schemas/base"; // The Zod schema we built earlier
+import { BaseQuestion, BaseQuestionSchema, BaseUserResponse } from "@/lib/llm/schemas/base"; // The Zod schema we built earlier
 import { Biometrics, Baseline, BiometricsSchema } from "@/lib/profile/schema";
 import { Thread, ThreadSchema } from "@/lib/external/schemas/thread";
-import { convertQuestionToMessage, convertResponseToMessage } from "@/lib/external/schemas/message";
+import { AssistantMessageSchema, convertMessageToQuestion, convertQuestionToMessage, convertResponseToMessage } from "@/lib/external/schemas/message";
 import { BiometricsForm } from "./BiometricsForm"
 import { DynamicQuestionCard } from "./QuestionCard"
 import { getInitialLLMQuestion, getNextLLMQuestion } from "@/lib/llm/service";
@@ -33,33 +33,32 @@ export default function OnboardingFlow() {
   const loadPersistedData = useCallback(async () => {
     if (!session?.user?.id) return;
 
-    try {
-      const data = await getOnBoardingAction(session.user.id);
-      
-      if (data.biometrics) {
-        setBiometrics(BiometricsSchema.parse(data.biometrics));
-      }
-      
-      if (data.activeThread) {
-        setThread(ThreadSchema.parse(data.activeThread))
-        // TODO wait we store msg as context?
-        // Find the last assistant message to reconstruct the current question
-        // const lastAssistantMsg = [...data.activeThread.messages]
-        //   .reverse()
-        //   .find(m => m.role === 'assistant');
-        
-        // if (lastAssistantMsg) {
-          // In a real app, you might want the LLM to re-generate the Question object 
-          // or store the Question object in the Message 'context' JSON field
-          // setCurrentQuestion(lastAssistantMsg.context as BaseQuestion);
-        // }
-      }
-    } catch (e) {
-      console.error("Failed to recover session", e);
-    } finally {
-      setIsInitializing(false);
+    const data = await getOnBoardingAction(session.user.id);
+    console.log('data??', data)
+    
+    if (data.biometrics) {
+      setBiometrics(BiometricsSchema.parse(data.biometrics));
     }
+    
+    if (data.activeThread) {
+      const validThread  = ThreadSchema.parse(data.activeThread)
+      setThread(validThread)
+
+      const lastAssistantMsg = [...validThread.messages ?? []]
+        .reverse()
+        .find(m => m.role === 'assistant');
+
+      const validatedAssistantMsg = AssistantMessageSchema.parse(lastAssistantMsg)
+      const question = convertMessageToQuestion(validatedAssistantMsg)
+      console.log('question?', question)
+      const validatedQuestion = BaseQuestionSchema.parse(question)
+      console.log('validatedQuestion', validatedQuestion)
+      setCurrentQuestion(validatedQuestion)
+    }
+
   }, [session?.user?.id]);
+
+
 
   if (status === "unauthenticated") {
     router.push("/login");
@@ -81,6 +80,9 @@ export default function OnboardingFlow() {
     const updatedBio = await updateBiometricsAction(userId, bio)
     setBiometrics(BiometricsSchema.parse(updatedBio))
 
+    const q1 = await getInitialLLMQuestion(updatedBio) 
+    const q1Message = convertQuestionToMessage(q1, thread?.id ?? null, 'onboarding')
+
     const newThread = await updateThreadAction({
       userId: userId,
       threadId: thread?.id ?? null,
@@ -88,9 +90,7 @@ export default function OnboardingFlow() {
       messages: []
     });
 
-    const q1 = await getInitialLLMQuestion(updatedBio) 
-    const q1Message = convertQuestionToMessage(q1, newThread.id, 'onboarding')
-
+    
     const updated = await updateThreadAction({
       userId: userId,
       threadId: newThread.id,
@@ -144,9 +144,10 @@ export default function OnboardingFlow() {
     );
   }
 
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6">
-      {!biometrics ? (
+      {!biometrics || !thread ? (
         <BiometricsForm onComplete={submitBio} />
       ) : (
         <div className="w-full max-w-lg space-y-6">

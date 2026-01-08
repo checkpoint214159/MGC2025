@@ -5,7 +5,7 @@ import { getOrGenerateFullState, updateModuleProgress } from "@/lib/state/servic
 import { Biometrics, ProfileInput } from "@/lib/profile/schema";
 import { setProfile } from "@/lib/profile/generate"
 import { getExistingOnboardingData, setBiometric, updateThread } from "./llm/service";
-import { Message } from "./external/schemas/message";
+import { BaseMessage } from "./external/schemas/message";
 
 
 export async function setProfileAction(data: ProfileInput, userId: string) {
@@ -46,7 +46,7 @@ export async function updateThreadAction({ userId, threadId, threadType, message
   userId: string;
   threadId: string | null;
   threadType: string | null;
-  messages: Message[];
+  messages: BaseMessage[];
 }) {
   return updateThread(userId, threadId, threadType, messages)
 }
