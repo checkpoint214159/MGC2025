@@ -58,8 +58,6 @@ export default function OnboardingFlow() {
 
   }, [session?.user?.id]);
 
-
-
   if (status === "unauthenticated") {
     router.push("/login");
     return;
@@ -70,6 +68,23 @@ export default function OnboardingFlow() {
       loadPersistedData();
     }
   }, [status, loadPersistedData]);
+
+  
+  useEffect(() => {
+    const generateProfile = async () => {
+      if (currentQuestion?.inputType === 'terminateQuestioning') {
+        try {
+          await generateUserProfile(session?.user?.id!, thread);
+
+          router.push('/')
+        } catch (error) {
+          console.error("Finalization failed:", error);
+        }
+      }
+    }
+
+    generateProfile()
+  }, [currentQuestion, thread, session, router])
 
   // TODO: integrate baseline here
   async function submitBio(bio: Biometrics) {
@@ -104,7 +119,6 @@ export default function OnboardingFlow() {
     setIsAiLoading(false);
   }
 
-
   async function nextQuestion(answer: string) {
     if (!thread || !biometrics || !session?.user?.id) return;
     setIsAiLoading(true)
@@ -118,7 +132,6 @@ export default function OnboardingFlow() {
       threadType: 'onboarding',
       messages: [userMsg]
     });
-    console.log('thread??', updated)
     const nextQn = await getNextLLMQuestion(biometrics, updated) 
     const nextMsg = convertQuestionToMessage(nextQn, updated.id, 'onboarding')
     updated = await updateThreadAction({
@@ -143,7 +156,6 @@ export default function OnboardingFlow() {
       </div>
     );
   }
-
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6">
