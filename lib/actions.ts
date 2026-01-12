@@ -50,3 +50,4 @@ export async function updateThreadAction({ userId, threadId, threadType, message
 }) {
   return updateThread(userId, threadId, threadType, messages)
 }
+
