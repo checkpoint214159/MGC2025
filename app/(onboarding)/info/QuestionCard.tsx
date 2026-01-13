@@ -84,9 +84,9 @@ export function DynamicQuestionCard({ question, onAnswer, loading }: {
             />
             
             <div className="flex justify-between text-[10px] font-bold text-slate-400 px-1 uppercase tracking-widest">
-              <span>{question.metadata.labels?.[0] ?? "Low"}</span>
-              <span>{question.metadata.labels?.[1] ?? "Moderate"}</span>
-              <span>{question.metadata.labels?.[2] ?? "High"}</span>
+              <span>{question.metadata.sliderLabels?.[0] ?? "Low"}</span>
+              <span>{question.metadata.sliderLabels?.[1] ?? "Moderate"}</span>
+              <span>{question.metadata.sliderLabels?.[2] ?? "High"}</span>
             </div>
 
             <button 
