@@ -3,10 +3,11 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 
 type DateContextType = {
-  displayDate: Date;      // The date for the UI
-  normalizedDate: Date;   // The date at 00:00:00 for DB queries
-  isSimulated: boolean;   // Flag to show "DEV MODE" warnings
-};
+  displayDate: Date;  
+  normalizedDate: Date;  
+  isSimulated: boolean;   
+  isToday: boolean;
+}
 
 const DateContext = createContext<DateContextType | undefined>(undefined);
 
@@ -24,11 +25,17 @@ export function DateProvider({
     setDate(new Date(initialDate));
   }, [initialDate]);
 
-  const value = {
-    displayDate: date,
-    normalizedDate: new Date(new Date(date).setHours(0, 0, 0, 0)),
-    isSimulated: new Date(date).toDateString() !== new Date().toDateString()  // is it today?
-  };
+  const value = useMemo(() => {
+    const normalized = new Date(new Date(date).setHours(0, 0, 0, 0));
+    const realToday = new Date(new Date().setHours(0, 0, 0, 0));
+    
+    return {
+      displayDate: date,
+      normalizedDate: normalized,
+      isSimulated: normalized.getTime() !== realToday.getTime(),
+      isToday: normalized.getTime() === realToday.getTime() // New helper
+    };
+  }, [date]);
 
   return (
     <DateContext.Provider value={value}>

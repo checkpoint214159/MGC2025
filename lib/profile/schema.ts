@@ -1,12 +1,11 @@
 import { z } from "zod";
+import { ThreadSchema } from "@/lib/external/schemas/thread";
 
 
-export const ProfileSchema = z.object({
-  age: z.coerce.number().min(0).max(120),
-  sex: z.enum(["Male", "Female", "Other"]),
-  treatment: z.string().min(3),
-  profile: z.string().optional(),
-});
+// export const ProfileInputSchema = z.object({
+//   thread: ThreadSchema,
+
+// });
 
 export const BiometricsSchema = z.object({
   age: z.coerce.number().min(0).max(120),
@@ -28,5 +27,5 @@ export const BaselineSchema = z.object({
 export type Biometrics = z.infer<typeof BiometricsSchema>;
 export type Baseline = z.infer<typeof BaselineSchema>;
 
-export type ProfileInput = z.infer<typeof ProfileSchema>;
+// export type ProfileInput = z.infer<typeof ProfileSchema>;
 
