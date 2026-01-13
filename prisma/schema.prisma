@@ -57,7 +57,7 @@ model State {
   userId       String
   dateCreated  DateTime @db.Date @default(now())
 
-  isActive      Boolean?
+  isActive      Boolean
 
   user      User @relation(fields:[userId], references:[id], onDelete: Cascade)
   

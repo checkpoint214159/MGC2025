@@ -111,10 +111,9 @@ const EXAMPLE_WIDGET_OUTPUT: StateBlueprint = {
 
 const schema = StateSchema
 
-export async function getOrGenerateFullState(userId: string) {
+export async function getOrGenerateFullState(userId: string, date: Date) {
   // TODO: make it conditional whether we check for existence of progress, and whether
   // we make it too
-    const date = await getNormalizedAppDate();
 
     const existing = await prisma.state.findUnique({
         where: { userId_dateCreated_isActive: { userId, dateCreated: date, isActive: true } },
@@ -140,6 +139,7 @@ export async function getOrGenerateFullState(userId: string) {
         data: {
             userId,
             dateCreated: date,
+            isActive: true,
             exercise: {
                 create: {
                     summary: generatedPlan.exercise.summary,
@@ -163,7 +163,7 @@ export async function getOrGenerateFullState(userId: string) {
                           }
                     }
                 }
-            }
+            },
         },
         include: {
             exercise: { include: { progress: true } },

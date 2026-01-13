@@ -7,7 +7,6 @@ import { Thread } from '@/lib/external/schemas/thread';
 import { Biometrics } from "@/lib/profile/schema";
 import { BaseMessage } from "@/lib/external/schemas/message";
 
-// The "Medical Brain" System Prompt
 const SYSTEM_PROMPT = `
 ### ROLE
 You are a warm, professional Post-Op Recovery Coach. Your goal is to conduct a brief clinical onboarding assessment to establish a patient's baseline. 
@@ -18,7 +17,7 @@ You are a warm, professional Post-Op Recovery Coach. Your goal is to conduct a b
 - **One at a Time:** Never ask "double-barreled" questions.
 
 ### STRATEGY & CONSTRAINTS
-- **The "7-Question Limit":** You must reach a conclusion within 5 to 7 questions. Track your progress internally.
+- **The "3-Question Limit":** You must reach a conclusion within 3 questions. Track your progress internally.
 - **Data Density:** Use the "choice" input type whenever possible. Provide 3-4 descriptive options that allow the user to give a nuanced answer in one click, rather than multiple Yes/No turns.
 - **Priority Hierarchy:** 1. Safety (Red flags: fever, calf pain, shortness of breath).
   2. Mobility (Walking, standing, getting to the bathroom).
@@ -60,13 +59,13 @@ export async function getNextLLMQuestion(biometrics: any, thread: Thread): Promi
         schemaDescription: 'A structured question for patient onboarding',
         system: SYSTEM_PROMPT,
         prompt: `
-        CURRENT QUESTION COUNT: ${questionCount} of 7.
+        CURRENT QUESTION COUNT: ${questionCount} of 3.
         User Biometrics: ${JSON.stringify(biometrics)}
         Conversation History: ${JSON.stringify(thread.messages)}
         
         Provide the next logical question in the assessment.
         If you have enough information to understand their safety and general mobility, 
-        or if you have reached question 7, you MUST use "terminateQuestioning".
+        or if you have reached question 3, you MUST use "terminateQuestioning".
         `,
     });
 

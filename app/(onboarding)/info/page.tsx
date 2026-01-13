@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, SessionProvider } from "next-auth/react";
 import { BaseQuestion, BaseQuestionSchema, BaseUserResponse } from "@/lib/llm/schemas/base"; // The Zod schema we built earlier
@@ -13,9 +14,10 @@ import { getInitialLLMQuestion, getNextLLMQuestion } from "@/lib/llm/service";
 import { 
   updateBiometricsAction, 
   getOnBoardingAction, 
-  updateThreadAction 
+  updateThreadAction, 
+  setProfileAction,
+  generateUserProfileAction
 } from "@/lib/actions";
-
 
 export default function OnboardingFlow() {
   const { data: session, status, update } = useSession();
@@ -24,67 +26,43 @@ export default function OnboardingFlow() {
   const [thread, setThread] = useState<Thread | null>()
   
   const [currentQuestion, setCurrentQuestion] = useState<BaseQuestion | null>(null);
-
-  const [isInitializing, setIsInitializing] = useState(true);
   const [isAiLoading, setIsAiLoading] = useState(false);
   
   const router = useRouter();
 
-  const loadPersistedData = useCallback(async () => {
-    if (!session?.user?.id) return;
-
-    const data = await getOnBoardingAction(session.user.id);
-    console.log('data??', data)
-    
-    if (data.biometrics) {
-      setBiometrics(BiometricsSchema.parse(data.biometrics));
-    }
-    
-    if (data.activeThread) {
-      const validThread  = ThreadSchema.parse(data.activeThread)
-      setThread(validThread)
-
-      const lastAssistantMsg = [...validThread.messages ?? []]
-        .reverse()
-        .find(m => m.role === 'assistant');
-
-      const validatedAssistantMsg = AssistantMessageSchema.parse(lastAssistantMsg)
-      const question = convertMessageToQuestion(validatedAssistantMsg)
-      console.log('question?', question)
-      const validatedQuestion = BaseQuestionSchema.parse(question)
-      console.log('validatedQuestion', validatedQuestion)
-      setCurrentQuestion(validatedQuestion)
-    }
-
-  }, [session?.user?.id]);
-
-  if (status === "unauthenticated") {
-    router.push("/login");
-    return;
-  }
+  const { data: onboardingData, isLoading: isInitialLoading } = useQuery({
+      queryKey: ['onboarding', session?.user?.id],
+      queryFn: async () => {
+          if (!session?.user?.id) return null;
+          const data = await getOnBoardingAction(session.user.id);
+          
+          return {
+              biometrics: data.biometrics ? BiometricsSchema.parse(data.biometrics) : null,
+              thread: data.activeThread ? ThreadSchema.parse(data.activeThread) : null,
+          };
+      },
+      enabled: !!session?.user?.id,
+  });
 
   useEffect(() => {
-    if (status === "authenticated") {
-      loadPersistedData();
-    }
-  }, [status, loadPersistedData]);
+      if (onboardingData) {
+          if (onboardingData.biometrics) setBiometrics(onboardingData.biometrics);
+          if (onboardingData.thread) {
+              setThread(onboardingData.thread);
+              
+              // Derive the current question from the thread
+              const lastAssistantMsg = [...onboardingData.thread.messages ?? []]
+                  .reverse()
+                  .find(m => m.role === 'assistant');
 
-  
-  useEffect(() => {
-    const generateProfile = async () => {
-      if (currentQuestion?.inputType === 'terminateQuestioning') {
-        try {
-          await generateUserProfile(session?.user?.id!, thread);
-
-          router.push('/')
-        } catch (error) {
-          console.error("Finalization failed:", error);
-        }
+              if (lastAssistantMsg) {
+                  const validatedMsg = AssistantMessageSchema.parse(lastAssistantMsg);
+                  const question = convertMessageToQuestion(validatedMsg);
+                  setCurrentQuestion(BaseQuestionSchema.parse(question));
+              }
+          }
       }
-    }
-
-    generateProfile()
-  }, [currentQuestion, thread, session, router])
+  }, [onboardingData]);
 
   // TODO: integrate baseline here
   async function submitBio(bio: Biometrics) {
@@ -105,7 +83,6 @@ export default function OnboardingFlow() {
       messages: []
     });
 
-    
     const updated = await updateThreadAction({
       userId: userId,
       threadId: newThread.id,
@@ -133,6 +110,24 @@ export default function OnboardingFlow() {
       messages: [userMsg]
     });
     const nextQn = await getNextLLMQuestion(biometrics, updated) 
+    
+    // terminate
+    if (nextQn.inputType === 'terminateQuestioning') {
+      try {
+        const profile = await generateUserProfileAction({ thread: updated, bio: biometrics });
+        await setProfileAction(userId, profile);
+        
+        await update(); 
+        router.push('/');
+        return;
+      } catch (e) {
+        console.error("Finalization failed", e);
+      } finally {
+        setIsAiLoading(false);
+      }
+    }
+    
+    // here meants the llm did not terminate, so save latest to thread
     const nextMsg = convertQuestionToMessage(nextQn, updated.id, 'onboarding')
     updated = await updateThreadAction({
       userId: userId,

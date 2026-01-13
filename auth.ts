@@ -2,8 +2,7 @@ import NextAuth from "next-auth";
 import { prisma } from "@/lib/prisma";
 const bcrypt = require("bcryptjs");
 import Credentials from "next-auth/providers/credentials";
-import { getNormalizedAppDate } from "@/lib/date-utils"
-
+import { getNormalizedAppDate } from "@/lib/date-utils";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     providers: [
@@ -14,15 +13,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) return null;
-                const email = credentials.email as string
-                const password = credentials.password as string
+                const email = credentials.email as string;
+                
                 const account = await prisma.account.findUnique({
                     where: { email: email },
                 });
 
                 if (!account) return null;
 
-                const isValid = await bcrypt.compare(credentials.password, account.password);
+                const isValid = await bcrypt.compare(credentials.password as string, account.password);
                 if (!isValid) return null;
 
                 return {
@@ -33,36 +32,43 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }),
     ],
     callbacks: {
-        async jwt({ token, user, trigger, session }) {
+        async jwt({ token, user, trigger }) {
             if (user) {
                 token.id = user.id;
             }
 
             if (token?.id) {
-                if (!token.userProfile || trigger === "update") {
+                // Only re-fetch if we don't know about the profile yet, or if explicitly updating
+                if (!token.hasProfile|| trigger === "update") {
                     const today = await getNormalizedAppDate();
 
-                    console.log("Querying for:", { id: token.id, date: today });
                     const [stateRecord, dbUser] = await Promise.all([
                         prisma.state.findUnique({
-                            where: { userId_dateCreated_isActive: {
-                                userId: token.id as string,
-                                dateCreated: today,
-                                isActive: true,
-                            } }
+                            where: { 
+                                userId_dateCreated_isActive: {
+                                    userId: token.id as string,
+                                    dateCreated: today,
+                                    isActive: true,
+                                } 
+                            }
                         }),
                         prisma.user.findUnique({
-                            where: { id: token.id as string } // Fixed: Use token.id
+                            where: { id: token.id as string },
+                            select: { name: true, profile: true }
                         })
                     ]);
+                    console.log('auth staterecord??')
+                    console.log(stateRecord)
+                    console.log('dbuser?')
+                    console.log(dbUser)
+                    token.hasTodayState = !!stateRecord;
 
-                    if (stateRecord) {
-                        token.hasTodayState = true;
-                    }
-
+                    console.log('dbuser profile??')
+                    console.log(dbUser.profile)
                     if (dbUser) {
-                        token.userProfile = dbUser.profile
-                        token.name = dbUser.name
+                        token.name = dbUser.name;
+                        // Store a boolean instead of the full clinical string
+                        token.hasProfile = !!dbUser.profile;
                     }
                 }
             }
@@ -72,8 +78,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (session.user) {
                 session.user.id = token.id as string;
                 session.hasTodayState = token.hasTodayState as boolean;
-                // technically really bad, this profile is sensitive info kinda
-                session.user.profile = token.userProfile as string;
+                // Expose the boolean to the client UI
+                session.user.hasProfile = token.hasProfile as boolean;
             }
             return session;
         }
