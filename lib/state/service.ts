@@ -2,14 +2,18 @@
  * Houses functionality to get, set and update progress of State.
  * Also to convert state
  */
-import { StateBlueprint, StateSchema, State, StateBlueprintSchema } from './schemas/state';
+import { LLMBlueprint, StateSchema, State, LLMBlueprintSchema } from './schemas/state';
 import { prisma } from "@/lib/prisma";
 import { createInitialProgress, createInitialChecklistState } from "@/lib/state/converters"
 import { isDeepStrictEqual } from "util";
 import { getNormalizedAppDate } from "@/lib/date-utils"
+import { compileExternalAction } from '../actions';
+import { External } from '../external/schemas/external';
+import { generateObject } from 'ai';
 
-const EXAMPLE_WIDGET_OUTPUT: StateBlueprint = {
-    "exercise": {
+const EXAMPLE_WIDGET_OUTPUT: LLMBlueprint = {
+    exercise: {
+      "type": "EXERCISE",
       "summary": "Focus on circulation and light respiratory recovery.",
       "plan": [
         {
@@ -24,7 +28,6 @@ const EXAMPLE_WIDGET_OUTPUT: StateBlueprint = {
             "ankle pumps": {"goal":30, "value":0, "unit":'reps'},
             "calf raises": {"goal":30, "value":0, "unit":'reps'}
           }
-          
         },
         {
           "id": "mobility dd-mm-yy",
@@ -40,9 +43,11 @@ const EXAMPLE_WIDGET_OUTPUT: StateBlueprint = {
           }
           
         }
-      ]
+      ],
+      "checklists": [],
     },
-    "nutrition": {
+    nutrition: {
+      "type": "NUTRITION",
       "summary": "Support tissue repair with high protein and controlled sodium intake.",
       "plan": [
         {
@@ -97,7 +102,7 @@ const EXAMPLE_WIDGET_OUTPUT: StateBlueprint = {
         }
       ]
     }
-}
+  }
     // "symptoms": {
     //   "emergencyProtocol": "Call your surgeon immediately if fever exceeds 38.5°C or if you notice heavy bleeding.",
     //   "dailyChecks": [
@@ -114,12 +119,11 @@ const schema = StateSchema
 export async function getOrGenerateFullState(userId: string, date: Date) {
   // TODO: make it conditional whether we check for existence of progress, and whether
   // we make it too
-
+    console.log('date??', date)
     const existing = await prisma.state.findUnique({
         where: { userId_dateCreated_isActive: { userId, dateCreated: date, isActive: true } },
         include: {
-            exercise: { include: { progress: true } },
-            nutrition: { include: { progress: true } }
+            modules: { include: { progress: true } },
         }
     });
 
@@ -129,111 +133,99 @@ export async function getOrGenerateFullState(userId: string, date: Date) {
     prev_date.setDate(prev_date.getDate() - 1);
     
     const prevRecord = await prisma.state.findUnique({
-        where: { userId_dateCreated_isActive: { userId, dateCreated: date, isActive: true } },
-        include: { exercise: { include: { progress: true } }, nutrition: { include: { progress: true } } }
+        where: { userId_dateCreated_isActive: { userId, dateCreated: prev_date, isActive: true } },
+        include:{ modules: { include: { progress: true } } }
     });
 
-    const [ generatedPlan ] = await LLMGenerateState(prevRecord as any, null, userId);
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { 
+        threads: {
+          include: { messages: true }
+        }
+      }
+    });
+
+    if (!user) {
+      throw new Error("User not found"); 
+    }
+
+    const {threads, profile} = user
+    const x = await compileExternalAction(userId, threads, profile as unknown as string) // todo this is bad
+    const generatedPlan = await LLMGenerateState(prevRecord as any, x, userId);
 
     return await prisma.state.create({
         data: {
             userId,
             dateCreated: date,
             isActive: true,
-            exercise: {
-                create: {
-                    summary: generatedPlan.exercise.summary,
-                    plan: generatedPlan.exercise.plan as any,
-                    progress: {
-                        create: {
-                            trackables : createInitialProgress(generatedPlan.exercise.plan)
-                        }
-                    }
+            causalStateId: prevRecord?.id,
+            modules: {
+              create: Object.entries(generatedPlan).map(([type, blueprint]: [string, any]) => ({
+                type: type, // 'NUTRITION', 'EXERCISE'
+                summary: blueprint.summary,
+                plan: blueprint.plan,
+                checklists: blueprint.checklists || [],
+                progress: {
+                  create: {
+                    trackables: createInitialProgress(blueprint.plan),
+                    // Only create checklist state if checklists exist
+                    checklistState: blueprint.checklists 
+                      ? createInitialChecklistState(blueprint.checklists) 
+                      : {}
+                  }
                 }
-            },
-            nutrition: {
-                create: {
-                    summary: generatedPlan.nutrition.summary,
-                    plan: generatedPlan.nutrition.plan as any,
-                    checklists: generatedPlan.nutrition.checklists as any,
-                    progress: {
-                        create: {
-                            trackables: createInitialProgress(generatedPlan.nutrition.plan) as any,
-                            checklistState: createInitialChecklistState(generatedPlan.nutrition.checklists) as any,
-                          }
-                    }
-                }
-            },
-        },
-        include: {
-            exercise: { include: { progress: true } },
-            nutrition: { include: { progress: true } }
-        }
-    });
+              }))
+            }
+          },
+    include: {
+      modules: { include: { progress: true } }
+    }
+  });
 }
 
-type ModuleType = 'exercise' | 'nutrition';
+type ModuleType = 'NUTRITION' | 'EXERCISE'; 
 
 export async function getModule(userId: string, type: ModuleType) {
   const date = await getNormalizedAppDate();
 
-  const stateRecord = await prisma.state.findUnique({
-    where: { userId_dateCreated_isActive: { userId, dateCreated: date, isActive: true } },
-    select: { id: true }
+  // We find the module directly using the composite filter
+  return await prisma.module.findFirst({
+    where: {
+      type: type,
+      state: {
+        userId: userId,
+        dateCreated: date,
+        isActive: true
+      }
+    },
+    include: { progress: true }
   });
-
-  if (!stateRecord) return null;
-
-  switch (type) {
-    case 'exercise':
-      return await prisma.exerciseModule.findUnique({
-        where: { stateId: stateRecord.id },
-        include: { progress: true }
-      });
-    case 'nutrition':
-      return await prisma.nutritionModule.findUnique({
-        where: { stateId: stateRecord.id },
-        include: { progress: true }
-      });
-    default:
-      throw new Error(`Unknown module type: ${type}`);
-  }
 }
-
-const ProgressActions = {
-  exercise: prisma.exerciseProgress,
-  nutrition: prisma.nutritionProgress,
-} as const;
-
-
 
 export async function updateModuleProgress(
   moduleId: string,
-  type: 'exercise' | 'nutrition',
   updates: { id: string; data: any }[]
 ) {
-  const delegateProgress = ProgressActions[type] as any;
-
-  // 1. fetch current state
-  const currentRecord = await delegateProgress.findUnique({
+  
+  const currentRecord = await prisma.progress.findUnique({
     where: { moduleId },
   });
 
-  if (!currentRecord) throw new Error(`Progress record for module ${moduleId} not found.`);
+  if (!currentRecord) {
+    throw new Error(`Progress record for module ${moduleId} not found.`);
+  }
 
+  // Cast trackables for logic, though Zod will handle the final safety
   const currentTrackables = currentRecord.trackables as any[];
-  // console.log('currentTrackables in updatemodule', currentTrackables[0].trackables)
+
   // 2. Map and Merge
   const updatedTrackables = currentTrackables.map((existing) => {
     const update = updates.find((u) => u.id === existing.id);
-    if (update) {
-      return { ...existing, data: update.data };
-    }
-    return existing;
+    return update ? { ...existing, data: update.data } : existing;
   });
-  // console.log('updatedTrackables in updatemodule', updatedTrackables[0].trackables)
 
-  // 3. Validation: Check if we tried to update something that doesn't exist
+  // 3. Validation Logic
   const updateIds = updates.map(u => u.id);
   const existingIds = currentTrackables.map(t => t.id);
   const invalidIds = updateIds.filter(id => !existingIds.includes(id));
@@ -242,43 +234,69 @@ export async function updateModuleProgress(
     throw new Error(`Invalid trackable IDs: ${invalidIds.join(", ")}`);
   }
 
-  if (isDeepStrictEqual(currentTrackables, updatedTrackables)) return currentRecord;
+  // 4. Optimization: Skip DB call if nothing changed
+  if (isDeepStrictEqual(currentTrackables, updatedTrackables)) {
+    return currentRecord;
+  }
 
-  return await delegateProgress.update({
+  // 5. Save the JSON back to the unified Progress table
+  return await prisma.progress.update({
     where: { moduleId },
     data: { trackables: updatedTrackables },
   });
 }
 
-async function LLMGenerateState(in_state: State | null, x: null, userId:string ) {
-  /*
-  Generates a target using LLM. This target state is of the same schema as
-  our user state
-  **/
-  const outschema = StateBlueprintSchema
+export async function LLMGenerateState(
+  in_state: State | null, 
+  x: External, 
+  userId: string 
+) {
+  // 1. Distill the ThreadContext into a readable transcript for the LLM
+  // We prioritize the most recent messages if tokens are an issue
+  const transcript = x.threadContext.map(thread => {
+    const msgs = thread.messages?.map(m => `[${m.role.toUpperCase()}]: ${m.content}`).join("\n") || "No messages";
+    return `### Thread: ${thread.title || 'General'}\n${msgs}`;
+  }).join("\n\n---\n\n");
+
+  const profile = x.profile
+
   const systemPrompt = `
-    You are a medical recovery expert. Based on the patient's data, 
-    select exactly 2-3 recovery widgets from the available list.
-    
-    Available Widget Types:
-    - EXERCISE_TRACKER: For physical movements or PT.
-    - NUTRITION_PLAN: For dietary restrictions.
-    - SYMPTOM_CHECKER: For tracking pain or red flags.
+    ROLE: You are a Senior Clinical Rehabilitation Specialist.
+    TASK: Generate a "Recovery Blueprint" (JSON) for a patient based on their History Snapshot.
 
-    For NUTRITION_PLAN widgets, prioritize High-Protein targets (1.5g/kg) and Low-Residue diet items.
-    Structure macros as a dictionary and micros as an array of electrolyte goals.
+    INPUT DATA:
+    1. PATIENT PROFILE: ${x.profile}
+    2. CONVERSATION SNAPSHOT: This is a frozen record of recent patient interactions. 
+       Analyze these for:
+       - Reported pain levels or physical limitations.
+       - Nutritional preferences or adherence issues.
+       - Direct requests from the patient or doctor.
 
-    Return ONLY the JSON structure.
+    OUTPUT INSTRUCTIONS:
+    - Your goal is to output a "Blueprint" containing exactly 1-3 modules.
+    - Each module must match the specific schema for NUTRITION, EXERCISE, etc.
+    - If the history mentions pain, include a SYMPTOM_CHECKER or modify EXERCISE intensity.
+    - If post-surgery (per profile), prioritize High-Protein NUTRITION goals.
+
+    STRICT CONSTRAINTS:
+    - Do NOT generate IDs or timestamps (these are system-managed).
+    - Return ONLY valid JSON matching the provided schema.
   `;
 
-//   const { target } = await generateObject({
-//             model: "deepseek/deepseek-v3.2", // Use the same string as your chat
-//             system: systemPrompt,
-//             prompt: `Patient: ${age}yo ${sex}, Surgery: ${treatment}`,
-//             schema: schema,
-//         });
-  const stateBlueprint: StateBlueprint = EXAMPLE_WIDGET_OUTPUT
-    
-  return [ stateBlueprint ]
-}
+  const { object } = await generateObject ({
+    model: 'deepseek/deepseek-v3.2', // e.g., gpt-4o or deepseek-v3
+    system: systemPrompt,
+    prompt: `
+      PREVIOUS STATE: ${in_state ? JSON.stringify(in_state.modules) : "No previous state. This is a fresh start."}
+      USER PROFILE: ${profile}
+      EVIDENCE LOG (Snapshot):
+      ${transcript}
+    `,
+    schema: LLMBlueprintSchema, // This ensures the LLM sticks to your factory-built schema
+  });
 
+  const generatedPlan = LLMBlueprintSchema.parse(object)
+
+
+  return generatedPlan;
+}

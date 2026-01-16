@@ -7,6 +7,7 @@ import {
     createProgressSchema,
     createModuleBlueprintSchema,
     createModuleSchema,
+    BaseChecklistObj,
 } from '@/lib/state/schemas/base'
 
 
@@ -33,7 +34,9 @@ export const ExerciseProgressSchema = createProgressSchema({
 })
 
 export const ExerciseModuleBlueprintSchema = createModuleBlueprintSchema({
-    planSchema: ExercisePlanSchema
+    type: "EXERCISE",
+    planSchema: ExercisePlanSchema,
+    checklistSchema: BaseChecklistObj,
 })
 
 export const ExerciseModuleSchema = createModuleSchema({

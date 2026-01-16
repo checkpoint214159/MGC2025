@@ -183,9 +183,11 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   biometric?: Prisma.XOR<Prisma.BiometricsNullableScalarRelationFilter, Prisma.BiometricsWhereInput> | null
+  baselines?: Prisma.BaselineListRelationFilter
   account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
   states?: Prisma.StateListRelationFilter
   threads?: Prisma.ThreadListRelationFilter
+  externals?: Prisma.ExternalListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -195,9 +197,11 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   biometric?: Prisma.BiometricsOrderByWithRelationInput
+  baselines?: Prisma.BaselineOrderByRelationAggregateInput
   account?: Prisma.AccountOrderByWithRelationInput
   states?: Prisma.StateOrderByRelationAggregateInput
   threads?: Prisma.ThreadOrderByRelationAggregateInput
+  externals?: Prisma.ExternalOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -210,9 +214,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   biometric?: Prisma.XOR<Prisma.BiometricsNullableScalarRelationFilter, Prisma.BiometricsWhereInput> | null
+  baselines?: Prisma.BaselineListRelationFilter
   account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
   states?: Prisma.StateListRelationFilter
   threads?: Prisma.ThreadListRelationFilter
+  externals?: Prisma.ExternalListRelationFilter
 }, "id">
 
 export type UserOrderByWithAggregationInput = {
@@ -244,9 +250,11 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput
+  baselines?: Prisma.BaselineCreateNestedManyWithoutUserInput
   account?: Prisma.AccountCreateNestedOneWithoutUserInput
   states?: Prisma.StateCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -256,9 +264,11 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput
+  baselines?: Prisma.BaselineUncheckedCreateNestedManyWithoutUserInput
   account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput
   states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -268,9 +278,11 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput
+  baselines?: Prisma.BaselineUpdateManyWithoutUserNestedInput
   account?: Prisma.AccountUpdateOneWithoutUserNestedInput
   states?: Prisma.StateUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -280,9 +292,11 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput
+  baselines?: Prisma.BaselineUncheckedUpdateManyWithoutUserNestedInput
   account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput
   states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -360,6 +374,20 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type UserCreateNestedOneWithoutBaselinesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBaselinesInput, Prisma.UserUncheckedCreateWithoutBaselinesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBaselinesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutBaselinesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutBaselinesInput, Prisma.UserUncheckedCreateWithoutBaselinesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutBaselinesInput
+  upsert?: Prisma.UserUpsertWithoutBaselinesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBaselinesInput, Prisma.UserUpdateWithoutBaselinesInput>, Prisma.UserUncheckedUpdateWithoutBaselinesInput>
+}
+
 export type UserCreateNestedOneWithoutBiometricInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutBiometricInput, Prisma.UserUncheckedCreateWithoutBiometricInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutBiometricInput
@@ -388,6 +416,20 @@ export type UserUpdateOneRequiredWithoutStatesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStatesInput, Prisma.UserUpdateWithoutStatesInput>, Prisma.UserUncheckedUpdateWithoutStatesInput>
 }
 
+export type UserCreateNestedOneWithoutExternalsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutExternalsInput, Prisma.UserUncheckedCreateWithoutExternalsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutExternalsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutExternalsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutExternalsInput, Prisma.UserUncheckedCreateWithoutExternalsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutExternalsInput
+  upsert?: Prisma.UserUpsertWithoutExternalsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutExternalsInput, Prisma.UserUpdateWithoutExternalsInput>, Prisma.UserUncheckedUpdateWithoutExternalsInput>
+}
+
 export type UserCreateNestedOneWithoutThreadsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutThreadsInput, Prisma.UserUncheckedCreateWithoutThreadsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutThreadsInput
@@ -409,8 +451,10 @@ export type UserCreateWithoutAccountInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput
+  baselines?: Prisma.BaselineCreateNestedManyWithoutUserInput
   states?: Prisma.StateCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountInput = {
@@ -420,8 +464,10 @@ export type UserUncheckedCreateWithoutAccountInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput
+  baselines?: Prisma.BaselineUncheckedCreateNestedManyWithoutUserInput
   states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountInput = {
@@ -447,8 +493,10 @@ export type UserUpdateWithoutAccountInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput
+  baselines?: Prisma.BaselineUpdateManyWithoutUserNestedInput
   states?: Prisma.StateUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountInput = {
@@ -458,8 +506,78 @@ export type UserUncheckedUpdateWithoutAccountInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput
+  baselines?: Prisma.BaselineUncheckedUpdateManyWithoutUserNestedInput
   states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutBaselinesInput = {
+  id?: string
+  name: string
+  profile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput
+  account?: Prisma.AccountCreateNestedOneWithoutUserInput
+  states?: Prisma.StateCreateNestedManyWithoutUserInput
+  threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutBaselinesInput = {
+  id?: string
+  name: string
+  profile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput
+  account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput
+  states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
+  threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutBaselinesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutBaselinesInput, Prisma.UserUncheckedCreateWithoutBaselinesInput>
+}
+
+export type UserUpsertWithoutBaselinesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutBaselinesInput, Prisma.UserUncheckedUpdateWithoutBaselinesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutBaselinesInput, Prisma.UserUncheckedCreateWithoutBaselinesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutBaselinesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutBaselinesInput, Prisma.UserUncheckedUpdateWithoutBaselinesInput>
+}
+
+export type UserUpdateWithoutBaselinesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput
+  account?: Prisma.AccountUpdateOneWithoutUserNestedInput
+  states?: Prisma.StateUpdateManyWithoutUserNestedInput
+  threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutBaselinesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput
+  account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput
+  states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
+  threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBiometricInput = {
@@ -468,9 +586,11 @@ export type UserCreateWithoutBiometricInput = {
   profile?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  baselines?: Prisma.BaselineCreateNestedManyWithoutUserInput
   account?: Prisma.AccountCreateNestedOneWithoutUserInput
   states?: Prisma.StateCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBiometricInput = {
@@ -479,9 +599,11 @@ export type UserUncheckedCreateWithoutBiometricInput = {
   profile?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  baselines?: Prisma.BaselineUncheckedCreateNestedManyWithoutUserInput
   account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput
   states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBiometricInput = {
@@ -506,9 +628,11 @@ export type UserUpdateWithoutBiometricInput = {
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  baselines?: Prisma.BaselineUpdateManyWithoutUserNestedInput
   account?: Prisma.AccountUpdateOneWithoutUserNestedInput
   states?: Prisma.StateUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBiometricInput = {
@@ -517,9 +641,11 @@ export type UserUncheckedUpdateWithoutBiometricInput = {
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  baselines?: Prisma.BaselineUncheckedUpdateManyWithoutUserNestedInput
   account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput
   states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutStatesInput = {
@@ -529,8 +655,10 @@ export type UserCreateWithoutStatesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput
+  baselines?: Prisma.BaselineCreateNestedManyWithoutUserInput
   account?: Prisma.AccountCreateNestedOneWithoutUserInput
   threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStatesInput = {
@@ -540,8 +668,10 @@ export type UserUncheckedCreateWithoutStatesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput
+  baselines?: Prisma.BaselineUncheckedCreateNestedManyWithoutUserInput
   account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput
   threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStatesInput = {
@@ -567,8 +697,10 @@ export type UserUpdateWithoutStatesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput
+  baselines?: Prisma.BaselineUpdateManyWithoutUserNestedInput
   account?: Prisma.AccountUpdateOneWithoutUserNestedInput
   threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStatesInput = {
@@ -578,7 +710,77 @@ export type UserUncheckedUpdateWithoutStatesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput
+  baselines?: Prisma.BaselineUncheckedUpdateManyWithoutUserNestedInput
   account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput
+  threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutExternalsInput = {
+  id?: string
+  name: string
+  profile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput
+  baselines?: Prisma.BaselineCreateNestedManyWithoutUserInput
+  account?: Prisma.AccountCreateNestedOneWithoutUserInput
+  states?: Prisma.StateCreateNestedManyWithoutUserInput
+  threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutExternalsInput = {
+  id?: string
+  name: string
+  profile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput
+  baselines?: Prisma.BaselineUncheckedCreateNestedManyWithoutUserInput
+  account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput
+  states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
+  threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutExternalsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutExternalsInput, Prisma.UserUncheckedCreateWithoutExternalsInput>
+}
+
+export type UserUpsertWithoutExternalsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutExternalsInput, Prisma.UserUncheckedUpdateWithoutExternalsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutExternalsInput, Prisma.UserUncheckedCreateWithoutExternalsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutExternalsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutExternalsInput, Prisma.UserUncheckedUpdateWithoutExternalsInput>
+}
+
+export type UserUpdateWithoutExternalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput
+  baselines?: Prisma.BaselineUpdateManyWithoutUserNestedInput
+  account?: Prisma.AccountUpdateOneWithoutUserNestedInput
+  states?: Prisma.StateUpdateManyWithoutUserNestedInput
+  threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutExternalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput
+  baselines?: Prisma.BaselineUncheckedUpdateManyWithoutUserNestedInput
+  account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput
+  states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -589,8 +791,10 @@ export type UserCreateWithoutThreadsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput
+  baselines?: Prisma.BaselineCreateNestedManyWithoutUserInput
   account?: Prisma.AccountCreateNestedOneWithoutUserInput
   states?: Prisma.StateCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutThreadsInput = {
@@ -600,8 +804,10 @@ export type UserUncheckedCreateWithoutThreadsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput
+  baselines?: Prisma.BaselineUncheckedCreateNestedManyWithoutUserInput
   account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput
   states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutThreadsInput = {
@@ -627,8 +833,10 @@ export type UserUpdateWithoutThreadsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput
+  baselines?: Prisma.BaselineUpdateManyWithoutUserNestedInput
   account?: Prisma.AccountUpdateOneWithoutUserNestedInput
   states?: Prisma.StateUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutThreadsInput = {
@@ -638,8 +846,10 @@ export type UserUncheckedUpdateWithoutThreadsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput
+  baselines?: Prisma.BaselineUncheckedUpdateManyWithoutUserNestedInput
   account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput
   states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -648,13 +858,17 @@ export type UserUncheckedUpdateWithoutThreadsInput = {
  */
 
 export type UserCountOutputType = {
+  baselines: number
   states: number
   threads: number
+  externals: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  baselines?: boolean | UserCountOutputTypeCountBaselinesArgs
   states?: boolean | UserCountOutputTypeCountStatesArgs
   threads?: boolean | UserCountOutputTypeCountThreadsArgs
+  externals?: boolean | UserCountOutputTypeCountExternalsArgs
 }
 
 /**
@@ -665,6 +879,13 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
    * Select specific fields to fetch from the UserCountOutputType
    */
   select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountBaselinesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.BaselineWhereInput
 }
 
 /**
@@ -681,6 +902,13 @@ export type UserCountOutputTypeCountThreadsArgs<ExtArgs extends runtime.Types.Ex
   where?: Prisma.ThreadWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountExternalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ExternalWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -689,9 +917,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   biometric?: boolean | Prisma.User$biometricArgs<ExtArgs>
+  baselines?: boolean | Prisma.User$baselinesArgs<ExtArgs>
   account?: boolean | Prisma.User$accountArgs<ExtArgs>
   states?: boolean | Prisma.User$statesArgs<ExtArgs>
   threads?: boolean | Prisma.User$threadsArgs<ExtArgs>
+  externals?: boolean | Prisma.User$externalsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -722,9 +952,11 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "profile" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   biometric?: boolean | Prisma.User$biometricArgs<ExtArgs>
+  baselines?: boolean | Prisma.User$baselinesArgs<ExtArgs>
   account?: boolean | Prisma.User$accountArgs<ExtArgs>
   states?: boolean | Prisma.User$statesArgs<ExtArgs>
   threads?: boolean | Prisma.User$threadsArgs<ExtArgs>
+  externals?: boolean | Prisma.User$externalsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -734,9 +966,11 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     biometric: Prisma.$BiometricsPayload<ExtArgs> | null
+    baselines: Prisma.$BaselinePayload<ExtArgs>[]
     account: Prisma.$AccountPayload<ExtArgs> | null
     states: Prisma.$StatePayload<ExtArgs>[]
     threads: Prisma.$ThreadPayload<ExtArgs>[]
+    externals: Prisma.$ExternalPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1139,9 +1373,11 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   biometric<T extends Prisma.User$biometricArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$biometricArgs<ExtArgs>>): Prisma.Prisma__BiometricsClient<runtime.Types.Result.GetResult<Prisma.$BiometricsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  baselines<T extends Prisma.User$baselinesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$baselinesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BaselinePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   account<T extends Prisma.User$accountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   states<T extends Prisma.User$statesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$statesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   threads<T extends Prisma.User$threadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$threadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ThreadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  externals<T extends Prisma.User$externalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$externalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExternalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1583,6 +1819,30 @@ export type User$biometricArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
+ * User.baselines
+ */
+export type User$baselinesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Baseline
+   */
+  select?: Prisma.BaselineSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Baseline
+   */
+  omit?: Prisma.BaselineOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BaselineInclude<ExtArgs> | null
+  where?: Prisma.BaselineWhereInput
+  orderBy?: Prisma.BaselineOrderByWithRelationInput | Prisma.BaselineOrderByWithRelationInput[]
+  cursor?: Prisma.BaselineWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.BaselineScalarFieldEnum | Prisma.BaselineScalarFieldEnum[]
+}
+
+/**
  * User.account
  */
 export type User$accountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1647,6 +1907,30 @@ export type User$threadsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.ThreadScalarFieldEnum | Prisma.ThreadScalarFieldEnum[]
+}
+
+/**
+ * User.externals
+ */
+export type User$externalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the External
+   */
+  select?: Prisma.ExternalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the External
+   */
+  omit?: Prisma.ExternalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExternalInclude<ExtArgs> | null
+  where?: Prisma.ExternalWhereInput
+  orderBy?: Prisma.ExternalOrderByWithRelationInput | Prisma.ExternalOrderByWithRelationInput[]
+  cursor?: Prisma.ExternalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ExternalScalarFieldEnum | Prisma.ExternalScalarFieldEnum[]
 }
 
 /**

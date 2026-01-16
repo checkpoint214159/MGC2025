@@ -202,8 +202,7 @@ export type StateWhereInput = {
   causalState?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
   nextState?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
   causalX?: Prisma.XOR<Prisma.ExternalNullableScalarRelationFilter, Prisma.ExternalWhereInput> | null
-  exercise?: Prisma.XOR<Prisma.ExerciseModuleNullableScalarRelationFilter, Prisma.ExerciseModuleWhereInput> | null
-  nutrition?: Prisma.XOR<Prisma.NutritionModuleNullableScalarRelationFilter, Prisma.NutritionModuleWhereInput> | null
+  modules?: Prisma.ModuleListRelationFilter
 }
 
 export type StateOrderByWithRelationInput = {
@@ -218,8 +217,7 @@ export type StateOrderByWithRelationInput = {
   causalState?: Prisma.StateOrderByWithRelationInput
   nextState?: Prisma.StateOrderByWithRelationInput
   causalX?: Prisma.ExternalOrderByWithRelationInput
-  exercise?: Prisma.ExerciseModuleOrderByWithRelationInput
-  nutrition?: Prisma.NutritionModuleOrderByWithRelationInput
+  modules?: Prisma.ModuleOrderByRelationAggregateInput
 }
 
 export type StateWhereUniqueInput = Prisma.AtLeast<{
@@ -238,8 +236,7 @@ export type StateWhereUniqueInput = Prisma.AtLeast<{
   causalState?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
   nextState?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
   causalX?: Prisma.XOR<Prisma.ExternalNullableScalarRelationFilter, Prisma.ExternalWhereInput> | null
-  exercise?: Prisma.XOR<Prisma.ExerciseModuleNullableScalarRelationFilter, Prisma.ExerciseModuleWhereInput> | null
-  nutrition?: Prisma.XOR<Prisma.NutritionModuleNullableScalarRelationFilter, Prisma.NutritionModuleWhereInput> | null
+  modules?: Prisma.ModuleListRelationFilter
 }, "id" | "causalStateId" | "nextStateId" | "causalXId" | "userId_dateCreated_isActive">
 
 export type StateOrderByWithAggregationInput = {
@@ -277,8 +274,7 @@ export type StateCreateInput = {
   causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
   nextState?: Prisma.StateCreateNestedOneWithoutCausalStateInput
   causalX?: Prisma.ExternalCreateNestedOneWithoutStateInput
-  exercise?: Prisma.ExerciseModuleCreateNestedOneWithoutStateInput
-  nutrition?: Prisma.NutritionModuleCreateNestedOneWithoutStateInput
+  modules?: Prisma.ModuleCreateNestedManyWithoutStateInput
 }
 
 export type StateUncheckedCreateInput = {
@@ -290,8 +286,7 @@ export type StateUncheckedCreateInput = {
   nextStateId?: string | null
   causalXId?: string | null
   nextState?: Prisma.StateUncheckedCreateNestedOneWithoutCausalStateInput
-  exercise?: Prisma.ExerciseModuleUncheckedCreateNestedOneWithoutStateInput
-  nutrition?: Prisma.NutritionModuleUncheckedCreateNestedOneWithoutStateInput
+  modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutStateInput
 }
 
 export type StateUpdateInput = {
@@ -303,8 +298,7 @@ export type StateUpdateInput = {
   causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
   nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
   causalX?: Prisma.ExternalUpdateOneWithoutStateNestedInput
-  exercise?: Prisma.ExerciseModuleUpdateOneWithoutStateNestedInput
-  nutrition?: Prisma.NutritionModuleUpdateOneWithoutStateNestedInput
+  modules?: Prisma.ModuleUpdateManyWithoutStateNestedInput
 }
 
 export type StateUncheckedUpdateInput = {
@@ -316,8 +310,7 @@ export type StateUncheckedUpdateInput = {
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
-  exercise?: Prisma.ExerciseModuleUncheckedUpdateOneWithoutStateNestedInput
-  nutrition?: Prisma.NutritionModuleUncheckedUpdateOneWithoutStateNestedInput
+  modules?: Prisma.ModuleUncheckedUpdateManyWithoutStateNestedInput
 }
 
 export type StateCreateManyInput = {
@@ -497,64 +490,60 @@ export type StateUncheckedUpdateOneWithoutCausalStateNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StateUpdateToOneWithWhereWithoutCausalStateInput, Prisma.StateUpdateWithoutCausalStateInput>, Prisma.StateUncheckedUpdateWithoutCausalStateInput>
 }
 
-export type StateCreateNestedOneWithoutExerciseInput = {
-  create?: Prisma.XOR<Prisma.StateCreateWithoutExerciseInput, Prisma.StateUncheckedCreateWithoutExerciseInput>
-  connectOrCreate?: Prisma.StateCreateOrConnectWithoutExerciseInput
+export type StateCreateNestedOneWithoutModulesInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutModulesInput, Prisma.StateUncheckedCreateWithoutModulesInput>
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutModulesInput
   connect?: Prisma.StateWhereUniqueInput
 }
 
-export type StateUpdateOneRequiredWithoutExerciseNestedInput = {
-  create?: Prisma.XOR<Prisma.StateCreateWithoutExerciseInput, Prisma.StateUncheckedCreateWithoutExerciseInput>
-  connectOrCreate?: Prisma.StateCreateOrConnectWithoutExerciseInput
-  upsert?: Prisma.StateUpsertWithoutExerciseInput
+export type StateUpdateOneRequiredWithoutModulesNestedInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutModulesInput, Prisma.StateUncheckedCreateWithoutModulesInput>
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutModulesInput
+  upsert?: Prisma.StateUpsertWithoutModulesInput
   connect?: Prisma.StateWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.StateUpdateToOneWithWhereWithoutExerciseInput, Prisma.StateUpdateWithoutExerciseInput>, Prisma.StateUncheckedUpdateWithoutExerciseInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StateUpdateToOneWithWhereWithoutModulesInput, Prisma.StateUpdateWithoutModulesInput>, Prisma.StateUncheckedUpdateWithoutModulesInput>
 }
 
-export type StateCreateNestedOneWithoutNutritionInput = {
-  create?: Prisma.XOR<Prisma.StateCreateWithoutNutritionInput, Prisma.StateUncheckedCreateWithoutNutritionInput>
-  connectOrCreate?: Prisma.StateCreateOrConnectWithoutNutritionInput
-  connect?: Prisma.StateWhereUniqueInput
+export type StateCreateNestedManyWithoutCausalXInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutCausalXInput, Prisma.StateUncheckedCreateWithoutCausalXInput> | Prisma.StateCreateWithoutCausalXInput[] | Prisma.StateUncheckedCreateWithoutCausalXInput[]
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutCausalXInput | Prisma.StateCreateOrConnectWithoutCausalXInput[]
+  createMany?: Prisma.StateCreateManyCausalXInputEnvelope
+  connect?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
 }
 
-export type StateUpdateOneRequiredWithoutNutritionNestedInput = {
-  create?: Prisma.XOR<Prisma.StateCreateWithoutNutritionInput, Prisma.StateUncheckedCreateWithoutNutritionInput>
-  connectOrCreate?: Prisma.StateCreateOrConnectWithoutNutritionInput
-  upsert?: Prisma.StateUpsertWithoutNutritionInput
-  connect?: Prisma.StateWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.StateUpdateToOneWithWhereWithoutNutritionInput, Prisma.StateUpdateWithoutNutritionInput>, Prisma.StateUncheckedUpdateWithoutNutritionInput>
+export type StateUncheckedCreateNestedManyWithoutCausalXInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutCausalXInput, Prisma.StateUncheckedCreateWithoutCausalXInput> | Prisma.StateCreateWithoutCausalXInput[] | Prisma.StateUncheckedCreateWithoutCausalXInput[]
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutCausalXInput | Prisma.StateCreateOrConnectWithoutCausalXInput[]
+  createMany?: Prisma.StateCreateManyCausalXInputEnvelope
+  connect?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
 }
 
-export type StateCreateNestedOneWithoutCausalXInput = {
-  create?: Prisma.XOR<Prisma.StateCreateWithoutCausalXInput, Prisma.StateUncheckedCreateWithoutCausalXInput>
-  connectOrCreate?: Prisma.StateCreateOrConnectWithoutCausalXInput
-  connect?: Prisma.StateWhereUniqueInput
+export type StateUpdateManyWithoutCausalXNestedInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutCausalXInput, Prisma.StateUncheckedCreateWithoutCausalXInput> | Prisma.StateCreateWithoutCausalXInput[] | Prisma.StateUncheckedCreateWithoutCausalXInput[]
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutCausalXInput | Prisma.StateCreateOrConnectWithoutCausalXInput[]
+  upsert?: Prisma.StateUpsertWithWhereUniqueWithoutCausalXInput | Prisma.StateUpsertWithWhereUniqueWithoutCausalXInput[]
+  createMany?: Prisma.StateCreateManyCausalXInputEnvelope
+  set?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  disconnect?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  delete?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  connect?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  update?: Prisma.StateUpdateWithWhereUniqueWithoutCausalXInput | Prisma.StateUpdateWithWhereUniqueWithoutCausalXInput[]
+  updateMany?: Prisma.StateUpdateManyWithWhereWithoutCausalXInput | Prisma.StateUpdateManyWithWhereWithoutCausalXInput[]
+  deleteMany?: Prisma.StateScalarWhereInput | Prisma.StateScalarWhereInput[]
 }
 
-export type StateUncheckedCreateNestedOneWithoutCausalXInput = {
-  create?: Prisma.XOR<Prisma.StateCreateWithoutCausalXInput, Prisma.StateUncheckedCreateWithoutCausalXInput>
-  connectOrCreate?: Prisma.StateCreateOrConnectWithoutCausalXInput
-  connect?: Prisma.StateWhereUniqueInput
-}
-
-export type StateUpdateOneWithoutCausalXNestedInput = {
-  create?: Prisma.XOR<Prisma.StateCreateWithoutCausalXInput, Prisma.StateUncheckedCreateWithoutCausalXInput>
-  connectOrCreate?: Prisma.StateCreateOrConnectWithoutCausalXInput
-  upsert?: Prisma.StateUpsertWithoutCausalXInput
-  disconnect?: Prisma.StateWhereInput | boolean
-  delete?: Prisma.StateWhereInput | boolean
-  connect?: Prisma.StateWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.StateUpdateToOneWithWhereWithoutCausalXInput, Prisma.StateUpdateWithoutCausalXInput>, Prisma.StateUncheckedUpdateWithoutCausalXInput>
-}
-
-export type StateUncheckedUpdateOneWithoutCausalXNestedInput = {
-  create?: Prisma.XOR<Prisma.StateCreateWithoutCausalXInput, Prisma.StateUncheckedCreateWithoutCausalXInput>
-  connectOrCreate?: Prisma.StateCreateOrConnectWithoutCausalXInput
-  upsert?: Prisma.StateUpsertWithoutCausalXInput
-  disconnect?: Prisma.StateWhereInput | boolean
-  delete?: Prisma.StateWhereInput | boolean
-  connect?: Prisma.StateWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.StateUpdateToOneWithWhereWithoutCausalXInput, Prisma.StateUpdateWithoutCausalXInput>, Prisma.StateUncheckedUpdateWithoutCausalXInput>
+export type StateUncheckedUpdateManyWithoutCausalXNestedInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutCausalXInput, Prisma.StateUncheckedCreateWithoutCausalXInput> | Prisma.StateCreateWithoutCausalXInput[] | Prisma.StateUncheckedCreateWithoutCausalXInput[]
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutCausalXInput | Prisma.StateCreateOrConnectWithoutCausalXInput[]
+  upsert?: Prisma.StateUpsertWithWhereUniqueWithoutCausalXInput | Prisma.StateUpsertWithWhereUniqueWithoutCausalXInput[]
+  createMany?: Prisma.StateCreateManyCausalXInputEnvelope
+  set?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  disconnect?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  delete?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  connect?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  update?: Prisma.StateUpdateWithWhereUniqueWithoutCausalXInput | Prisma.StateUpdateWithWhereUniqueWithoutCausalXInput[]
+  updateMany?: Prisma.StateUpdateManyWithWhereWithoutCausalXInput | Prisma.StateUpdateManyWithWhereWithoutCausalXInput[]
+  deleteMany?: Prisma.StateScalarWhereInput | Prisma.StateScalarWhereInput[]
 }
 
 export type StateCreateWithoutUserInput = {
@@ -565,8 +554,7 @@ export type StateCreateWithoutUserInput = {
   causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
   nextState?: Prisma.StateCreateNestedOneWithoutCausalStateInput
   causalX?: Prisma.ExternalCreateNestedOneWithoutStateInput
-  exercise?: Prisma.ExerciseModuleCreateNestedOneWithoutStateInput
-  nutrition?: Prisma.NutritionModuleCreateNestedOneWithoutStateInput
+  modules?: Prisma.ModuleCreateNestedManyWithoutStateInput
 }
 
 export type StateUncheckedCreateWithoutUserInput = {
@@ -577,8 +565,7 @@ export type StateUncheckedCreateWithoutUserInput = {
   nextStateId?: string | null
   causalXId?: string | null
   nextState?: Prisma.StateUncheckedCreateNestedOneWithoutCausalStateInput
-  exercise?: Prisma.ExerciseModuleUncheckedCreateNestedOneWithoutStateInput
-  nutrition?: Prisma.NutritionModuleUncheckedCreateNestedOneWithoutStateInput
+  modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutStateInput
 }
 
 export type StateCreateOrConnectWithoutUserInput = {
@@ -628,8 +615,7 @@ export type StateCreateWithoutNextStateInput = {
   user: Prisma.UserCreateNestedOneWithoutStatesInput
   causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
   causalX?: Prisma.ExternalCreateNestedOneWithoutStateInput
-  exercise?: Prisma.ExerciseModuleCreateNestedOneWithoutStateInput
-  nutrition?: Prisma.NutritionModuleCreateNestedOneWithoutStateInput
+  modules?: Prisma.ModuleCreateNestedManyWithoutStateInput
 }
 
 export type StateUncheckedCreateWithoutNextStateInput = {
@@ -640,8 +626,7 @@ export type StateUncheckedCreateWithoutNextStateInput = {
   causalStateId?: string | null
   nextStateId?: string | null
   causalXId?: string | null
-  exercise?: Prisma.ExerciseModuleUncheckedCreateNestedOneWithoutStateInput
-  nutrition?: Prisma.NutritionModuleUncheckedCreateNestedOneWithoutStateInput
+  modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutStateInput
 }
 
 export type StateCreateOrConnectWithoutNextStateInput = {
@@ -657,8 +642,7 @@ export type StateCreateWithoutCausalStateInput = {
   user: Prisma.UserCreateNestedOneWithoutStatesInput
   nextState?: Prisma.StateCreateNestedOneWithoutCausalStateInput
   causalX?: Prisma.ExternalCreateNestedOneWithoutStateInput
-  exercise?: Prisma.ExerciseModuleCreateNestedOneWithoutStateInput
-  nutrition?: Prisma.NutritionModuleCreateNestedOneWithoutStateInput
+  modules?: Prisma.ModuleCreateNestedManyWithoutStateInput
 }
 
 export type StateUncheckedCreateWithoutCausalStateInput = {
@@ -669,8 +653,7 @@ export type StateUncheckedCreateWithoutCausalStateInput = {
   nextStateId?: string | null
   causalXId?: string | null
   nextState?: Prisma.StateUncheckedCreateNestedOneWithoutCausalStateInput
-  exercise?: Prisma.ExerciseModuleUncheckedCreateNestedOneWithoutStateInput
-  nutrition?: Prisma.NutritionModuleUncheckedCreateNestedOneWithoutStateInput
+  modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutStateInput
 }
 
 export type StateCreateOrConnectWithoutCausalStateInput = {
@@ -697,8 +680,7 @@ export type StateUpdateWithoutNextStateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
   causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
   causalX?: Prisma.ExternalUpdateOneWithoutStateNestedInput
-  exercise?: Prisma.ExerciseModuleUpdateOneWithoutStateNestedInput
-  nutrition?: Prisma.NutritionModuleUpdateOneWithoutStateNestedInput
+  modules?: Prisma.ModuleUpdateManyWithoutStateNestedInput
 }
 
 export type StateUncheckedUpdateWithoutNextStateInput = {
@@ -709,8 +691,7 @@ export type StateUncheckedUpdateWithoutNextStateInput = {
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  exercise?: Prisma.ExerciseModuleUncheckedUpdateOneWithoutStateNestedInput
-  nutrition?: Prisma.NutritionModuleUncheckedUpdateOneWithoutStateNestedInput
+  modules?: Prisma.ModuleUncheckedUpdateManyWithoutStateNestedInput
 }
 
 export type StateUpsertWithoutCausalStateInput = {
@@ -732,8 +713,7 @@ export type StateUpdateWithoutCausalStateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
   nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
   causalX?: Prisma.ExternalUpdateOneWithoutStateNestedInput
-  exercise?: Prisma.ExerciseModuleUpdateOneWithoutStateNestedInput
-  nutrition?: Prisma.NutritionModuleUpdateOneWithoutStateNestedInput
+  modules?: Prisma.ModuleUpdateManyWithoutStateNestedInput
 }
 
 export type StateUncheckedUpdateWithoutCausalStateInput = {
@@ -744,11 +724,10 @@ export type StateUncheckedUpdateWithoutCausalStateInput = {
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
-  exercise?: Prisma.ExerciseModuleUncheckedUpdateOneWithoutStateNestedInput
-  nutrition?: Prisma.NutritionModuleUncheckedUpdateOneWithoutStateNestedInput
+  modules?: Prisma.ModuleUncheckedUpdateManyWithoutStateNestedInput
 }
 
-export type StateCreateWithoutExerciseInput = {
+export type StateCreateWithoutModulesInput = {
   id?: string
   dateCreated?: Date | string
   isActive: boolean
@@ -757,10 +736,9 @@ export type StateCreateWithoutExerciseInput = {
   causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
   nextState?: Prisma.StateCreateNestedOneWithoutCausalStateInput
   causalX?: Prisma.ExternalCreateNestedOneWithoutStateInput
-  nutrition?: Prisma.NutritionModuleCreateNestedOneWithoutStateInput
 }
 
-export type StateUncheckedCreateWithoutExerciseInput = {
+export type StateUncheckedCreateWithoutModulesInput = {
   id?: string
   userId: string
   dateCreated?: Date | string
@@ -769,26 +747,25 @@ export type StateUncheckedCreateWithoutExerciseInput = {
   nextStateId?: string | null
   causalXId?: string | null
   nextState?: Prisma.StateUncheckedCreateNestedOneWithoutCausalStateInput
-  nutrition?: Prisma.NutritionModuleUncheckedCreateNestedOneWithoutStateInput
 }
 
-export type StateCreateOrConnectWithoutExerciseInput = {
+export type StateCreateOrConnectWithoutModulesInput = {
   where: Prisma.StateWhereUniqueInput
-  create: Prisma.XOR<Prisma.StateCreateWithoutExerciseInput, Prisma.StateUncheckedCreateWithoutExerciseInput>
+  create: Prisma.XOR<Prisma.StateCreateWithoutModulesInput, Prisma.StateUncheckedCreateWithoutModulesInput>
 }
 
-export type StateUpsertWithoutExerciseInput = {
-  update: Prisma.XOR<Prisma.StateUpdateWithoutExerciseInput, Prisma.StateUncheckedUpdateWithoutExerciseInput>
-  create: Prisma.XOR<Prisma.StateCreateWithoutExerciseInput, Prisma.StateUncheckedCreateWithoutExerciseInput>
+export type StateUpsertWithoutModulesInput = {
+  update: Prisma.XOR<Prisma.StateUpdateWithoutModulesInput, Prisma.StateUncheckedUpdateWithoutModulesInput>
+  create: Prisma.XOR<Prisma.StateCreateWithoutModulesInput, Prisma.StateUncheckedCreateWithoutModulesInput>
   where?: Prisma.StateWhereInput
 }
 
-export type StateUpdateToOneWithWhereWithoutExerciseInput = {
+export type StateUpdateToOneWithWhereWithoutModulesInput = {
   where?: Prisma.StateWhereInput
-  data: Prisma.XOR<Prisma.StateUpdateWithoutExerciseInput, Prisma.StateUncheckedUpdateWithoutExerciseInput>
+  data: Prisma.XOR<Prisma.StateUpdateWithoutModulesInput, Prisma.StateUncheckedUpdateWithoutModulesInput>
 }
 
-export type StateUpdateWithoutExerciseInput = {
+export type StateUpdateWithoutModulesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -797,10 +774,9 @@ export type StateUpdateWithoutExerciseInput = {
   causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
   nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
   causalX?: Prisma.ExternalUpdateOneWithoutStateNestedInput
-  nutrition?: Prisma.NutritionModuleUpdateOneWithoutStateNestedInput
 }
 
-export type StateUncheckedUpdateWithoutExerciseInput = {
+export type StateUncheckedUpdateWithoutModulesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -809,71 +785,6 @@ export type StateUncheckedUpdateWithoutExerciseInput = {
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
-  nutrition?: Prisma.NutritionModuleUncheckedUpdateOneWithoutStateNestedInput
-}
-
-export type StateCreateWithoutNutritionInput = {
-  id?: string
-  dateCreated?: Date | string
-  isActive: boolean
-  nextStateId?: string | null
-  user: Prisma.UserCreateNestedOneWithoutStatesInput
-  causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
-  nextState?: Prisma.StateCreateNestedOneWithoutCausalStateInput
-  causalX?: Prisma.ExternalCreateNestedOneWithoutStateInput
-  exercise?: Prisma.ExerciseModuleCreateNestedOneWithoutStateInput
-}
-
-export type StateUncheckedCreateWithoutNutritionInput = {
-  id?: string
-  userId: string
-  dateCreated?: Date | string
-  isActive: boolean
-  causalStateId?: string | null
-  nextStateId?: string | null
-  causalXId?: string | null
-  nextState?: Prisma.StateUncheckedCreateNestedOneWithoutCausalStateInput
-  exercise?: Prisma.ExerciseModuleUncheckedCreateNestedOneWithoutStateInput
-}
-
-export type StateCreateOrConnectWithoutNutritionInput = {
-  where: Prisma.StateWhereUniqueInput
-  create: Prisma.XOR<Prisma.StateCreateWithoutNutritionInput, Prisma.StateUncheckedCreateWithoutNutritionInput>
-}
-
-export type StateUpsertWithoutNutritionInput = {
-  update: Prisma.XOR<Prisma.StateUpdateWithoutNutritionInput, Prisma.StateUncheckedUpdateWithoutNutritionInput>
-  create: Prisma.XOR<Prisma.StateCreateWithoutNutritionInput, Prisma.StateUncheckedCreateWithoutNutritionInput>
-  where?: Prisma.StateWhereInput
-}
-
-export type StateUpdateToOneWithWhereWithoutNutritionInput = {
-  where?: Prisma.StateWhereInput
-  data: Prisma.XOR<Prisma.StateUpdateWithoutNutritionInput, Prisma.StateUncheckedUpdateWithoutNutritionInput>
-}
-
-export type StateUpdateWithoutNutritionInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
-  causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
-  nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
-  causalX?: Prisma.ExternalUpdateOneWithoutStateNestedInput
-  exercise?: Prisma.ExerciseModuleUpdateOneWithoutStateNestedInput
-}
-
-export type StateUncheckedUpdateWithoutNutritionInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
-  exercise?: Prisma.ExerciseModuleUncheckedUpdateOneWithoutStateNestedInput
 }
 
 export type StateCreateWithoutCausalXInput = {
@@ -884,8 +795,7 @@ export type StateCreateWithoutCausalXInput = {
   user: Prisma.UserCreateNestedOneWithoutStatesInput
   causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
   nextState?: Prisma.StateCreateNestedOneWithoutCausalStateInput
-  exercise?: Prisma.ExerciseModuleCreateNestedOneWithoutStateInput
-  nutrition?: Prisma.NutritionModuleCreateNestedOneWithoutStateInput
+  modules?: Prisma.ModuleCreateNestedManyWithoutStateInput
 }
 
 export type StateUncheckedCreateWithoutCausalXInput = {
@@ -896,8 +806,7 @@ export type StateUncheckedCreateWithoutCausalXInput = {
   causalStateId?: string | null
   nextStateId?: string | null
   nextState?: Prisma.StateUncheckedCreateNestedOneWithoutCausalStateInput
-  exercise?: Prisma.ExerciseModuleUncheckedCreateNestedOneWithoutStateInput
-  nutrition?: Prisma.NutritionModuleUncheckedCreateNestedOneWithoutStateInput
+  modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutStateInput
 }
 
 export type StateCreateOrConnectWithoutCausalXInput = {
@@ -905,39 +814,25 @@ export type StateCreateOrConnectWithoutCausalXInput = {
   create: Prisma.XOR<Prisma.StateCreateWithoutCausalXInput, Prisma.StateUncheckedCreateWithoutCausalXInput>
 }
 
-export type StateUpsertWithoutCausalXInput = {
-  update: Prisma.XOR<Prisma.StateUpdateWithoutCausalXInput, Prisma.StateUncheckedUpdateWithoutCausalXInput>
-  create: Prisma.XOR<Prisma.StateCreateWithoutCausalXInput, Prisma.StateUncheckedCreateWithoutCausalXInput>
-  where?: Prisma.StateWhereInput
+export type StateCreateManyCausalXInputEnvelope = {
+  data: Prisma.StateCreateManyCausalXInput | Prisma.StateCreateManyCausalXInput[]
+  skipDuplicates?: boolean
 }
 
-export type StateUpdateToOneWithWhereWithoutCausalXInput = {
-  where?: Prisma.StateWhereInput
+export type StateUpsertWithWhereUniqueWithoutCausalXInput = {
+  where: Prisma.StateWhereUniqueInput
+  update: Prisma.XOR<Prisma.StateUpdateWithoutCausalXInput, Prisma.StateUncheckedUpdateWithoutCausalXInput>
+  create: Prisma.XOR<Prisma.StateCreateWithoutCausalXInput, Prisma.StateUncheckedCreateWithoutCausalXInput>
+}
+
+export type StateUpdateWithWhereUniqueWithoutCausalXInput = {
+  where: Prisma.StateWhereUniqueInput
   data: Prisma.XOR<Prisma.StateUpdateWithoutCausalXInput, Prisma.StateUncheckedUpdateWithoutCausalXInput>
 }
 
-export type StateUpdateWithoutCausalXInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
-  causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
-  nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
-  exercise?: Prisma.ExerciseModuleUpdateOneWithoutStateNestedInput
-  nutrition?: Prisma.NutritionModuleUpdateOneWithoutStateNestedInput
-}
-
-export type StateUncheckedUpdateWithoutCausalXInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
-  exercise?: Prisma.ExerciseModuleUncheckedUpdateOneWithoutStateNestedInput
-  nutrition?: Prisma.NutritionModuleUncheckedUpdateOneWithoutStateNestedInput
+export type StateUpdateManyWithWhereWithoutCausalXInput = {
+  where: Prisma.StateScalarWhereInput
+  data: Prisma.XOR<Prisma.StateUpdateManyMutationInput, Prisma.StateUncheckedUpdateManyWithoutCausalXInput>
 }
 
 export type StateCreateManyUserInput = {
@@ -957,8 +852,7 @@ export type StateUpdateWithoutUserInput = {
   causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
   nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
   causalX?: Prisma.ExternalUpdateOneWithoutStateNestedInput
-  exercise?: Prisma.ExerciseModuleUpdateOneWithoutStateNestedInput
-  nutrition?: Prisma.NutritionModuleUpdateOneWithoutStateNestedInput
+  modules?: Prisma.ModuleUpdateManyWithoutStateNestedInput
 }
 
 export type StateUncheckedUpdateWithoutUserInput = {
@@ -969,8 +863,7 @@ export type StateUncheckedUpdateWithoutUserInput = {
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
-  exercise?: Prisma.ExerciseModuleUncheckedUpdateOneWithoutStateNestedInput
-  nutrition?: Prisma.NutritionModuleUncheckedUpdateOneWithoutStateNestedInput
+  modules?: Prisma.ModuleUncheckedUpdateManyWithoutStateNestedInput
 }
 
 export type StateUncheckedUpdateManyWithoutUserInput = {
@@ -982,6 +875,75 @@ export type StateUncheckedUpdateManyWithoutUserInput = {
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
+export type StateCreateManyCausalXInput = {
+  id?: string
+  userId: string
+  dateCreated?: Date | string
+  isActive: boolean
+  causalStateId?: string | null
+  nextStateId?: string | null
+}
+
+export type StateUpdateWithoutCausalXInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
+  causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
+  nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
+  modules?: Prisma.ModuleUpdateManyWithoutStateNestedInput
+}
+
+export type StateUncheckedUpdateWithoutCausalXInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
+  modules?: Prisma.ModuleUncheckedUpdateManyWithoutStateNestedInput
+}
+
+export type StateUncheckedUpdateManyWithoutCausalXInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+
+/**
+ * Count Type StateCountOutputType
+ */
+
+export type StateCountOutputType = {
+  modules: number
+}
+
+export type StateCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  modules?: boolean | StateCountOutputTypeCountModulesArgs
+}
+
+/**
+ * StateCountOutputType without action
+ */
+export type StateCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StateCountOutputType
+   */
+  select?: Prisma.StateCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * StateCountOutputType without action
+ */
+export type StateCountOutputTypeCountModulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ModuleWhereInput
+}
 
 
 export type StateSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -996,8 +958,8 @@ export type StateSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   causalState?: boolean | Prisma.State$causalStateArgs<ExtArgs>
   nextState?: boolean | Prisma.State$nextStateArgs<ExtArgs>
   causalX?: boolean | Prisma.State$causalXArgs<ExtArgs>
-  exercise?: boolean | Prisma.State$exerciseArgs<ExtArgs>
-  nutrition?: boolean | Prisma.State$nutritionArgs<ExtArgs>
+  modules?: boolean | Prisma.State$modulesArgs<ExtArgs>
+  _count?: boolean | Prisma.StateCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["state"]>
 
 export type StateSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1042,8 +1004,8 @@ export type StateInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   causalState?: boolean | Prisma.State$causalStateArgs<ExtArgs>
   nextState?: boolean | Prisma.State$nextStateArgs<ExtArgs>
   causalX?: boolean | Prisma.State$causalXArgs<ExtArgs>
-  exercise?: boolean | Prisma.State$exerciseArgs<ExtArgs>
-  nutrition?: boolean | Prisma.State$nutritionArgs<ExtArgs>
+  modules?: boolean | Prisma.State$modulesArgs<ExtArgs>
+  _count?: boolean | Prisma.StateCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type StateIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1063,8 +1025,7 @@ export type $StatePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     causalState: Prisma.$StatePayload<ExtArgs> | null
     nextState: Prisma.$StatePayload<ExtArgs> | null
     causalX: Prisma.$ExternalPayload<ExtArgs> | null
-    exercise: Prisma.$ExerciseModulePayload<ExtArgs> | null
-    nutrition: Prisma.$NutritionModulePayload<ExtArgs> | null
+    modules: Prisma.$ModulePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1472,8 +1433,7 @@ export interface Prisma__StateClient<T, Null = never, ExtArgs extends runtime.Ty
   causalState<T extends Prisma.State$causalStateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$causalStateArgs<ExtArgs>>): Prisma.Prisma__StateClient<runtime.Types.Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   nextState<T extends Prisma.State$nextStateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$nextStateArgs<ExtArgs>>): Prisma.Prisma__StateClient<runtime.Types.Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   causalX<T extends Prisma.State$causalXArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$causalXArgs<ExtArgs>>): Prisma.Prisma__ExternalClient<runtime.Types.Result.GetResult<Prisma.$ExternalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  exercise<T extends Prisma.State$exerciseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$exerciseArgs<ExtArgs>>): Prisma.Prisma__ExerciseModuleClient<runtime.Types.Result.GetResult<Prisma.$ExerciseModulePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  nutrition<T extends Prisma.State$nutritionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$nutritionArgs<ExtArgs>>): Prisma.Prisma__NutritionModuleClient<runtime.Types.Result.GetResult<Prisma.$NutritionModulePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  modules<T extends Prisma.State$modulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$modulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1963,41 +1923,27 @@ export type State$causalXArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
- * State.exercise
+ * State.modules
  */
-export type State$exerciseArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type State$modulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the ExerciseModule
+   * Select specific fields to fetch from the Module
    */
-  select?: Prisma.ExerciseModuleSelect<ExtArgs> | null
+  select?: Prisma.ModuleSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the ExerciseModule
+   * Omit specific fields from the Module
    */
-  omit?: Prisma.ExerciseModuleOmit<ExtArgs> | null
+  omit?: Prisma.ModuleOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ExerciseModuleInclude<ExtArgs> | null
-  where?: Prisma.ExerciseModuleWhereInput
-}
-
-/**
- * State.nutrition
- */
-export type State$nutritionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the NutritionModule
-   */
-  select?: Prisma.NutritionModuleSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the NutritionModule
-   */
-  omit?: Prisma.NutritionModuleOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.NutritionModuleInclude<ExtArgs> | null
-  where?: Prisma.NutritionModuleWhereInput
+  include?: Prisma.ModuleInclude<ExtArgs> | null
+  where?: Prisma.ModuleWhereInput
+  orderBy?: Prisma.ModuleOrderByWithRelationInput | Prisma.ModuleOrderByWithRelationInput[]
+  cursor?: Prisma.ModuleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ModuleScalarFieldEnum | Prisma.ModuleScalarFieldEnum[]
 }
 
 /**

@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, SessionProvider } from "next-auth/react";
 import { BaseQuestion, BaseQuestionSchema, BaseUserResponse } from "@/lib/llm/schemas/base"; // The Zod schema we built earlier
-import { Biometrics, Baseline, BiometricsSchema } from "@/lib/profile/schema";
+import { Biometrics, Baseline, BiometricsSchema } from "@/lib/user/schema";
 import { Thread, ThreadSchema } from "@/lib/external/schemas/thread";
 import { AssistantMessageSchema, convertMessageToQuestion, convertQuestionToMessage, convertResponseToMessage } from "@/lib/external/schemas/message";
 import { BiometricsForm } from "./BiometricsForm"
@@ -89,7 +89,6 @@ export default function OnboardingFlow() {
       threadType: 'onboarding',
       messages: [q1Message]
     });
-    // inits thread object, replace this with a service call
     
     setThread(updated);
     setCurrentQuestion(q1);

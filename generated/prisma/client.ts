@@ -50,6 +50,11 @@ export type Account = Prisma.AccountModel
  */
 export type User = Prisma.UserModel
 /**
+ * Model Baseline
+ * 
+ */
+export type Baseline = Prisma.BaselineModel
+/**
  * Model Biometrics
  * 
  */
@@ -60,25 +65,15 @@ export type Biometrics = Prisma.BiometricsModel
  */
 export type State = Prisma.StateModel
 /**
- * Model ExerciseModule
+ * Model Module
  * 
  */
-export type ExerciseModule = Prisma.ExerciseModuleModel
+export type Module = Prisma.ModuleModel
 /**
- * Model ExerciseProgress
+ * Model Progress
  * 
  */
-export type ExerciseProgress = Prisma.ExerciseProgressModel
-/**
- * Model NutritionModule
- * 
- */
-export type NutritionModule = Prisma.NutritionModuleModel
-/**
- * Model NutritionProgress
- * 
- */
-export type NutritionProgress = Prisma.NutritionProgressModel
+export type Progress = Prisma.ProgressModel
 /**
  * Model External
  * 

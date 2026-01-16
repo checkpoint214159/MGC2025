@@ -6,6 +6,7 @@ import {
     createProgressSchema,
     createModuleBlueprintSchema,
     createModuleSchema,
+    BaseChecklistObj,
 } from '@/lib/state/schemas/base';
 
 // Note: We don't use createCategoriesSchema here because these are fixed, not catchall.
@@ -86,9 +87,7 @@ export const NutritionPlanSchema = z.union([
     HydrationPlanSchema,
 ]);
 
-export const NutritionChecklistSchema = z.object({
-    id: z.string(),
-    name: z.string(),
+export const NutritionChecklistSchema = BaseChecklistObj.extend({
     impact: z.record(z.string(), z.number()),
     metadata: z.object({
         message: z.string().optional(),
@@ -99,15 +98,13 @@ export const NutritionChecklistSchema = z.object({
 
 export const NutritionProgressSchema = createProgressSchema({
     planSchema: NutritionPlanSchema,
-}).extend({
-    checklistState: z.record(z.string(), z.boolean()).default({}),
-});
+})
 
 export const NutritionModuleBlueprintSchema = createModuleBlueprintSchema({
+    type: 'NUTRITION',
     planSchema: NutritionPlanSchema,
-}).extend({
-    checklists: z.array(NutritionChecklistSchema).default([]),
-});
+    checklistSchema: NutritionChecklistSchema
+})
 
 export const NutritionModuleSchema = createModuleSchema({
     blueprintSchema: NutritionModuleBlueprintSchema,

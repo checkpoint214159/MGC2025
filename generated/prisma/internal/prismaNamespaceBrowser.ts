@@ -53,12 +53,11 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Account: 'Account',
   User: 'User',
+  Baseline: 'Baseline',
   Biometrics: 'Biometrics',
   State: 'State',
-  ExerciseModule: 'ExerciseModule',
-  ExerciseProgress: 'ExerciseProgress',
-  NutritionModule: 'NutritionModule',
-  NutritionProgress: 'NutritionProgress',
+  Module: 'Module',
+  Progress: 'Progress',
   External: 'External',
   Thread: 'Thread',
   Message: 'Message'
@@ -101,6 +100,15 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const BaselineScalarFieldEnum = {
+  id: 'id',
+  data: 'data',
+  userId: 'userId'
+} as const
+
+export type BaselineScalarFieldEnum = (typeof BaselineScalarFieldEnum)[keyof typeof BaselineScalarFieldEnum]
+
+
 export const BiometricsScalarFieldEnum = {
   id: 'id',
   age: 'age',
@@ -126,38 +134,19 @@ export const StateScalarFieldEnum = {
 export type StateScalarFieldEnum = (typeof StateScalarFieldEnum)[keyof typeof StateScalarFieldEnum]
 
 
-export const ExerciseModuleScalarFieldEnum = {
+export const ModuleScalarFieldEnum = {
   id: 'id',
-  stateId: 'stateId',
-  summary: 'summary',
-  plan: 'plan'
-} as const
-
-export type ExerciseModuleScalarFieldEnum = (typeof ExerciseModuleScalarFieldEnum)[keyof typeof ExerciseModuleScalarFieldEnum]
-
-
-export const ExerciseProgressScalarFieldEnum = {
-  id: 'id',
-  moduleId: 'moduleId',
-  summary: 'summary',
-  trackables: 'trackables'
-} as const
-
-export type ExerciseProgressScalarFieldEnum = (typeof ExerciseProgressScalarFieldEnum)[keyof typeof ExerciseProgressScalarFieldEnum]
-
-
-export const NutritionModuleScalarFieldEnum = {
-  id: 'id',
+  type: 'type',
   stateId: 'stateId',
   summary: 'summary',
   plan: 'plan',
   checklists: 'checklists'
 } as const
 
-export type NutritionModuleScalarFieldEnum = (typeof NutritionModuleScalarFieldEnum)[keyof typeof NutritionModuleScalarFieldEnum]
+export type ModuleScalarFieldEnum = (typeof ModuleScalarFieldEnum)[keyof typeof ModuleScalarFieldEnum]
 
 
-export const NutritionProgressScalarFieldEnum = {
+export const ProgressScalarFieldEnum = {
   id: 'id',
   moduleId: 'moduleId',
   summary: 'summary',
@@ -165,15 +154,15 @@ export const NutritionProgressScalarFieldEnum = {
   checklistState: 'checklistState'
 } as const
 
-export type NutritionProgressScalarFieldEnum = (typeof NutritionProgressScalarFieldEnum)[keyof typeof NutritionProgressScalarFieldEnum]
+export type ProgressScalarFieldEnum = (typeof ProgressScalarFieldEnum)[keyof typeof ProgressScalarFieldEnum]
 
 
 export const ExternalScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   dateCreated: 'dateCreated',
   threadContext: 'threadContext',
-  messageCount: 'messageCount',
-  threadCount: 'threadCount'
+  profile: 'profile'
 } as const
 
 export type ExternalScalarFieldEnum = (typeof ExternalScalarFieldEnum)[keyof typeof ExternalScalarFieldEnum]
