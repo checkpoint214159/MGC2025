@@ -2,9 +2,10 @@ import z from "zod"
 import { ThreadContextSchema } from "./thread";
 
 export const ExternalSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   dateCreated: z.coerce.date(),
   threadContext: ThreadContextSchema, // Validates your "Frozen" JSON
-  messageCount: z.number().nullable(),
-  threadCount: z.number().nullable(),
+  profile: z.string(),
 });
+
+export type External = z.infer<typeof ExternalSchema>

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { generateObject } from 'ai';
 import { BaseQuestionSchema, type BaseQuestion } from '@/lib/llm/schemas/base';
 import { Thread } from '@/lib/external/schemas/thread';
-import { Biometrics } from "@/lib/profile/schema";
+import { Biometrics } from "@/lib/user/schema";
 import { BaseMessage } from "@/lib/external/schemas/message";
 
 const SYSTEM_PROMPT = `
@@ -69,9 +69,6 @@ export async function getNextLLMQuestion(biometrics: any, thread: Thread): Promi
         `,
     });
 
-  // 'object' is now fully typed and guaranteed to match BaseQuestionSchema
-  console.log('server: thread messages', thread.messages)
-  console.log('server:', object)
   return object; 
 }
 
@@ -105,8 +102,6 @@ export async function setBiometric(userId: string, bio: Biometrics) {
       sex: bio.sex,
       treatment: bio.treatment,
       surgeryDate: bio.surgeryDate,
-    //   weightKg: bio.weightKg,
-    //   heightCm: bio.heightCm,
     },
     create: {
       userId: userId, // Ensure the relation is linked on creation
@@ -114,8 +109,6 @@ export async function setBiometric(userId: string, bio: Biometrics) {
       sex: bio.sex,
       treatment: bio.treatment,
       surgeryDate: bio.surgeryDate,
-    //   weightKg: bio.weightKg,
-    //   heightCm: bio.heightCm,
     },
   });
 }

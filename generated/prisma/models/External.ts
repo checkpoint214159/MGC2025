@@ -20,76 +20,54 @@ export type ExternalModel = runtime.Types.Result.DefaultSelection<Prisma.$Extern
 
 export type AggregateExternal = {
   _count: ExternalCountAggregateOutputType | null
-  _avg: ExternalAvgAggregateOutputType | null
-  _sum: ExternalSumAggregateOutputType | null
   _min: ExternalMinAggregateOutputType | null
   _max: ExternalMaxAggregateOutputType | null
 }
 
-export type ExternalAvgAggregateOutputType = {
-  messageCount: number | null
-  threadCount: number | null
-}
-
-export type ExternalSumAggregateOutputType = {
-  messageCount: number | null
-  threadCount: number | null
-}
-
 export type ExternalMinAggregateOutputType = {
   id: string | null
+  userId: string | null
   dateCreated: Date | null
-  messageCount: number | null
-  threadCount: number | null
+  profile: string | null
 }
 
 export type ExternalMaxAggregateOutputType = {
   id: string | null
+  userId: string | null
   dateCreated: Date | null
-  messageCount: number | null
-  threadCount: number | null
+  profile: string | null
 }
 
 export type ExternalCountAggregateOutputType = {
   id: number
+  userId: number
   dateCreated: number
   threadContext: number
-  messageCount: number
-  threadCount: number
+  profile: number
   _all: number
 }
 
 
-export type ExternalAvgAggregateInputType = {
-  messageCount?: true
-  threadCount?: true
-}
-
-export type ExternalSumAggregateInputType = {
-  messageCount?: true
-  threadCount?: true
-}
-
 export type ExternalMinAggregateInputType = {
   id?: true
+  userId?: true
   dateCreated?: true
-  messageCount?: true
-  threadCount?: true
+  profile?: true
 }
 
 export type ExternalMaxAggregateInputType = {
   id?: true
+  userId?: true
   dateCreated?: true
-  messageCount?: true
-  threadCount?: true
+  profile?: true
 }
 
 export type ExternalCountAggregateInputType = {
   id?: true
+  userId?: true
   dateCreated?: true
   threadContext?: true
-  messageCount?: true
-  threadCount?: true
+  profile?: true
   _all?: true
 }
 
@@ -131,18 +109,6 @@ export type ExternalAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: ExternalAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: ExternalSumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: ExternalMinAggregateInputType
@@ -173,21 +139,17 @@ export type ExternalGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   _count?: ExternalCountAggregateInputType | true
-  _avg?: ExternalAvgAggregateInputType
-  _sum?: ExternalSumAggregateInputType
   _min?: ExternalMinAggregateInputType
   _max?: ExternalMaxAggregateInputType
 }
 
 export type ExternalGroupByOutputType = {
   id: string
+  userId: string
   dateCreated: Date
   threadContext: runtime.JsonValue
-  messageCount: number | null
-  threadCount: number | null
+  profile: string
   _count: ExternalCountAggregateOutputType | null
-  _avg: ExternalAvgAggregateOutputType | null
-  _sum: ExternalSumAggregateOutputType | null
   _min: ExternalMinAggregateOutputType | null
   _max: ExternalMaxAggregateOutputType | null
 }
@@ -212,20 +174,22 @@ export type ExternalWhereInput = {
   OR?: Prisma.ExternalWhereInput[]
   NOT?: Prisma.ExternalWhereInput | Prisma.ExternalWhereInput[]
   id?: Prisma.StringFilter<"External"> | string
+  userId?: Prisma.StringFilter<"External"> | string
   dateCreated?: Prisma.DateTimeFilter<"External"> | Date | string
   threadContext?: Prisma.JsonFilter<"External">
-  messageCount?: Prisma.IntNullableFilter<"External"> | number | null
-  threadCount?: Prisma.IntNullableFilter<"External"> | number | null
-  state?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
+  profile?: Prisma.StringFilter<"External"> | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  state?: Prisma.StateListRelationFilter
 }
 
 export type ExternalOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   dateCreated?: Prisma.SortOrder
   threadContext?: Prisma.SortOrder
-  messageCount?: Prisma.SortOrderInput | Prisma.SortOrder
-  threadCount?: Prisma.SortOrderInput | Prisma.SortOrder
-  state?: Prisma.StateOrderByWithRelationInput
+  profile?: Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
+  state?: Prisma.StateOrderByRelationAggregateInput
 }
 
 export type ExternalWhereUniqueInput = Prisma.AtLeast<{
@@ -233,24 +197,23 @@ export type ExternalWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ExternalWhereInput | Prisma.ExternalWhereInput[]
   OR?: Prisma.ExternalWhereInput[]
   NOT?: Prisma.ExternalWhereInput | Prisma.ExternalWhereInput[]
+  userId?: Prisma.StringFilter<"External"> | string
   dateCreated?: Prisma.DateTimeFilter<"External"> | Date | string
   threadContext?: Prisma.JsonFilter<"External">
-  messageCount?: Prisma.IntNullableFilter<"External"> | number | null
-  threadCount?: Prisma.IntNullableFilter<"External"> | number | null
-  state?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
+  profile?: Prisma.StringFilter<"External"> | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  state?: Prisma.StateListRelationFilter
 }, "id">
 
 export type ExternalOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   dateCreated?: Prisma.SortOrder
   threadContext?: Prisma.SortOrder
-  messageCount?: Prisma.SortOrderInput | Prisma.SortOrder
-  threadCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  profile?: Prisma.SortOrder
   _count?: Prisma.ExternalCountOrderByAggregateInput
-  _avg?: Prisma.ExternalAvgOrderByAggregateInput
   _max?: Prisma.ExternalMaxOrderByAggregateInput
   _min?: Prisma.ExternalMinOrderByAggregateInput
-  _sum?: Prisma.ExternalSumOrderByAggregateInput
 }
 
 export type ExternalScalarWhereWithAggregatesInput = {
@@ -258,70 +221,79 @@ export type ExternalScalarWhereWithAggregatesInput = {
   OR?: Prisma.ExternalScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ExternalScalarWhereWithAggregatesInput | Prisma.ExternalScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"External"> | string
+  userId?: Prisma.StringWithAggregatesFilter<"External"> | string
   dateCreated?: Prisma.DateTimeWithAggregatesFilter<"External"> | Date | string
   threadContext?: Prisma.JsonWithAggregatesFilter<"External">
-  messageCount?: Prisma.IntNullableWithAggregatesFilter<"External"> | number | null
-  threadCount?: Prisma.IntNullableWithAggregatesFilter<"External"> | number | null
+  profile?: Prisma.StringWithAggregatesFilter<"External"> | string
 }
 
 export type ExternalCreateInput = {
   id?: string
   dateCreated?: Date | string
   threadContext: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  messageCount?: number | null
-  threadCount?: number | null
-  state?: Prisma.StateCreateNestedOneWithoutCausalXInput
+  profile: string
+  user: Prisma.UserCreateNestedOneWithoutExternalsInput
+  state?: Prisma.StateCreateNestedManyWithoutCausalXInput
 }
 
 export type ExternalUncheckedCreateInput = {
   id?: string
+  userId: string
   dateCreated?: Date | string
   threadContext: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  messageCount?: number | null
-  threadCount?: number | null
-  state?: Prisma.StateUncheckedCreateNestedOneWithoutCausalXInput
+  profile: string
+  state?: Prisma.StateUncheckedCreateNestedManyWithoutCausalXInput
 }
 
 export type ExternalUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   threadContext?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  messageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  threadCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  state?: Prisma.StateUpdateOneWithoutCausalXNestedInput
+  profile?: Prisma.StringFieldUpdateOperationsInput | string
+  user?: Prisma.UserUpdateOneRequiredWithoutExternalsNestedInput
+  state?: Prisma.StateUpdateManyWithoutCausalXNestedInput
 }
 
 export type ExternalUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   threadContext?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  messageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  threadCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  state?: Prisma.StateUncheckedUpdateOneWithoutCausalXNestedInput
+  profile?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StateUncheckedUpdateManyWithoutCausalXNestedInput
 }
 
 export type ExternalCreateManyInput = {
   id?: string
+  userId: string
   dateCreated?: Date | string
   threadContext: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  messageCount?: number | null
-  threadCount?: number | null
+  profile: string
 }
 
 export type ExternalUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   threadContext?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  messageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  threadCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  profile?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ExternalUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   threadContext?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  messageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  threadCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  profile?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type ExternalListRelationFilter = {
+  every?: Prisma.ExternalWhereInput
+  some?: Prisma.ExternalWhereInput
+  none?: Prisma.ExternalWhereInput
+}
+
+export type ExternalOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type ExternalNullableScalarRelationFilter = {
@@ -331,34 +303,66 @@ export type ExternalNullableScalarRelationFilter = {
 
 export type ExternalCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   dateCreated?: Prisma.SortOrder
   threadContext?: Prisma.SortOrder
-  messageCount?: Prisma.SortOrder
-  threadCount?: Prisma.SortOrder
-}
-
-export type ExternalAvgOrderByAggregateInput = {
-  messageCount?: Prisma.SortOrder
-  threadCount?: Prisma.SortOrder
+  profile?: Prisma.SortOrder
 }
 
 export type ExternalMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   dateCreated?: Prisma.SortOrder
-  messageCount?: Prisma.SortOrder
-  threadCount?: Prisma.SortOrder
+  profile?: Prisma.SortOrder
 }
 
 export type ExternalMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   dateCreated?: Prisma.SortOrder
-  messageCount?: Prisma.SortOrder
-  threadCount?: Prisma.SortOrder
+  profile?: Prisma.SortOrder
 }
 
-export type ExternalSumOrderByAggregateInput = {
-  messageCount?: Prisma.SortOrder
-  threadCount?: Prisma.SortOrder
+export type ExternalCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.ExternalCreateWithoutUserInput, Prisma.ExternalUncheckedCreateWithoutUserInput> | Prisma.ExternalCreateWithoutUserInput[] | Prisma.ExternalUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ExternalCreateOrConnectWithoutUserInput | Prisma.ExternalCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.ExternalCreateManyUserInputEnvelope
+  connect?: Prisma.ExternalWhereUniqueInput | Prisma.ExternalWhereUniqueInput[]
+}
+
+export type ExternalUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.ExternalCreateWithoutUserInput, Prisma.ExternalUncheckedCreateWithoutUserInput> | Prisma.ExternalCreateWithoutUserInput[] | Prisma.ExternalUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ExternalCreateOrConnectWithoutUserInput | Prisma.ExternalCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.ExternalCreateManyUserInputEnvelope
+  connect?: Prisma.ExternalWhereUniqueInput | Prisma.ExternalWhereUniqueInput[]
+}
+
+export type ExternalUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ExternalCreateWithoutUserInput, Prisma.ExternalUncheckedCreateWithoutUserInput> | Prisma.ExternalCreateWithoutUserInput[] | Prisma.ExternalUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ExternalCreateOrConnectWithoutUserInput | Prisma.ExternalCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.ExternalUpsertWithWhereUniqueWithoutUserInput | Prisma.ExternalUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.ExternalCreateManyUserInputEnvelope
+  set?: Prisma.ExternalWhereUniqueInput | Prisma.ExternalWhereUniqueInput[]
+  disconnect?: Prisma.ExternalWhereUniqueInput | Prisma.ExternalWhereUniqueInput[]
+  delete?: Prisma.ExternalWhereUniqueInput | Prisma.ExternalWhereUniqueInput[]
+  connect?: Prisma.ExternalWhereUniqueInput | Prisma.ExternalWhereUniqueInput[]
+  update?: Prisma.ExternalUpdateWithWhereUniqueWithoutUserInput | Prisma.ExternalUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.ExternalUpdateManyWithWhereWithoutUserInput | Prisma.ExternalUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.ExternalScalarWhereInput | Prisma.ExternalScalarWhereInput[]
+}
+
+export type ExternalUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ExternalCreateWithoutUserInput, Prisma.ExternalUncheckedCreateWithoutUserInput> | Prisma.ExternalCreateWithoutUserInput[] | Prisma.ExternalUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ExternalCreateOrConnectWithoutUserInput | Prisma.ExternalCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.ExternalUpsertWithWhereUniqueWithoutUserInput | Prisma.ExternalUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.ExternalCreateManyUserInputEnvelope
+  set?: Prisma.ExternalWhereUniqueInput | Prisma.ExternalWhereUniqueInput[]
+  disconnect?: Prisma.ExternalWhereUniqueInput | Prisma.ExternalWhereUniqueInput[]
+  delete?: Prisma.ExternalWhereUniqueInput | Prisma.ExternalWhereUniqueInput[]
+  connect?: Prisma.ExternalWhereUniqueInput | Prisma.ExternalWhereUniqueInput[]
+  update?: Prisma.ExternalUpdateWithWhereUniqueWithoutUserInput | Prisma.ExternalUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.ExternalUpdateManyWithWhereWithoutUserInput | Prisma.ExternalUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.ExternalScalarWhereInput | Prisma.ExternalScalarWhereInput[]
 }
 
 export type ExternalCreateNestedOneWithoutStateInput = {
@@ -377,28 +381,73 @@ export type ExternalUpdateOneWithoutStateNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ExternalUpdateToOneWithWhereWithoutStateInput, Prisma.ExternalUpdateWithoutStateInput>, Prisma.ExternalUncheckedUpdateWithoutStateInput>
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
+export type ExternalCreateWithoutUserInput = {
+  id?: string
+  dateCreated?: Date | string
+  threadContext: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  profile: string
+  state?: Prisma.StateCreateNestedManyWithoutCausalXInput
+}
+
+export type ExternalUncheckedCreateWithoutUserInput = {
+  id?: string
+  dateCreated?: Date | string
+  threadContext: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  profile: string
+  state?: Prisma.StateUncheckedCreateNestedManyWithoutCausalXInput
+}
+
+export type ExternalCreateOrConnectWithoutUserInput = {
+  where: Prisma.ExternalWhereUniqueInput
+  create: Prisma.XOR<Prisma.ExternalCreateWithoutUserInput, Prisma.ExternalUncheckedCreateWithoutUserInput>
+}
+
+export type ExternalCreateManyUserInputEnvelope = {
+  data: Prisma.ExternalCreateManyUserInput | Prisma.ExternalCreateManyUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type ExternalUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.ExternalWhereUniqueInput
+  update: Prisma.XOR<Prisma.ExternalUpdateWithoutUserInput, Prisma.ExternalUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.ExternalCreateWithoutUserInput, Prisma.ExternalUncheckedCreateWithoutUserInput>
+}
+
+export type ExternalUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.ExternalWhereUniqueInput
+  data: Prisma.XOR<Prisma.ExternalUpdateWithoutUserInput, Prisma.ExternalUncheckedUpdateWithoutUserInput>
+}
+
+export type ExternalUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.ExternalScalarWhereInput
+  data: Prisma.XOR<Prisma.ExternalUpdateManyMutationInput, Prisma.ExternalUncheckedUpdateManyWithoutUserInput>
+}
+
+export type ExternalScalarWhereInput = {
+  AND?: Prisma.ExternalScalarWhereInput | Prisma.ExternalScalarWhereInput[]
+  OR?: Prisma.ExternalScalarWhereInput[]
+  NOT?: Prisma.ExternalScalarWhereInput | Prisma.ExternalScalarWhereInput[]
+  id?: Prisma.StringFilter<"External"> | string
+  userId?: Prisma.StringFilter<"External"> | string
+  dateCreated?: Prisma.DateTimeFilter<"External"> | Date | string
+  threadContext?: Prisma.JsonFilter<"External">
+  profile?: Prisma.StringFilter<"External"> | string
 }
 
 export type ExternalCreateWithoutStateInput = {
   id?: string
   dateCreated?: Date | string
   threadContext: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  messageCount?: number | null
-  threadCount?: number | null
+  profile: string
+  user: Prisma.UserCreateNestedOneWithoutExternalsInput
 }
 
 export type ExternalUncheckedCreateWithoutStateInput = {
   id?: string
+  userId: string
   dateCreated?: Date | string
   threadContext: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  messageCount?: number | null
-  threadCount?: number | null
+  profile: string
 }
 
 export type ExternalCreateOrConnectWithoutStateInput = {
@@ -421,71 +470,141 @@ export type ExternalUpdateWithoutStateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   threadContext?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  messageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  threadCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  profile?: Prisma.StringFieldUpdateOperationsInput | string
+  user?: Prisma.UserUpdateOneRequiredWithoutExternalsNestedInput
 }
 
 export type ExternalUncheckedUpdateWithoutStateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   threadContext?: Prisma.JsonNullValueInput | runtime.InputJsonValue
-  messageCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  threadCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  profile?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
+export type ExternalCreateManyUserInput = {
+  id?: string
+  dateCreated?: Date | string
+  threadContext: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  profile: string
+}
+
+export type ExternalUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  threadContext?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  profile?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StateUpdateManyWithoutCausalXNestedInput
+}
+
+export type ExternalUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  threadContext?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  profile?: Prisma.StringFieldUpdateOperationsInput | string
+  state?: Prisma.StateUncheckedUpdateManyWithoutCausalXNestedInput
+}
+
+export type ExternalUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  threadContext?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  profile?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+
+/**
+ * Count Type ExternalCountOutputType
+ */
+
+export type ExternalCountOutputType = {
+  state: number
+}
+
+export type ExternalCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  state?: boolean | ExternalCountOutputTypeCountStateArgs
+}
+
+/**
+ * ExternalCountOutputType without action
+ */
+export type ExternalCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ExternalCountOutputType
+   */
+  select?: Prisma.ExternalCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ExternalCountOutputType without action
+ */
+export type ExternalCountOutputTypeCountStateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StateWhereInput
+}
 
 
 export type ExternalSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  userId?: boolean
   dateCreated?: boolean
   threadContext?: boolean
-  messageCount?: boolean
-  threadCount?: boolean
+  profile?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   state?: boolean | Prisma.External$stateArgs<ExtArgs>
+  _count?: boolean | Prisma.ExternalCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["external"]>
 
 export type ExternalSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  userId?: boolean
   dateCreated?: boolean
   threadContext?: boolean
-  messageCount?: boolean
-  threadCount?: boolean
+  profile?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["external"]>
 
 export type ExternalSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  userId?: boolean
   dateCreated?: boolean
   threadContext?: boolean
-  messageCount?: boolean
-  threadCount?: boolean
+  profile?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["external"]>
 
 export type ExternalSelectScalar = {
   id?: boolean
+  userId?: boolean
   dateCreated?: boolean
   threadContext?: boolean
-  messageCount?: boolean
-  threadCount?: boolean
+  profile?: boolean
 }
 
-export type ExternalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "dateCreated" | "threadContext" | "messageCount" | "threadCount", ExtArgs["result"]["external"]>
+export type ExternalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "dateCreated" | "threadContext" | "profile", ExtArgs["result"]["external"]>
 export type ExternalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   state?: boolean | Prisma.External$stateArgs<ExtArgs>
+  _count?: boolean | Prisma.ExternalCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type ExternalIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type ExternalIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ExternalIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type ExternalIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
 
 export type $ExternalPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "External"
   objects: {
-    state: Prisma.$StatePayload<ExtArgs> | null
+    user: Prisma.$UserPayload<ExtArgs>
+    state: Prisma.$StatePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    userId: string
     dateCreated: Date
     threadContext: runtime.JsonValue
-    messageCount: number | null
-    threadCount: number | null
+    profile: string
   }, ExtArgs["result"]["external"]>
   composites: {}
 }
@@ -880,7 +999,8 @@ readonly fields: ExternalFieldRefs;
  */
 export interface Prisma__ExternalClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  state<T extends Prisma.External$stateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.External$stateArgs<ExtArgs>>): Prisma.Prisma__StateClient<runtime.Types.Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  state<T extends Prisma.External$stateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.External$stateArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -911,10 +1031,10 @@ export interface Prisma__ExternalClient<T, Null = never, ExtArgs extends runtime
  */
 export interface ExternalFieldRefs {
   readonly id: Prisma.FieldRef<"External", 'String'>
+  readonly userId: Prisma.FieldRef<"External", 'String'>
   readonly dateCreated: Prisma.FieldRef<"External", 'DateTime'>
   readonly threadContext: Prisma.FieldRef<"External", 'Json'>
-  readonly messageCount: Prisma.FieldRef<"External", 'Int'>
-  readonly threadCount: Prisma.FieldRef<"External", 'Int'>
+  readonly profile: Prisma.FieldRef<"External", 'String'>
 }
     
 
@@ -1164,6 +1284,10 @@ export type ExternalCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    */
   data: Prisma.ExternalCreateManyInput | Prisma.ExternalCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExternalIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1234,6 +1358,10 @@ export type ExternalUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many Externals to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExternalIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1319,6 +1447,11 @@ export type External$stateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    */
   include?: Prisma.StateInclude<ExtArgs> | null
   where?: Prisma.StateWhereInput
+  orderBy?: Prisma.StateOrderByWithRelationInput | Prisma.StateOrderByWithRelationInput[]
+  cursor?: Prisma.StateWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StateScalarFieldEnum | Prisma.StateScalarFieldEnum[]
 }
 
 /**
