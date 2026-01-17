@@ -64,7 +64,9 @@ model Biometrics {
 model State {
   id           String   @id @default(cuid())
   userId       String
-  dateCreated  DateTime @db.Date @default(now())
+  dateCreated  DateTime @db.Date
+
+  createdAt    DateTime @default(now())
 
   isActive      Boolean
 
@@ -83,14 +85,12 @@ model State {
 
   // all modules attached to the state
   modules       Module[]
-
-  @@unique([userId, dateCreated, isActive])
 }
 
 model Module {
   id          String    @id @default(cuid())
   type        String
-  stateId     String    @unique
+  stateId     String
   state       State @relation(fields: [stateId], references: [id], onDelete: Cascade)
   
   summary     String?

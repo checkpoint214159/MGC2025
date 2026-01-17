@@ -28,6 +28,7 @@ export function DateProvider({
   const value = useMemo(() => {
     const normalized = new Date(new Date(date).setHours(0, 0, 0, 0));
     const realToday = new Date(new Date().setHours(0, 0, 0, 0));
+    console.log('normalized.getTime()', normalized.getTime())
     
     console.log('raw date in dateProvider?', date)
     return {

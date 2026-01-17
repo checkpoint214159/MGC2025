@@ -28,6 +28,7 @@ export type StateMinAggregateOutputType = {
   id: string | null
   userId: string | null
   dateCreated: Date | null
+  createdAt: Date | null
   isActive: boolean | null
   causalStateId: string | null
   nextStateId: string | null
@@ -38,6 +39,7 @@ export type StateMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   dateCreated: Date | null
+  createdAt: Date | null
   isActive: boolean | null
   causalStateId: string | null
   nextStateId: string | null
@@ -48,6 +50,7 @@ export type StateCountAggregateOutputType = {
   id: number
   userId: number
   dateCreated: number
+  createdAt: number
   isActive: number
   causalStateId: number
   nextStateId: number
@@ -60,6 +63,7 @@ export type StateMinAggregateInputType = {
   id?: true
   userId?: true
   dateCreated?: true
+  createdAt?: true
   isActive?: true
   causalStateId?: true
   nextStateId?: true
@@ -70,6 +74,7 @@ export type StateMaxAggregateInputType = {
   id?: true
   userId?: true
   dateCreated?: true
+  createdAt?: true
   isActive?: true
   causalStateId?: true
   nextStateId?: true
@@ -80,6 +85,7 @@ export type StateCountAggregateInputType = {
   id?: true
   userId?: true
   dateCreated?: true
+  createdAt?: true
   isActive?: true
   causalStateId?: true
   nextStateId?: true
@@ -163,6 +169,7 @@ export type StateGroupByOutputType = {
   id: string
   userId: string
   dateCreated: Date
+  createdAt: Date
   isActive: boolean
   causalStateId: string | null
   nextStateId: string | null
@@ -194,6 +201,7 @@ export type StateWhereInput = {
   id?: Prisma.StringFilter<"State"> | string
   userId?: Prisma.StringFilter<"State"> | string
   dateCreated?: Prisma.DateTimeFilter<"State"> | Date | string
+  createdAt?: Prisma.DateTimeFilter<"State"> | Date | string
   isActive?: Prisma.BoolFilter<"State"> | boolean
   causalStateId?: Prisma.StringNullableFilter<"State"> | string | null
   nextStateId?: Prisma.StringNullableFilter<"State"> | string | null
@@ -209,6 +217,7 @@ export type StateOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   dateCreated?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   causalStateId?: Prisma.SortOrderInput | Prisma.SortOrder
   nextStateId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -225,24 +234,25 @@ export type StateWhereUniqueInput = Prisma.AtLeast<{
   causalStateId?: string
   nextStateId?: string
   causalXId?: string
-  userId_dateCreated_isActive?: Prisma.StateUserIdDateCreatedIsActiveCompoundUniqueInput
   AND?: Prisma.StateWhereInput | Prisma.StateWhereInput[]
   OR?: Prisma.StateWhereInput[]
   NOT?: Prisma.StateWhereInput | Prisma.StateWhereInput[]
   userId?: Prisma.StringFilter<"State"> | string
   dateCreated?: Prisma.DateTimeFilter<"State"> | Date | string
+  createdAt?: Prisma.DateTimeFilter<"State"> | Date | string
   isActive?: Prisma.BoolFilter<"State"> | boolean
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   causalState?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
   nextState?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
   causalX?: Prisma.XOR<Prisma.ExternalNullableScalarRelationFilter, Prisma.ExternalWhereInput> | null
   modules?: Prisma.ModuleListRelationFilter
-}, "id" | "causalStateId" | "nextStateId" | "causalXId" | "userId_dateCreated_isActive">
+}, "id" | "causalStateId" | "nextStateId" | "causalXId">
 
 export type StateOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   dateCreated?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   causalStateId?: Prisma.SortOrderInput | Prisma.SortOrder
   nextStateId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -259,6 +269,7 @@ export type StateScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"State"> | string
   userId?: Prisma.StringWithAggregatesFilter<"State"> | string
   dateCreated?: Prisma.DateTimeWithAggregatesFilter<"State"> | Date | string
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"State"> | Date | string
   isActive?: Prisma.BoolWithAggregatesFilter<"State"> | boolean
   causalStateId?: Prisma.StringNullableWithAggregatesFilter<"State"> | string | null
   nextStateId?: Prisma.StringNullableWithAggregatesFilter<"State"> | string | null
@@ -267,7 +278,8 @@ export type StateScalarWhereWithAggregatesInput = {
 
 export type StateCreateInput = {
   id?: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   nextStateId?: string | null
   user: Prisma.UserCreateNestedOneWithoutStatesInput
@@ -280,7 +292,8 @@ export type StateCreateInput = {
 export type StateUncheckedCreateInput = {
   id?: string
   userId: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   causalStateId?: string | null
   nextStateId?: string | null
@@ -292,6 +305,7 @@ export type StateUncheckedCreateInput = {
 export type StateUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
@@ -305,6 +319,7 @@ export type StateUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -316,7 +331,8 @@ export type StateUncheckedUpdateInput = {
 export type StateCreateManyInput = {
   id?: string
   userId: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   causalStateId?: string | null
   nextStateId?: string | null
@@ -326,6 +342,7 @@ export type StateCreateManyInput = {
 export type StateUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -334,6 +351,7 @@ export type StateUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -355,16 +373,11 @@ export type StateNullableScalarRelationFilter = {
   isNot?: Prisma.StateWhereInput | null
 }
 
-export type StateUserIdDateCreatedIsActiveCompoundUniqueInput = {
-  userId: string
-  dateCreated: Date | string
-  isActive: boolean
-}
-
 export type StateCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   dateCreated?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   causalStateId?: Prisma.SortOrder
   nextStateId?: Prisma.SortOrder
@@ -375,6 +388,7 @@ export type StateMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   dateCreated?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   causalStateId?: Prisma.SortOrder
   nextStateId?: Prisma.SortOrder
@@ -385,6 +399,7 @@ export type StateMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   dateCreated?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   causalStateId?: Prisma.SortOrder
   nextStateId?: Prisma.SortOrder
@@ -548,7 +563,8 @@ export type StateUncheckedUpdateManyWithoutCausalXNestedInput = {
 
 export type StateCreateWithoutUserInput = {
   id?: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   nextStateId?: string | null
   causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
@@ -559,7 +575,8 @@ export type StateCreateWithoutUserInput = {
 
 export type StateUncheckedCreateWithoutUserInput = {
   id?: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   causalStateId?: string | null
   nextStateId?: string | null
@@ -601,6 +618,7 @@ export type StateScalarWhereInput = {
   id?: Prisma.StringFilter<"State"> | string
   userId?: Prisma.StringFilter<"State"> | string
   dateCreated?: Prisma.DateTimeFilter<"State"> | Date | string
+  createdAt?: Prisma.DateTimeFilter<"State"> | Date | string
   isActive?: Prisma.BoolFilter<"State"> | boolean
   causalStateId?: Prisma.StringNullableFilter<"State"> | string | null
   nextStateId?: Prisma.StringNullableFilter<"State"> | string | null
@@ -609,7 +627,8 @@ export type StateScalarWhereInput = {
 
 export type StateCreateWithoutNextStateInput = {
   id?: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   nextStateId?: string | null
   user: Prisma.UserCreateNestedOneWithoutStatesInput
@@ -621,7 +640,8 @@ export type StateCreateWithoutNextStateInput = {
 export type StateUncheckedCreateWithoutNextStateInput = {
   id?: string
   userId: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   causalStateId?: string | null
   nextStateId?: string | null
@@ -636,7 +656,8 @@ export type StateCreateOrConnectWithoutNextStateInput = {
 
 export type StateCreateWithoutCausalStateInput = {
   id?: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   nextStateId?: string | null
   user: Prisma.UserCreateNestedOneWithoutStatesInput
@@ -648,7 +669,8 @@ export type StateCreateWithoutCausalStateInput = {
 export type StateUncheckedCreateWithoutCausalStateInput = {
   id?: string
   userId: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   nextStateId?: string | null
   causalXId?: string | null
@@ -675,6 +697,7 @@ export type StateUpdateToOneWithWhereWithoutNextStateInput = {
 export type StateUpdateWithoutNextStateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
@@ -687,6 +710,7 @@ export type StateUncheckedUpdateWithoutNextStateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -708,6 +732,7 @@ export type StateUpdateToOneWithWhereWithoutCausalStateInput = {
 export type StateUpdateWithoutCausalStateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
@@ -720,6 +745,7 @@ export type StateUncheckedUpdateWithoutCausalStateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -729,7 +755,8 @@ export type StateUncheckedUpdateWithoutCausalStateInput = {
 
 export type StateCreateWithoutModulesInput = {
   id?: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   nextStateId?: string | null
   user: Prisma.UserCreateNestedOneWithoutStatesInput
@@ -741,7 +768,8 @@ export type StateCreateWithoutModulesInput = {
 export type StateUncheckedCreateWithoutModulesInput = {
   id?: string
   userId: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   causalStateId?: string | null
   nextStateId?: string | null
@@ -768,6 +796,7 @@ export type StateUpdateToOneWithWhereWithoutModulesInput = {
 export type StateUpdateWithoutModulesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
@@ -780,6 +809,7 @@ export type StateUncheckedUpdateWithoutModulesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -789,7 +819,8 @@ export type StateUncheckedUpdateWithoutModulesInput = {
 
 export type StateCreateWithoutCausalXInput = {
   id?: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   nextStateId?: string | null
   user: Prisma.UserCreateNestedOneWithoutStatesInput
@@ -801,7 +832,8 @@ export type StateCreateWithoutCausalXInput = {
 export type StateUncheckedCreateWithoutCausalXInput = {
   id?: string
   userId: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   causalStateId?: string | null
   nextStateId?: string | null
@@ -837,7 +869,8 @@ export type StateUpdateManyWithWhereWithoutCausalXInput = {
 
 export type StateCreateManyUserInput = {
   id?: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   causalStateId?: string | null
   nextStateId?: string | null
@@ -847,6 +880,7 @@ export type StateCreateManyUserInput = {
 export type StateUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
@@ -858,6 +892,7 @@ export type StateUpdateWithoutUserInput = {
 export type StateUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -869,6 +904,7 @@ export type StateUncheckedUpdateWithoutUserInput = {
 export type StateUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -878,7 +914,8 @@ export type StateUncheckedUpdateManyWithoutUserInput = {
 export type StateCreateManyCausalXInput = {
   id?: string
   userId: string
-  dateCreated?: Date | string
+  dateCreated: Date | string
+  createdAt?: Date | string
   isActive: boolean
   causalStateId?: string | null
   nextStateId?: string | null
@@ -887,6 +924,7 @@ export type StateCreateManyCausalXInput = {
 export type StateUpdateWithoutCausalXInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
@@ -899,6 +937,7 @@ export type StateUncheckedUpdateWithoutCausalXInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -910,6 +949,7 @@ export type StateUncheckedUpdateManyWithoutCausalXInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -950,6 +990,7 @@ export type StateSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   id?: boolean
   userId?: boolean
   dateCreated?: boolean
+  createdAt?: boolean
   isActive?: boolean
   causalStateId?: boolean
   nextStateId?: boolean
@@ -966,6 +1007,7 @@ export type StateSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   userId?: boolean
   dateCreated?: boolean
+  createdAt?: boolean
   isActive?: boolean
   causalStateId?: boolean
   nextStateId?: boolean
@@ -979,6 +1021,7 @@ export type StateSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   id?: boolean
   userId?: boolean
   dateCreated?: boolean
+  createdAt?: boolean
   isActive?: boolean
   causalStateId?: boolean
   nextStateId?: boolean
@@ -992,13 +1035,14 @@ export type StateSelectScalar = {
   id?: boolean
   userId?: boolean
   dateCreated?: boolean
+  createdAt?: boolean
   isActive?: boolean
   causalStateId?: boolean
   nextStateId?: boolean
   causalXId?: boolean
 }
 
-export type StateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "dateCreated" | "isActive" | "causalStateId" | "nextStateId" | "causalXId", ExtArgs["result"]["state"]>
+export type StateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "dateCreated" | "createdAt" | "isActive" | "causalStateId" | "nextStateId" | "causalXId", ExtArgs["result"]["state"]>
 export type StateInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   causalState?: boolean | Prisma.State$causalStateArgs<ExtArgs>
@@ -1031,6 +1075,7 @@ export type $StatePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     id: string
     userId: string
     dateCreated: Date
+    createdAt: Date
     isActive: boolean
     causalStateId: string | null
     nextStateId: string | null
@@ -1466,6 +1511,7 @@ export interface StateFieldRefs {
   readonly id: Prisma.FieldRef<"State", 'String'>
   readonly userId: Prisma.FieldRef<"State", 'String'>
   readonly dateCreated: Prisma.FieldRef<"State", 'DateTime'>
+  readonly createdAt: Prisma.FieldRef<"State", 'DateTime'>
   readonly isActive: Prisma.FieldRef<"State", 'Boolean'>
   readonly causalStateId: Prisma.FieldRef<"State", 'String'>
   readonly nextStateId: Prisma.FieldRef<"State", 'String'>

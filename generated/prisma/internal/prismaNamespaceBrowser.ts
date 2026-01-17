@@ -125,6 +125,7 @@ export const StateScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   dateCreated: 'dateCreated',
+  createdAt: 'createdAt',
   isActive: 'isActive',
   causalStateId: 'causalStateId',
   nextStateId: 'nextStateId',

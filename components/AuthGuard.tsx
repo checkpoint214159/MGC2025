@@ -9,15 +9,19 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  const publicRoutes = ["/login", "/signup"];
+  const isPublicRoute = publicRoutes.includes(pathname);
+
   useEffect(() => {
     if (status === "loading") return;
 
-    if (status === "unauthenticated") {
+    if (status === "unauthenticated" && !isPublicRoute) {
       router.replace("/login");
       return;
     }
-
+    
     if (session && !session.user.hasProfile && pathname !== "/info") {
+      console.log('test')
       router.replace("/info");
     }
   }, [status, session, router, pathname]);

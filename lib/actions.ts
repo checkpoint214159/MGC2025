@@ -1,7 +1,7 @@
 "use server"
 
 import { auth } from "@/auth";
-import { getOrGenerateFullState, updateModuleProgress } from "@/lib/state/service";
+import { getActiveState, generateNewState, updateModuleProgress } from "@/lib/state/service";
 import { Biometrics } from "@/lib/user/schema";
 import { setProfile, generateUserProfile  } from "@/lib/user/service"
 import { getExistingOnboardingData, setBiometric, updateThread } from "./llm/service";
@@ -10,50 +10,82 @@ import { Thread, ThreadContext } from "@/lib/external/schemas/thread";
 import { ExternalSchema, type External } from "@/lib/external/schemas/external";
 import { prisma } from "./prisma";
 import { compileExternal } from "./external/service";
+import { State } from "./state/schemas/state";
 
 
-export async function setProfileAction(userId: string, profile: string) {
-    return setProfile(userId, profile)
+// i love functors
+export async function authenticatedAction<T>(
+  callback: (userId: string) => Promise<T>
+) {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    throw new Error("Unauthorized user attempted to call an action. This incident will be reported to ben."); // no, it wont
+  }
+
+  try {
+    const result = await callback(userId);
+    return { success: true, data: result };
+  } catch (e: any) {
+    console.error("Action Error:", e);
+    return { success: false, error: e.message || "An unexpected error occurred." };
+  }
+}
+
+
+export async function setProfileAction(profile: string) {
+  return authenticatedAction(async (userId) => {return setProfile(userId, profile)})
 }
 
 export async function fetchStateAction(date: Date) {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  return await authenticatedAction(async (userId): Promise<State> => {
+    console.log('fetchstate')
+    let state = await getActiveState(userId, date);
+    if (!state) {
+      // Get necessary context for generation
+      const user = await prisma.user.findUnique({ 
+        where: { id: userId }, 
+        include: { threads: { include: { messages: true } } } 
+      });
+      if (!user) throw new Error("User record missing");
 
-  const data = await getOrGenerateFullState(session.user.id, date);
-  console.log('data from fetch state?', data)
-  return { success: true, data: data };
+      state = await generateNewState(userId, date);
+    }
+    return state;
+  });
 }
 
 export async function updateProgressAction(
   moduleId: string, 
-  type: 'exercise' | 'nutrition', 
   updates: { id: string; data: any }[]
 ) {
-  try {
-    const updated = await updateModuleProgress(moduleId, type, updates);
-    // console.log('udpated?', updated)
-    return { success: true };
-  } catch (e: any) {
-    return { success: false, error: e.message };
-  }
+  return authenticatedAction(async () => {
+    // Note: If updateModuleProgress requires userId for security, add it here
+    return await updateModuleProgress(moduleId, updates);
+  });
 }
 
-export async function updateBiometricsAction(userId: string, bio: Biometrics) {
-  return setBiometric(userId, bio)
+export async function updateBiometricsAction(bio: Biometrics) {
+  return authenticatedAction(async (userId) => {
+    return await setBiometric(userId, bio);
+  });
 }
 
-export async function getOnBoardingAction(userId: string) {
-  return getExistingOnboardingData(userId)
+export async function getOnBoardingAction() {
+  return authenticatedAction(async (userId) => {
+    return await getExistingOnboardingData(userId);
+  });
 }
 
-export async function updateThreadAction({ userId, threadId, threadType, messages }: {
-  userId: string;
+export async function updateThreadAction({ threadId, threadType, messages }: {
   threadId: string | null;
   threadType: string | null;
   messages: BaseMessage[];
 }) {
-  return updateThread(userId, threadId, threadType, messages)
+  return authenticatedAction(async (userId) => {
+    return await updateThread(userId, threadId, threadType, messages);
+  });
 }
 
 export async function generateUserProfileAction({thread, bio}: {
@@ -65,6 +97,8 @@ export async function generateUserProfileAction({thread, bio}: {
   return generateUserProfile({thread: thread, bio: bio})
 }
 
-export async function compileExternalAction(userId: string, threadContext: ThreadContext, profile: string) {
-  return compileExternal(userId, threadContext, profile,)
+export async function compileExternalAction(threadContext: ThreadContext, profile: string) {
+  return authenticatedAction(async (userId) => {
+    return await compileExternal(userId, threadContext, profile);
+  });
 }

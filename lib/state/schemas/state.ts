@@ -18,9 +18,9 @@ export const StateSchema = z.object({
   userId: z.string(),
   dateCreated: z.coerce.date(),
 
-  causalStateId: z.string().optional(),
-  causalXId: z.string().optional(),
-  nextStateId: z.string().optional(),
+  causalStateId: z.string().optional().nullable(),
+  causalXId: z.string().optional().nullable(),
+  nextStateId: z.string().optional().nullable(),
 
   modules: z.array(ModuleSchema).default([]),
 });

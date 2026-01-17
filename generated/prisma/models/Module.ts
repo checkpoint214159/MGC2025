@@ -199,17 +199,17 @@ export type ModuleOrderByWithRelationInput = {
 
 export type ModuleWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  stateId?: string
   AND?: Prisma.ModuleWhereInput | Prisma.ModuleWhereInput[]
   OR?: Prisma.ModuleWhereInput[]
   NOT?: Prisma.ModuleWhereInput | Prisma.ModuleWhereInput[]
   type?: Prisma.StringFilter<"Module"> | string
+  stateId?: Prisma.StringFilter<"Module"> | string
   summary?: Prisma.StringNullableFilter<"Module"> | string | null
   plan?: Prisma.JsonFilter<"Module">
   checklists?: Prisma.JsonNullableFilter<"Module">
   state?: Prisma.XOR<Prisma.StateScalarRelationFilter, Prisma.StateWhereInput>
   progress?: Prisma.XOR<Prisma.ProgressNullableScalarRelationFilter, Prisma.ProgressWhereInput> | null
-}, "id" | "stateId">
+}, "id">
 
 export type ModuleOrderByWithAggregationInput = {
   id?: Prisma.SortOrder

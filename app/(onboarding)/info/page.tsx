@@ -16,8 +16,9 @@ import {
   getOnBoardingAction, 
   updateThreadAction, 
   setProfileAction,
-  generateUserProfileAction
+  generateUserProfileAction,
 } from "@/lib/actions";
+import { ensureAction } from "@/lib/utils";
 
 export default function OnboardingFlow() {
   const { data: session, status, update } = useSession();
@@ -34,8 +35,14 @@ export default function OnboardingFlow() {
       queryKey: ['onboarding', session?.user?.id],
       queryFn: async () => {
           if (!session?.user?.id) return null;
-          const data = await getOnBoardingAction(session.user.id);
-          
+          const result = await getOnBoardingAction();
+
+          if (!result.success || !result.data) {
+            throw new Error(result.error || "Failed to fetch onboarding data");
+          }
+
+          const data = result.data
+                
           return {
               biometrics: data.biometrics ? BiometricsSchema.parse(data.biometrics) : null,
               thread: data.activeThread ? ThreadSchema.parse(data.activeThread) : null,
@@ -70,26 +77,30 @@ export default function OnboardingFlow() {
     setIsAiLoading(true)
     
     const userId = session?.user?.id!
-    const updatedBio = await updateBiometricsAction(userId, bio)
+    const updatedBioResult = await updateBiometricsAction(bio)
+    const updatedBio = ensureAction(updatedBioResult)
+    console.log('updatedBio', updatedBio)
     setBiometrics(BiometricsSchema.parse(updatedBio))
 
     const q1 = await getInitialLLMQuestion(updatedBio) 
     const q1Message = convertQuestionToMessage(q1, thread?.id ?? null, 'onboarding')
 
-    const newThread = await updateThreadAction({
-      userId: userId,
+    const threadResult = await updateThreadAction({
       threadId: thread?.id ?? null,
       threadType: 'onboarding',
       messages: []
     });
 
-    const updated = await updateThreadAction({
-      userId: userId,
-      threadId: newThread.id,
+    const newThread = ensureAction(threadResult)
+
+    const updatedResult = await updateThreadAction({
+      threadId: newThread?.id ?? null,
       threadType: 'onboarding',
       messages: [q1Message]
     });
-    
+
+    const updated = ensureAction(updatedResult)
+
     setThread(updated);
     setCurrentQuestion(q1);
     setIsAiLoading(false);
@@ -102,20 +113,19 @@ export default function OnboardingFlow() {
     const userId = session?.user?.id!
     
     const userMsg = convertResponseToMessage(answer, thread.id, 'onboarding')
-    let updated = await updateThreadAction({
-      userId: userId,
+    const updatedResult = await updateThreadAction({
       threadId: thread.id,
       threadType: 'onboarding',
       messages: [userMsg]
     });
+    const updated = ensureAction(updatedResult)
     const nextQn = await getNextLLMQuestion(biometrics, updated) 
     
     // terminate
     if (nextQn.inputType === 'terminateQuestioning') {
       try {
         const profile = await generateUserProfileAction({ thread: updated, bio: biometrics });
-        await setProfileAction(userId, profile);
-        
+        await setProfileAction(profile);
         await update(); 
         router.push('/');
         return;
@@ -128,14 +138,14 @@ export default function OnboardingFlow() {
     
     // here meants the llm did not terminate, so save latest to thread
     const nextMsg = convertQuestionToMessage(nextQn, updated.id, 'onboarding')
-    updated = await updateThreadAction({
-      userId: userId,
+    const postLLMResult = await updateThreadAction({
       threadId: updated.id,
       threadType: 'onboarding',
       messages: [nextMsg]
     });
+    const postLLM = ensureAction(postLLMResult)
     
-    setThread(updated)
+    setThread(postLLM)
     setCurrentQuestion(nextQn)
     setIsAiLoading(false);
   }
