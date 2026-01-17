@@ -3,7 +3,7 @@ import { ThreadContext } from "./schemas/thread"
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client"
 
-export async function compileExternal(userId: string, threadContext: ThreadContext, profile: string) : External {
+export async function compileExternal(userId: string, threadContext: ThreadContext, profile: string): Promise<External> {
   // compiles and saves to db an instance of external
   const e = await prisma.external.create({
     data: {
@@ -13,6 +13,10 @@ export async function compileExternal(userId: string, threadContext: ThreadConte
     }
   })
 
-  return ExternalSchema.parse(e)
+  const external = ExternalSchema.parse(e)
+  if (!external) {
+    throw new Error('external is undefined')
+  }
+  return external
 }
 

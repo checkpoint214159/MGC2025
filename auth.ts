@@ -43,13 +43,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     const today = await getNormalizedAppDate();
 
                     const [stateRecord, dbUser] = await Promise.all([
-                        prisma.state.findUnique({
-                            where: { 
-                                userId_dateCreated_isActive: {
-                                    userId: token.id as string,
-                                    dateCreated: today,
-                                    isActive: true,
-                                } 
+                        prisma.state.findFirst({
+                            where: {
+                                isActive: true,
                             }
                         }),
                         prisma.user.findUnique({
@@ -57,14 +53,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             select: { name: true, profile: true }
                         })
                     ]);
-                    console.log('auth staterecord??')
-                    console.log(stateRecord)
-                    console.log('dbuser?')
-                    console.log(dbUser)
-                    token.hasTodayState = !!stateRecord;
-
-                    console.log('dbuser profile??')
-                    console.log(dbUser.profile)
                     if (dbUser) {
                         token.name = dbUser.name;
                         // Store a boolean instead of the full clinical string

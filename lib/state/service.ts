@@ -116,73 +116,93 @@ const EXAMPLE_WIDGET_OUTPUT: LLMBlueprint = {
 
 const schema = StateSchema
 
-export async function getOrGenerateFullState(userId: string, date: Date) {
-  // TODO: make it conditional whether we check for existence of progress, and whether
-  // we make it too
-    console.log('date??', date)
-    const existing = await prisma.state.findUnique({
-        where: { userId_dateCreated_isActive: { userId, dateCreated: date, isActive: true } },
-        include: {
-            modules: { include: { progress: true } },
-        }
-    });
-
-    if (existing) return existing;
-
-    const prev_date = new Date(date);
-    prev_date.setDate(prev_date.getDate() - 1);
-    
-    const prevRecord = await prisma.state.findUnique({
-        where: { userId_dateCreated_isActive: { userId, dateCreated: prev_date, isActive: true } },
-        include:{ modules: { include: { progress: true } } }
-    });
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: { 
-        threads: {
-          include: { messages: true }
-        }
-      }
-    });
-
-    if (!user) {
-      throw new Error("User not found"); 
-    }
-
-    const {threads, profile} = user
-    const x = await compileExternalAction(userId, threads, profile as unknown as string) // todo this is bad
-    const generatedPlan = await LLMGenerateState(prevRecord as any, x, userId);
-
-    return await prisma.state.create({
-        data: {
-            userId,
-            dateCreated: date,
-            isActive: true,
-            causalStateId: prevRecord?.id,
-            modules: {
-              create: Object.entries(generatedPlan).map(([type, blueprint]: [string, any]) => ({
-                type: type, // 'NUTRITION', 'EXERCISE'
-                summary: blueprint.summary,
-                plan: blueprint.plan,
-                checklists: blueprint.checklists || [],
-                progress: {
-                  create: {
-                    trackables: createInitialProgress(blueprint.plan),
-                    // Only create checklist state if checklists exist
-                    checklistState: blueprint.checklists 
-                      ? createInitialChecklistState(blueprint.checklists) 
-                      : {}
-                  }
-                }
-              }))
-            }
-          },
+export async function getActiveState(userId: string, date: Date): Promise<State | null> {
+  const state = await prisma.state.findFirst({
+    where: {
+      userId: userId,
+      dateCreated: date,
+      isActive: true 
+    },
     include: {
-      modules: { include: { progress: true } }
+      modules: { include: { progress: true } },
+      causalX: true,
     }
   });
+
+  if (state) {
+    return StateSchema.parse(state)
+  } else {
+    return null  // really what am i even doing
+  }
 }
+
+export async function generateNewState(userId: string, date: Date) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { 
+      threads: {
+        include: { messages: true }
+      }
+    }
+  });
+
+  if (!user) {
+    throw new Error("User not found"); 
+  }
+
+  const yesterday = new Date(date);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayActive = await getActiveState(userId, yesterday);
+  console.log('generating new state')
+  const causalStateId = yesterdayActive?.id?? null;
+  
+  const {threads, profile} = user
+  const safeProfile = profile ?? "No profile data provided"
+  const result = await compileExternalAction(threads, safeProfile)
+  
+  if (!result.success || !result.data) {
+    throw new Error(result.error || "Failed to compile external context");
+  }
+
+  const x = result.data
+  const generatedPlan = await LLMGenerateState(yesterdayActive, x, userId);
+  console.log('generatedPlan?', generatedPlan)
+  const state = await prisma.$transaction(async (tx) => {
+
+    await tx.state.updateMany({
+      where: { userId, dateCreated: date, isActive: true },
+      data: { isActive: false }
+    });
+
+    return await tx.state.create({
+      data: {
+        userId,
+        dateCreated: date,
+        isActive: true,
+        causalStateId: causalStateId,
+        causalXId: x.id,
+        modules: {
+          create: Object.entries(generatedPlan).map(([type, blueprint]: [string, any]) => ({
+            type,
+            summary: blueprint.summary,
+            plan: blueprint.plan,
+            checklists: blueprint.checklists || [],
+            progress: {
+              create: {
+                trackables: createInitialProgress(blueprint.plan),
+                checklistState: blueprint.checklists ? createInitialChecklistState(blueprint.checklists) : {}
+              }
+            }
+          }))
+        }
+      },
+      include: { modules: { include: { progress: true } } }
+    });
+  });
+
+  return StateSchema.parse(state)
+}
+
 
 type ModuleType = 'NUTRITION' | 'EXERCISE'; 
 

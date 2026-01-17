@@ -15,20 +15,31 @@ export default function DashboardRenderer({ config }: { config: State | null }) 
   return (
     <div className="grid gap-6">
       {/* explicitly render for now */}
-      
-      {config.exercise && (
-        <ExercisePreviewCard 
-          data={config.exercise} 
-          onClick={() => redirect('/recovery/exercise')} 
-        />
-      )}
 
-      {config.nutrition && (
-        <NutritionPreviewCard 
-          data={config.nutrition} 
-          onClick={() => redirect('/recovery/nutrition')}
-        />
-      )}
+      {
+        config.modules.map((module) => {
+          if (module.type === 'exercise') {
+            return (
+              <ExercisePreviewCard 
+                key={module.id} 
+                data={module} 
+                onClick={() => redirect('/recovery/exercise')} 
+              />
+            );
+          }
+
+          if (module.type === 'nutrition') {
+            return (
+              <NutritionPreviewCard 
+                key={module.id} 
+                data={module} 
+                onClick={() => redirect('/recovery/nutrition')}
+              />
+            );
+          }
+        })
+
+      }
     </div>
   );
 }

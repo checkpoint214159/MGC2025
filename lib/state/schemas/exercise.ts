@@ -34,7 +34,7 @@ export const ExerciseProgressSchema = createProgressSchema({
 })
 
 export const ExerciseModuleBlueprintSchema = createModuleBlueprintSchema({
-    type: "EXERCISE",
+    type: "exercise",
     planSchema: ExercisePlanSchema,
     checklistSchema: BaseChecklistObj,
 })

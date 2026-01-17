@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { generateObject } from 'ai';
 import { BaseQuestionSchema, type BaseQuestion } from '@/lib/llm/schemas/base';
-import { Thread } from '@/lib/external/schemas/thread';
+import { Thread, ThreadSchema } from '@/lib/external/schemas/thread';
 import { Biometrics } from "@/lib/user/schema";
 import { BaseMessage } from "@/lib/external/schemas/message";
 
@@ -141,7 +141,7 @@ export async function updateThread(
   } else if (!threadType) {
     throw new Error('Invalid argument. If threadId is null, i.e create new thread, must provide thread type.')
   }
-  return await prisma.thread.create({
+  const t = await prisma.thread.create({
     data: {
       userId,
       type: threadType,
@@ -152,4 +152,10 @@ export async function updateThread(
     },
     include: { messages: { orderBy: { createdAt: 'asc' } } }
   });
+
+  const thread = ThreadSchema.parse(t)
+  if (!thread) {
+    throw new Error('thread is undefined')
+  }
+  return thread
 }

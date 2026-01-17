@@ -101,7 +101,7 @@ export const NutritionProgressSchema = createProgressSchema({
 })
 
 export const NutritionModuleBlueprintSchema = createModuleBlueprintSchema({
-    type: 'NUTRITION',
+    type: 'nutrition',
     planSchema: NutritionPlanSchema,
     checklistSchema: NutritionChecklistSchema
 })

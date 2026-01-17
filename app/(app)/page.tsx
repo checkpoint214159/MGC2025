@@ -9,10 +9,12 @@ import { State } from "@/lib/state/schemas/state";
 import DashboardRenderer from "@/components/recovery/DashboardRenderer";
 import { useAppDate } from "@/context/DateContext";
 import { DevDateSwitcher } from "@/components/DevDateSwitcher";
+import { ensureAction } from "@/lib/utils";
 
 export default function DashboardPage() {
     const router = useRouter();
-    const { normalizedDate, isSimulated, getTodayString } = useAppDate(); 
+    const { normalizedDate, isSimulated, displayDate, isToday } = useAppDate();
+
     const { data: session, status, update } = useSession();
 
     // query to retrieve state, if enabled
@@ -20,13 +22,11 @@ export default function DashboardPage() {
         queryKey: ['recoveryState', session?.user?.id, normalizedDate],
         queryFn: async () => {
             const response = await fetchStateAction(normalizedDate);
-            if (!response.success) return null;
-            return response.data as unknown as State;
+            return ensureAction(response)
         },
         enabled: status === "authenticated" && !!session?.user?.id,
         staleTime: 1000 * 60 * 5, // Cache data for 5 minutes
     });
-
     // redirects only
     useEffect(() => {
         if (status === "unauthenticated") {
@@ -39,7 +39,6 @@ export default function DashboardPage() {
     // Updates session if today's data is present
     useEffect(() => {
         const checkSessionSync = async () => {
-            const isToday = normalizedDate === getTodayString?.();
             const needsSync = state && isToday && !session?.hasTodayState && !isSimulated;
             
             if (needsSync) {
@@ -48,7 +47,7 @@ export default function DashboardPage() {
             }
         };
         checkSessionSync();
-    }, [state, normalizedDate, session?.hasTodayState, isSimulated, update, getTodayString]);
+    }, [state, normalizedDate, session?.hasTodayState, isSimulated, update, isToday]);
 
     // 4. RENDER LOGIC
     if (status === "loading" || isLoading) {
