@@ -102,7 +102,7 @@ export default function NutritionGroupRenderer({ plan, trackable, moduleId }: Pr
     );
     
     try {
-      await updateProgressAction(moduleId, 'nutrition', [{ id: trackable.id, data: updatedTrackable }]);
+      await updateProgressAction(moduleId, [{ id: trackable.id, data: updatedTrackable }]);
       setStatus('success');
       setTimeout(() => setStatus('idle'), 3000);
     } catch (e) {

@@ -88,7 +88,7 @@ export const NutritionPlanSchema = z.union([
 ]);
 
 export const NutritionChecklistSchema = BaseChecklistObj.extend({
-    impact: z.record(z.string(), z.number()),
+    progress_impact: z.record(z.string(), z.number()).describe('The amount contributed to each specific nutrient'),
     metadata: z.object({
         message: z.string().optional(),
         timing: z.string().optional(),

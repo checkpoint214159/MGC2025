@@ -31,7 +31,7 @@ export type BaseChecklist = z.infer<typeof BaseChecklistObj>
 
 
 
-export type AnyCategoriesData = Record<string, BaseMetric>;
+export type AnyCategoriesData = Object;
 
 export interface AnyPlanData {
   id: string;
@@ -61,11 +61,11 @@ export function createCategoriesSchema<T extends z.ZodType<BaseMetric>>({
 }: {
   metricSchema: T;
 }) {
-  return z.object({}).catchall(metricSchema);
+  return z.record(z.string(), metricSchema);
 }
 
 export function createPlanSchema<
-  D extends z.ZodType<AnyCategoriesData>,
+  D extends z.ZodType<Object>,
   M extends z.ZodType<BaseMeta>,
   E extends z.ZodRawShape = {}
 >({
