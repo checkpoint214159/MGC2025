@@ -87,13 +87,13 @@ export async function updateThreadAction({ threadId, threadType, messages }: {
   });
 }
 
-export async function generateUserProfileAction({thread, bio}: {
+export async function generateUserProfileAction({thread, biometrics}: {
   thread: Thread,
-  bio: Biometrics,
+  biometrics: Biometrics,
 }) {
   // console.log('GENERATE USER PROFILE ACTION CALLED')
   // return 'test'
-  return generateUserProfile({thread: thread, bio: bio})
+  return generateUserProfile({thread: thread, biometrics: biometrics})
 }
 
 export async function compileExternalAction(threadContext: ThreadContext, profile: string) {

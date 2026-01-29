@@ -29,7 +29,6 @@ export function BiometricsForm({ onComplete }: { onComplete: (data: any) => void
           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Treatment / Surgery</label>
           <input 
             name="treatment" 
-            placeholder="e.g. Total Knee Replacement" 
             required 
             className="w-full mt-1 p-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
           />
@@ -58,7 +57,6 @@ export function BiometricsForm({ onComplete }: { onComplete: (data: any) => void
               <option value="">Select...</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
-              <option value="Other">Other</option>
             </select>
           </div>
         </div>

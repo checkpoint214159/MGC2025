@@ -124,7 +124,7 @@ export default function OnboardingFlow() {
     // terminate
     if (nextQn.inputType === 'terminateQuestioning') {
       try {
-        const profile = await generateUserProfileAction({ thread: updated, bio: biometrics });
+        const profile = await generateUserProfileAction({ thread: updated, biometrics: biometrics });
         await setProfileAction(profile);
         await update(); 
         router.push('/');
