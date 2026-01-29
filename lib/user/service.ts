@@ -3,10 +3,11 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { Biometrics } from "./schema";
 import { Thread } from "@/lib/external/schemas/thread";
+import { getModel } from "../llm/model";
 
 export interface ProfileInput {
   thread: Thread;
-  bio: Biometrics;
+  biometrics: Biometrics;
 }
 
 export async function setProfile(userId: string, profile: string) {
@@ -18,7 +19,7 @@ export async function setProfile(userId: string, profile: string) {
   });
 }
 
-export async function generateUserProfile({ thread, bio }: ProfileInput): Promise<string> {
+export async function generateUserProfile({ thread, biometrics }: ProfileInput): Promise<string> {
   // Extracting conversational history for context
   const history = thread.messages
     ?.map((m) => `${m.role.toUpperCase()}: ${m.content}`)
@@ -49,22 +50,34 @@ export async function generateUserProfile({ thread, bio }: ProfileInput): Promis
   - **TERMINATION:** End the profile with a "Baseline Risk Level" (Low, Moderate, High) based on symptoms reported.
   `
 
-  console.log()
+  console.log('BIO??', biometrics)
+  console.log('HISTORY CONVO??', history)
   try {
     const { object } = await generateObject({
-      model: 'deepseek/deepseek-v3.2',
+      model: getModel(),
       system: systemPrompt,
       prompt: `
-        BIOMETRICS:
-        ${bio}
-        
         CONVERSATION HISTORY:
         ${history}
+
+        BIOMETRICS:
+        You MUST abide by these biometrics fully. 
+        Do NOT change ANY biometric data, especially age, sex and treatment type
+        ${JSON.stringify(biometrics, null, 2)}
       `,
       schema: z.object({
         summary: z.string().describe("The synthesized clinical profile of the patient."),
       }),
     });
+    console.log('PROFILE GEN PROMTP??', `
+        CONVERSATION HISTORY:
+        ${history}
+
+        BIOMETRICS:
+        You MUST abide by these biometrics fully. 
+        Do NOT change ANY biometric data, especially age, sex and treatment type
+        ${JSON.stringify(biometrics, null, 2)}
+      `)
     console.log("profile?", object)
     return object.summary;
   } catch (error) {

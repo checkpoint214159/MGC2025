@@ -210,7 +210,7 @@ export async function LLMGenerateState1(
       ${transcript}
     `)
   const { object } = await generateObject ({
-    model: getModel(), // e.g., gpt-4o or deepseek-v3
+    model: getModel(),
     system: systemPrompt,
     prompt: `
       PREVIOUS STATE: ${in_state ? JSON.stringify(in_state.modules) : "No previous state. This is a fresh start."}
@@ -227,108 +227,3 @@ export async function LLMGenerateState1(
   return generatedPlan;
 }
 
-
-
-
-const EXAMPLE_WIDGET_OUTPUT: LLMBlueprint = {
-    exercise: {
-      "type": "EXERCISE",
-      "summary": "Focus on circulation and light respiratory recovery.",
-      "plan": [
-        {
-          "id": "ankles dd-mm-yy",
-          "meta": {
-            "type": "ankles",
-            "name": "ankles recovery",
-            "intensity": "blue",
-            "precaution": "Avoid if you feel sharp calf pain."
-          },
-          "data": {
-            "ankle pumps": {"goal":30, "value":0, "unit":'reps'},
-            "calf raises": {"goal":30, "value":0, "unit":'reps'}
-          }
-        },
-        {
-          "id": "mobility dd-mm-yy",
-          "meta": {
-            "type": "mobility",
-            "name": "mobility recovery",
-            "intensity": "orange",
-            "precaution": "Must have a caregiver present."
-          },
-          "data": {
-            "hallway walks": {"goal":30, "value":0, "unit":'minutes'},
-            "knee raises": {"goal":20, "value":0, "unit":'reps'}
-          }
-          
-        }
-      ],
-      "checklists": [],
-    },
-    nutrition: {
-      "type": "NUTRITION",
-      "summary": "Support tissue repair with high protein and controlled sodium intake.",
-      "plan": [
-        {
-          "id": "daily-macros",
-          "meta": {
-            "type": "macros",
-            "importance": "Crucial for muscle synthesis"
-          },
-          "data": {
-            "calories": {goal:1800, value:0, unit: "grams",},
-            "protein": {goal:80, value:0, unit: "grams"},
-            "carbs": {goal:200, value:0, unit: "grams"},
-            "fats": {goal:50, value:0, unit: "grams"}
-          }
-        },
-        {
-          "id": "recovery-minerals",
-          "meta": {
-            "type": "minerals",
-          },
-          "data": {
-            "sodium": {goal:3000, value:0, unit: "mg"},
-            "potassium": {goal:2500, value:0, unit: "mg"},
-            "calcium": {goal:1000, value:0, unit: "mg"}
-          }
-        }
-      ],
-      "checklists": [
-        {
-          "id": "nut-1",
-          "name": "Electrolyte Drink (500ml)",
-          "impact": { 
-            "calories": 50, 
-            "carbs": 12, 
-            "sodium": 450 
-          },
-          "metadata": { 
-            "message": "Prevents dehydration post-surgery" 
-          }
-        },
-        {
-          "id": "nut-2",
-          "name": "Protein Shake",
-          "impact": { 
-            "protein": 25, 
-            "calories": 250,
-            "calcium": 150 
-          },
-          "metadata": { 
-            "message": "Aids muscle and tissue repair" 
-          }
-        }
-      ]
-    }
-  }
-    // "symptoms": {
-    //   "emergencyProtocol": "Call your surgeon immediately if fever exceeds 38.5°C or if you notice heavy bleeding.",
-    //   "dailyChecks": [
-    //     { "id": "sym-1", "label": "Is the incision site red or leaking?", "critical": true },
-    //     { "id": "sym-2", "label": "Have you had a bowel movement today?", "critical": false },
-    //     { "id": "sym-3", "label": "Rate your pain from 1-10", "critical": false }
-    //   ]
-    // }
-//   }
-// }
