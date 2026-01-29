@@ -7,7 +7,6 @@ import { setProfile, generateUserProfile  } from "@/lib/user/service"
 import { getExistingOnboardingData, setBiometric, updateThread } from "./llm/service";
 import { BaseMessage } from "./external/schemas/message";
 import { Thread, ThreadContext } from "@/lib/external/schemas/thread";
-import { ExternalSchema, type External } from "@/lib/external/schemas/external";
 import { prisma } from "./prisma";
 import { compileExternal } from "./external/service";
 import { State } from "./state/schemas/state";
@@ -38,11 +37,11 @@ export async function setProfileAction(profile: string) {
   return authenticatedAction(async (userId) => {return setProfile(userId, profile)})
 }
 
-export async function fetchStateAction(date: Date) {
+export async function fetchStateAction(date: Date, admin_force: boolean = false) {
   return await authenticatedAction(async (userId): Promise<State> => {
     console.log('fetchstate')
     let state = await getActiveState(userId, date);
-    if (!state) {
+    if (!state || admin_force) {
       // Get necessary context for generation
       const user = await prisma.user.findUnique({ 
         where: { id: userId }, 

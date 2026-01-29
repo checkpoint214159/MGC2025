@@ -15,13 +15,31 @@ export const ExerciseMetricsSchema = BaseMetricObj.extend({
     sets: z.number().optional(),
 })
 
+export const ExerciseCategoriesSchema = z.object({
+    // Strength / Resistance
+    resistance: ExerciseMetricsSchema.optional()
+        .describe("For weight-bearing or strength moves (e.g., reps, sets, load)"),
+    
+    // Mobility / Flexibility 
+    mobility: ExerciseMetricsSchema.optional()
+        .describe("For stretching or ROM (e.g., hold time, repetitions)"),
+    
+    // Cardiovascular / Aerobic
+    aerobic: ExerciseMetricsSchema.optional()
+        .describe("For endurance (e.g., duration, distance, heart rate)"),
+    
+    // Neuromuscular / Balance
+    stability: ExerciseMetricsSchema.optional()
+        .describe("For balance and coordination (e.g., sets, time per side)"),
+
+    // The "Safety Net" - equivalent to your old catchall but guided
+    custom: z.record(z.string(), ExerciseMetricsSchema).optional()
+        .describe("Any specific clinical metrics that don't fit the above categories")
+})
+
 export const ExerciseMetaSchema = BaseMetaObj.extend({
     intensity: z.enum(['blue', 'orange', 'red']),
     precaution: z.string().optional(),
-})
-
-export const ExerciseCategoriesSchema = createCategoriesSchema({
-    metricSchema: ExerciseMetricsSchema
 })
 
 export const ExercisePlanSchema = createPlanSchema({

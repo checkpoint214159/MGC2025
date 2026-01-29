@@ -10,6 +10,225 @@ import { getNormalizedAppDate } from "@/lib/date-utils"
 import { compileExternalAction } from '../actions';
 import { External } from '../external/schemas/external';
 import { generateObject } from 'ai';
+import { getModel } from '../llm/model';
+import { LLMGenerateState2 } from './services/full';
+import { getModuleFromState } from '../utils';
+
+const schema = StateSchema
+
+export async function getActiveState(userId: string, date: Date): Promise<State | null> {
+  const state = await prisma.state.findFirst({
+    where: {
+      userId: userId,
+      dateCreated: date,
+      isActive: true 
+    },
+    include: {
+      modules: { include: { progress: true } },
+      causalX: true,
+    }
+  });
+
+  if (state) {
+    return StateSchema.parse(state)
+  } else {
+    return null  // really what am i even doing
+  }
+}
+
+export async function generateNewState(userId: string, date: Date) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { 
+      threads: {
+        include: { messages: true }
+      }
+    }
+  });
+
+  if (!user) {
+    throw new Error("User not found"); 
+  }
+
+  const yesterday = new Date(date);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayActive = await getActiveState(userId, yesterday);
+  console.log('generating new state')
+  const causalStateId = yesterdayActive?.id?? null;
+  
+  const {threads, profile} = user
+  const safeProfile = profile ?? "No profile data provided"
+  const result = await compileExternalAction(threads, safeProfile)
+  
+  if (!result.success || !result.data) {
+    throw new Error(result.error || "Failed to compile external context");
+  }
+
+  const x = result.data
+  const generatedPlan = await LLMGenerateState2(yesterdayActive, x, userId);
+  console.log('generatedPlan?', generatedPlan)
+  const state = await prisma.$transaction(async (tx) => {
+
+    await tx.state.updateMany({
+      where: { userId, dateCreated: date, isActive: true },
+      data: { isActive: false }
+    });
+
+    return await tx.state.create({
+      data: {
+        userId,
+        dateCreated: date,
+        isActive: true,
+        causalStateId: causalStateId,
+        causalXId: x.id,
+        modules: {
+          create: Object.entries(generatedPlan).map(([type, blueprint]: [string, any]) => ({
+            type,
+            summary: blueprint.summary,
+            plan: blueprint.plan,
+            checklists: blueprint.checklists || [],
+            progress: {
+              create: {
+                trackables: createInitialProgress(blueprint.plan),
+                checklistState: blueprint.checklists ? createInitialChecklistState(blueprint.checklists) : {}
+              }
+            }
+          }))
+        }
+      },
+      include: { modules: { include: { progress: true } } }
+    });
+  });
+
+  return StateSchema.parse(state)
+}
+
+
+type ModuleType = 'NUTRITION' | 'EXERCISE'; 
+
+export async function getModule(userId: string, type: ModuleType) {
+  const date = await getNormalizedAppDate();
+
+  // We find the module directly using the composite filter
+  return await prisma.module.findFirst({
+    where: {
+      type: type,
+      state: {
+        userId: userId,
+        dateCreated: date,
+        isActive: true
+      }
+    },
+    include: { progress: true }
+  });
+}
+
+export async function updateModuleProgress(
+  moduleId: string,
+  updates: { id: string; data: any }[]
+) {
+  
+  const currentRecord = await prisma.progress.findUnique({
+    where: { moduleId },
+  });
+
+  if (!currentRecord) {
+    throw new Error(`Progress record for module ${moduleId} not found.`);
+  }
+
+  // Cast trackables for logic, though Zod will handle the final safety
+  const currentTrackables = currentRecord.trackables as any[];
+
+  // 2. Map and Merge
+  const updatedTrackables = currentTrackables.map((existing) => {
+    const update = updates.find((u) => u.id === existing.id);
+    return update ? { ...existing, data: update.data } : existing;
+  });
+
+  // 3. Validation Logic
+  const updateIds = updates.map(u => u.id);
+  const existingIds = currentTrackables.map(t => t.id);
+  const invalidIds = updateIds.filter(id => !existingIds.includes(id));
+
+  if (invalidIds.length > 0) {
+    throw new Error(`Invalid trackable IDs: ${invalidIds.join(", ")}`);
+  }
+
+  // 4. Optimization: Skip DB call if nothing changed
+  if (isDeepStrictEqual(currentTrackables, updatedTrackables)) {
+    return currentRecord;
+  }
+
+  // 5. Save the JSON back to the unified Progress table
+  return await prisma.progress.update({
+    where: { moduleId },
+    data: { trackables: updatedTrackables },
+  });
+}
+
+export async function LLMGenerateState1(
+  in_state: State | null, 
+  x: External, 
+  userId: string 
+) {
+  // 1. Distill the ThreadContext into a readable transcript for the LLM
+  // We prioritize the most recent messages if tokens are an issue
+  const transcript = x.threadContext.map(thread => {
+    const msgs = thread.messages?.map(m => `[${m.role.toUpperCase()}]: ${m.content}`).join("\n") || "No messages";
+    return `### Thread: ${thread.title || 'General'}\n${msgs}`;
+  }).join("\n\n---\n\n");
+
+  const profile = x.profile
+
+  const systemPrompt = `
+    ROLE: You are a Senior Clinical Rehabilitation Specialist.
+    TASK: Generate a "Recovery Blueprint" (JSON) for a patient based on their History Snapshot.
+
+    INPUT DATA:
+    1. PATIENT PROFILE: ${x.profile}
+    2. CONVERSATION SNAPSHOT: This is a frozen record of recent patient interactions. 
+       Analyze these for:
+       - Reported pain levels or physical limitations.
+       - Nutritional preferences or adherence issues.
+       - Direct requests from the patient or doctor.
+
+    OUTPUT INSTRUCTIONS:
+    - Your goal is to output a "Blueprint" containing exactly 1-3 modules.
+    - Each module must match the specific schema for NUTRITION, EXERCISE, etc.
+    - If the history mentions pain, include a SYMPTOM_CHECKER or modify EXERCISE intensity.
+    - If post-surgery (per profile), prioritize High-Protein NUTRITION goals.
+
+    STRICT CONSTRAINTS:
+    - Do NOT generate IDs or timestamps (these are system-managed).
+    - Return ONLY valid JSON matching the provided schema.
+  `;
+  console.log('systemPrompt???', systemPrompt)
+  console.log('prompt??', `
+      PREVIOUS STATE: ${in_state ? JSON.stringify(in_state.modules) : "No previous state. This is a fresh start."}
+      USER PROFILE: ${profile}
+      EVIDENCE LOG (Snapshot):
+      ${transcript}
+    `)
+  const { object } = await generateObject ({
+    model: getModel(), // e.g., gpt-4o or deepseek-v3
+    system: systemPrompt,
+    prompt: `
+      PREVIOUS STATE: ${in_state ? JSON.stringify(in_state.modules) : "No previous state. This is a fresh start."}
+      USER PROFILE: ${profile}
+      EVIDENCE LOG (Snapshot):
+      ${transcript}
+    `,
+    schema: LLMBlueprintSchema, // This ensures the LLM sticks to your factory-built schema
+  });
+
+  const generatedPlan = LLMBlueprintSchema.parse(object)
+  console.log('generatedPlan??', generatedPlan)
+
+  return generatedPlan;
+}
+
+
+
 
 const EXAMPLE_WIDGET_OUTPUT: LLMBlueprint = {
     exercise: {
@@ -113,210 +332,3 @@ const EXAMPLE_WIDGET_OUTPUT: LLMBlueprint = {
     // }
 //   }
 // }
-
-const schema = StateSchema
-
-export async function getActiveState(userId: string, date: Date): Promise<State | null> {
-  const state = await prisma.state.findFirst({
-    where: {
-      userId: userId,
-      dateCreated: date,
-      isActive: true 
-    },
-    include: {
-      modules: { include: { progress: true } },
-      causalX: true,
-    }
-  });
-
-  if (state) {
-    return StateSchema.parse(state)
-  } else {
-    return null  // really what am i even doing
-  }
-}
-
-export async function generateNewState(userId: string, date: Date) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    include: { 
-      threads: {
-        include: { messages: true }
-      }
-    }
-  });
-
-  if (!user) {
-    throw new Error("User not found"); 
-  }
-
-  const yesterday = new Date(date);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayActive = await getActiveState(userId, yesterday);
-  console.log('generating new state')
-  const causalStateId = yesterdayActive?.id?? null;
-  
-  const {threads, profile} = user
-  const safeProfile = profile ?? "No profile data provided"
-  const result = await compileExternalAction(threads, safeProfile)
-  
-  if (!result.success || !result.data) {
-    throw new Error(result.error || "Failed to compile external context");
-  }
-
-  const x = result.data
-  const generatedPlan = await LLMGenerateState(yesterdayActive, x, userId);
-  console.log('generatedPlan?', generatedPlan)
-  const state = await prisma.$transaction(async (tx) => {
-
-    await tx.state.updateMany({
-      where: { userId, dateCreated: date, isActive: true },
-      data: { isActive: false }
-    });
-
-    return await tx.state.create({
-      data: {
-        userId,
-        dateCreated: date,
-        isActive: true,
-        causalStateId: causalStateId,
-        causalXId: x.id,
-        modules: {
-          create: Object.entries(generatedPlan).map(([type, blueprint]: [string, any]) => ({
-            type,
-            summary: blueprint.summary,
-            plan: blueprint.plan,
-            checklists: blueprint.checklists || [],
-            progress: {
-              create: {
-                trackables: createInitialProgress(blueprint.plan),
-                checklistState: blueprint.checklists ? createInitialChecklistState(blueprint.checklists) : {}
-              }
-            }
-          }))
-        }
-      },
-      include: { modules: { include: { progress: true } } }
-    });
-  });
-
-  return StateSchema.parse(state)
-}
-
-
-type ModuleType = 'NUTRITION' | 'EXERCISE'; 
-
-export async function getModule(userId: string, type: ModuleType) {
-  const date = await getNormalizedAppDate();
-
-  // We find the module directly using the composite filter
-  return await prisma.module.findFirst({
-    where: {
-      type: type,
-      state: {
-        userId: userId,
-        dateCreated: date,
-        isActive: true
-      }
-    },
-    include: { progress: true }
-  });
-}
-
-export async function updateModuleProgress(
-  moduleId: string,
-  updates: { id: string; data: any }[]
-) {
-  
-  const currentRecord = await prisma.progress.findUnique({
-    where: { moduleId },
-  });
-
-  if (!currentRecord) {
-    throw new Error(`Progress record for module ${moduleId} not found.`);
-  }
-
-  // Cast trackables for logic, though Zod will handle the final safety
-  const currentTrackables = currentRecord.trackables as any[];
-
-  // 2. Map and Merge
-  const updatedTrackables = currentTrackables.map((existing) => {
-    const update = updates.find((u) => u.id === existing.id);
-    return update ? { ...existing, data: update.data } : existing;
-  });
-
-  // 3. Validation Logic
-  const updateIds = updates.map(u => u.id);
-  const existingIds = currentTrackables.map(t => t.id);
-  const invalidIds = updateIds.filter(id => !existingIds.includes(id));
-
-  if (invalidIds.length > 0) {
-    throw new Error(`Invalid trackable IDs: ${invalidIds.join(", ")}`);
-  }
-
-  // 4. Optimization: Skip DB call if nothing changed
-  if (isDeepStrictEqual(currentTrackables, updatedTrackables)) {
-    return currentRecord;
-  }
-
-  // 5. Save the JSON back to the unified Progress table
-  return await prisma.progress.update({
-    where: { moduleId },
-    data: { trackables: updatedTrackables },
-  });
-}
-
-export async function LLMGenerateState(
-  in_state: State | null, 
-  x: External, 
-  userId: string 
-) {
-  // 1. Distill the ThreadContext into a readable transcript for the LLM
-  // We prioritize the most recent messages if tokens are an issue
-  const transcript = x.threadContext.map(thread => {
-    const msgs = thread.messages?.map(m => `[${m.role.toUpperCase()}]: ${m.content}`).join("\n") || "No messages";
-    return `### Thread: ${thread.title || 'General'}\n${msgs}`;
-  }).join("\n\n---\n\n");
-
-  const profile = x.profile
-
-  const systemPrompt = `
-    ROLE: You are a Senior Clinical Rehabilitation Specialist.
-    TASK: Generate a "Recovery Blueprint" (JSON) for a patient based on their History Snapshot.
-
-    INPUT DATA:
-    1. PATIENT PROFILE: ${x.profile}
-    2. CONVERSATION SNAPSHOT: This is a frozen record of recent patient interactions. 
-       Analyze these for:
-       - Reported pain levels or physical limitations.
-       - Nutritional preferences or adherence issues.
-       - Direct requests from the patient or doctor.
-
-    OUTPUT INSTRUCTIONS:
-    - Your goal is to output a "Blueprint" containing exactly 1-3 modules.
-    - Each module must match the specific schema for NUTRITION, EXERCISE, etc.
-    - If the history mentions pain, include a SYMPTOM_CHECKER or modify EXERCISE intensity.
-    - If post-surgery (per profile), prioritize High-Protein NUTRITION goals.
-
-    STRICT CONSTRAINTS:
-    - Do NOT generate IDs or timestamps (these are system-managed).
-    - Return ONLY valid JSON matching the provided schema.
-  `;
-
-  const { object } = await generateObject ({
-    model: 'deepseek/deepseek-v3.2', // e.g., gpt-4o or deepseek-v3
-    system: systemPrompt,
-    prompt: `
-      PREVIOUS STATE: ${in_state ? JSON.stringify(in_state.modules) : "No previous state. This is a fresh start."}
-      USER PROFILE: ${profile}
-      EVIDENCE LOG (Snapshot):
-      ${transcript}
-    `,
-    schema: LLMBlueprintSchema, // This ensures the LLM sticks to your factory-built schema
-  });
-
-  const generatedPlan = LLMBlueprintSchema.parse(object)
-
-
-  return generatedPlan;
-}

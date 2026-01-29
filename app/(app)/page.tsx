@@ -10,6 +10,7 @@ import DashboardRenderer from "@/components/recovery/DashboardRenderer";
 import { useAppDate } from "@/context/DateContext";
 import { DevDateSwitcher } from "@/components/DevDateSwitcher";
 import { ensureAction } from "@/lib/utils";
+import ForceGenerateButton from "@/components/ForceStateGeneration";
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -35,19 +36,6 @@ export default function DashboardPage() {
             router.push("/info");
         }
     }, [status, session?.user?.hasProfile, router]);
-
-    // Updates session if today's data is present
-    useEffect(() => {
-        const checkSessionSync = async () => {
-            const needsSync = state && isToday && !session?.hasTodayState && !isSimulated;
-            
-            if (needsSync) {
-                console.log("Syncing session: today's state found.");
-                await update();
-            }
-        };
-        checkSessionSync();
-    }, [state, normalizedDate, session?.hasTodayState, isSimulated, update, isToday]);
 
     // 4. RENDER LOGIC
     if (status === "loading" || isLoading) {
@@ -92,14 +80,16 @@ export default function DashboardPage() {
                 )}
             </section>
             
-            <button 
+            {/* <button 
                 onClick={() => router.push('/chat')}
                 className="fixed bottom-6 left-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all z-40"
             >
                 💬 Ask Assistant
-            </button>
+            </button> */}
 
             <DevDateSwitcher />
+            
+            <ForceGenerateButton normalizedDate={normalizedDate}/>
         </div>
     );
 }
