@@ -155,7 +155,7 @@ model Message {
   // explainability?
   reasoning String?  
 
-  thread    Thread   @relation(fields: [threadId], references: [id])
+  thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
 }
