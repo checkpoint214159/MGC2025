@@ -11,7 +11,7 @@ import { compileExternalAction } from '../actions';
 import { External } from '../external/schemas/external';
 import { generateObject } from 'ai';
 import { getModel } from '../llm/model';
-import { LLMGenerateState2 } from './services/full';
+import { LLMGenerateState } from './services/full';
 import { getModuleFromState } from '../utils';
 
 const schema = StateSchema
@@ -65,7 +65,7 @@ export async function generateNewState(userId: string, date: Date) {
   }
 
   const x = result.data
-  const generatedPlan = await LLMGenerateState2(yesterdayActive, x, userId);
+  const generatedPlan = await LLMGenerateState(yesterdayActive, x, userId);
   console.log('generatedPlan?', generatedPlan)
   const state = await prisma.$transaction(async (tx) => {
 
@@ -165,65 +165,3 @@ export async function updateModuleProgress(
     data: { trackables: updatedTrackables },
   });
 }
-
-export async function LLMGenerateState1(
-  in_state: State | null, 
-  x: External, 
-  userId: string 
-) {
-  // 1. Distill the ThreadContext into a readable transcript for the LLM
-  // We prioritize the most recent messages if tokens are an issue
-  const transcript = x.threadContext.map(thread => {
-    const msgs = thread.messages?.map(m => `[${m.role.toUpperCase()}]: ${m.content}`).join("\n") || "No messages";
-    return `### Thread: ${thread.title || 'General'}\n${msgs}`;
-  }).join("\n\n---\n\n");
-
-  const profile = x.profile
-
-  const systemPrompt = `
-    ROLE: You are a Senior Clinical Rehabilitation Specialist.
-    TASK: Generate a "Recovery Blueprint" (JSON) for a patient based on their History Snapshot.
-
-    INPUT DATA:
-    1. PATIENT PROFILE: ${x.profile}
-    2. CONVERSATION SNAPSHOT: This is a frozen record of recent patient interactions. 
-       Analyze these for:
-       - Reported pain levels or physical limitations.
-       - Nutritional preferences or adherence issues.
-       - Direct requests from the patient or doctor.
-
-    OUTPUT INSTRUCTIONS:
-    - Your goal is to output a "Blueprint" containing exactly 1-3 modules.
-    - Each module must match the specific schema for NUTRITION, EXERCISE, etc.
-    - If the history mentions pain, include a SYMPTOM_CHECKER or modify EXERCISE intensity.
-    - If post-surgery (per profile), prioritize High-Protein NUTRITION goals.
-
-    STRICT CONSTRAINTS:
-    - Do NOT generate IDs or timestamps (these are system-managed).
-    - Return ONLY valid JSON matching the provided schema.
-  `;
-  console.log('systemPrompt???', systemPrompt)
-  console.log('prompt??', `
-      PREVIOUS STATE: ${in_state ? JSON.stringify(in_state.modules) : "No previous state. This is a fresh start."}
-      USER PROFILE: ${profile}
-      EVIDENCE LOG (Snapshot):
-      ${transcript}
-    `)
-  const { object } = await generateObject ({
-    model: getModel(),
-    system: systemPrompt,
-    prompt: `
-      PREVIOUS STATE: ${in_state ? JSON.stringify(in_state.modules) : "No previous state. This is a fresh start."}
-      USER PROFILE: ${profile}
-      EVIDENCE LOG (Snapshot):
-      ${transcript}
-    `,
-    schema: LLMBlueprintSchema, // This ensures the LLM sticks to your factory-built schema
-  });
-
-  const generatedPlan = LLMBlueprintSchema.parse(object)
-  console.log('generatedPlan??', generatedPlan)
-
-  return generatedPlan;
-}
-

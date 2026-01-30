@@ -7,7 +7,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      hasProfile: bool;
+      doneOnboarding: bool;
     } & DefaultSession["user"]
     hasTodayState?: boolean | null,
   }

@@ -3,8 +3,7 @@
 import { auth } from "@/auth";
 import { getActiveState, generateNewState, updateModuleProgress } from "@/lib/state/service";
 import { Biometrics } from "@/lib/user/schema";
-import { setProfile, generateUserProfile  } from "@/lib/user/service"
-import { getExistingOnboardingData, setBiometric, updateThread } from "./llm/service";
+import { setProfile, generateUserProfile, getExistingOnboardingData, deleteOnboardingData, setBiometric, updateThread  } from "@/lib/user/service"
 import { BaseMessage } from "./external/schemas/message";
 import { Thread, ThreadContext } from "@/lib/external/schemas/thread";
 import { prisma } from "./prisma";
@@ -75,6 +74,13 @@ export async function getOnBoardingAction() {
   return authenticatedAction(async (userId) => {
     return await getExistingOnboardingData(userId);
   });
+}
+
+export async function deleteOnboardingDataAction() {
+  authenticatedAction(
+    async (userId) => {
+      return await deleteOnboardingData(userId);
+    });
 }
 
 export async function updateThreadAction({ threadId, threadType, messages }: {

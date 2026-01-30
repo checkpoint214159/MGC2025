@@ -36,27 +36,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (user) {
                 token.id = user.id;
             }
-
+            // console.log('all?', { token, user, trigger, session })
             if (token?.id) {
-                // Only re-fetch if we don't know about the profile yet, or if explicitly updating
-                if (!token.hasProfile|| trigger === "update") {
-                    const today = await getNormalizedAppDate();
-
-                    const [stateRecord, dbUser] = await Promise.all([
-                        prisma.state.findFirst({
-                            where: {
-                                isActive: true,
-                            }
-                        }),
+                if (!token.doneOnboarding || trigger === "update") {
+                    // updating token function
+                    const [dbUser] = await Promise.all([
                         prisma.user.findUnique({
                             where: { id: token.id as string },
-                            select: { name: true, profile: true }
+                            select: { name: true, profile: true, biometric: true }
                         })
                     ]);
                     if (dbUser) {
                         token.name = dbUser.name;
-                        // Store a boolean instead of the full clinical string
-                        token.hasProfile = !!dbUser.profile;
+                        token.doneOnboarding = !!dbUser.profile && !!dbUser.biometric;
                     }
                 }
             }
@@ -67,7 +59,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 session.user.id = token.id as string;
                 session.hasTodayState = token.hasTodayState as boolean;
                 // Expose the boolean to the client UI
-                session.user.hasProfile = token.hasProfile as boolean;
+                session.user.doneOnboarding = token.doneOnboarding as boolean;
             }
             return session;
         }

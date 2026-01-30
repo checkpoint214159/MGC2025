@@ -5,18 +5,18 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetchStateAction } from "@/lib/actions";
-import { State } from "@/lib/state/schemas/state";
 import DashboardRenderer from "@/components/recovery/DashboardRenderer";
 import { useAppDate } from "@/context/DateContext";
 import { DevDateSwitcher } from "@/components/DevDateSwitcher";
 import { ensureAction } from "@/lib/utils";
-import ForceGenerateButton from "@/components/ForceStateGeneration";
+import ForceGenerateButton from "@/components/admin/ForceStateGeneration";
+import ForceOnboardingAction from "@/components/admin/ForceOnboarding";
 
 export default function DashboardPage() {
     const router = useRouter();
     const { normalizedDate, isSimulated, displayDate, isToday } = useAppDate();
 
-    const { data: session, status, update } = useSession();
+    const { data: session, status } = useSession();
 
     // query to retrieve state, if enabled
     const { data: state, isLoading } = useQuery({
@@ -32,10 +32,10 @@ export default function DashboardPage() {
     useEffect(() => {
         if (status === "unauthenticated") {
             router.push("/login");
-        } else if (status === "authenticated" && !session?.user?.hasProfile) {
+        } else if (status === "authenticated" && !session?.user?.doneOnboarding) {
             router.push("/info");
         }
-    }, [status, session?.user?.hasProfile, router]);
+    }, [status, session?.user?.doneOnboarding, router]);
 
     // 4. RENDER LOGIC
     if (status === "loading" || isLoading) {
@@ -87,9 +87,18 @@ export default function DashboardPage() {
                 💬 Ask Assistant
             </button> */}
 
-            <DevDateSwitcher />
-            
-            <ForceGenerateButton normalizedDate={normalizedDate}/>
+            {process.env.NODE_ENV === 'development' && (
+                <div className="mt-20 p-6 bg-red-50 border-2 border-red-200 rounded-2xl">
+                    <h3 className="text-red-800 font-bold mb-4 uppercase tracking-wider text-xs">
+                    Admin / Dev Tools
+                    </h3>
+                    <div className="flex flex-wrap gap-4">
+                    <DevDateSwitcher />
+                    <ForceGenerateButton normalizedDate={normalizedDate}/>
+                    <ForceOnboardingAction />
+                    </div>
+                </div>
+                )}
         </div>
     );
 }

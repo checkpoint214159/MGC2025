@@ -3,7 +3,7 @@ import { External } from "@/lib/external/schemas/external";
 import { generateModule } from "@/lib/state/services/modules";
 
 
-export async function LLMGenerateState2(
+export async function LLMGenerateState(
   in_state: State | null, 
   x: External, 
   userId: string 
