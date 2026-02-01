@@ -9,14 +9,19 @@ export const BiometricsSchema = z.object({
 });
 
 export const BaselineSchema = z.object({
-  height: z.coerce.number().positive("Height is required"),
-  weight: z.coerce.number().positive("Weight is required"),
-  assessedAt: z.coerce.date().default(() => new Date()),
-  assessmentType: z.enum(["pre-op", "initial-consult", "post-op"]).default("pre-op"),
+  baseline: z.string(),
+  
+})
 
-}).catchall(
-  z.union([z.string(), z.number(), z.boolean()])
-);
+// export const BaselineSchema = z.object({
+//   height: z.coerce.number().positive("Height is required"),
+//   weight: z.coerce.number().positive("Weight is required"),
+//   assessedAt: z.coerce.date().default(() => new Date()),
+//   assessmentType: z.enum(["pre-op", "initial-consult", "post-op"]).default("pre-op"),
+
+// }).catchall(
+//   z.union([z.string(), z.number(), z.boolean()])
+// );
 
 export type Biometrics = z.infer<typeof BiometricsSchema>;
 export type Baseline = z.infer<typeof BaselineSchema>;
