@@ -1,9 +1,13 @@
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation"; // Use router for client-side navigation
 import { State } from "@/lib/state/schemas/state";
 import ExercisePreviewCard from "@/components/ui/ExercisePreviewCard";
 import NutritionPreviewCard from "@/components/ui/NutritionPreviewCard";
+import SymptomPreviewCard from "../ui/SymptomsPreviewCard";
+import SleepPreviewCard from "../ui/SleepPreviewCard";
 
 export default function DashboardRenderer({ config }: { config: State | null }) {
+  const router = useRouter();
+
   if (!config) {
     return (
       <div className="p-6 border-2 border-dashed border-slate-200 rounded-xl text-center">
@@ -13,33 +17,39 @@ export default function DashboardRenderer({ config }: { config: State | null }) 
   }
   
   return (
-    <div className="grid gap-6">
-      {/* explicitly render for now */}
+    /* Responsive Grid Logic:
+       - grid-cols-1: Mobile (default)
+       - md:grid-cols-2: Tablets/Laptops
+       - lg:grid-cols-3: Desktop Monitors
+       - items-start: Prevents cards from stretching to match the height of the tallest card
+    */
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+      {config.modules.map((module) => {
+        if (module.type === 'exercise') {
+          return (
+            <ExercisePreviewCard 
+              key={module.id} 
+              data={module} 
+              onClick={() => router.push('/recovery/exercise')} 
+            />
+          );
+        }
 
-      {
-        config.modules.map((module) => {
-          if (module.type === 'exercise') {
-            return (
-              <ExercisePreviewCard 
-                key={module.id} 
-                data={module} 
-                onClick={() => redirect('/recovery/exercise')} 
-              />
-            );
-          }
+        if (module.type === 'nutrition') {
+          return (
+            <NutritionPreviewCard 
+              key={module.id} 
+              data={module} 
+              onClick={() => router.push('/recovery/nutrition')}
+            />
+          );
+        }
+        return null;
+      })}
 
-          if (module.type === 'nutrition') {
-            return (
-              <NutritionPreviewCard 
-                key={module.id} 
-                data={module} 
-                onClick={() => redirect('/recovery/nutrition')}
-              />
-            );
-          }
-        })
-
-      }
+      {/* Hardcoded visual modules */}
+      <SymptomPreviewCard data={{}} onClick={() => {}} />
+      <SleepPreviewCard data={{}} onClick={() => {}} />
     </div>
   );
 }

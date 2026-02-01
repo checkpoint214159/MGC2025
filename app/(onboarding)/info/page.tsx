@@ -9,7 +9,7 @@ import { Biometrics, Baseline, BiometricsSchema } from "@/lib/user/schema";
 import { Thread, ThreadSchema } from "@/lib/external/schemas/thread";
 import { AssistantMessageSchema, convertMessageToQuestion, convertQuestionToMessage, convertResponseToMessage } from "@/lib/external/schemas/message";
 import { BiometricsForm } from "./BiometricsForm"
-import { DynamicQuestionCard } from "./QuestionCard"
+import { DynamicQuestionCard, ThinkingCard } from "./QuestionCard"
 import { getInitialLLMQuestion, getNextLLMQuestion } from "@/lib/llm/service";
 import { 
   updateBiometricsAction, 
@@ -19,6 +19,7 @@ import {
   generateUserProfileAction,
 } from "@/lib/actions";
 import { ensureAction } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 export default function OnboardingFlow() {
   const { data: session, status, update } = useSession();
@@ -31,7 +32,7 @@ export default function OnboardingFlow() {
   
   const router = useRouter();
 
-  const { data: onboardingData, isLoading: isInitialLoading } = useQuery({
+  const { data: onboardingData } = useQuery({
       queryKey: ['onboarding', session?.user?.id],
       queryFn: async () => {
           if (!session?.user?.id) return null;
@@ -120,6 +121,7 @@ export default function OnboardingFlow() {
     });
     const updated = ensureAction(updatedResult)
     const nextQn = await getNextLLMQuestion(biometrics, updated) 
+    console.log('nextQn.inputType?', nextQn.inputType)
     
     // terminate
     if (nextQn.inputType === 'terminateQuestioning') {
@@ -150,38 +152,74 @@ export default function OnboardingFlow() {
     setIsAiLoading(false);
   }
 
-  if (status === "loading" || isAiLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-        <h2 className="text-xl font-semibold">
-          {status === "loading" ? "Checking Session..." : "Interpreting your response..."}
-        </h2>
-      </div>
-    );
+  if (status === "loading" && !onboardingData) {
+    return <LoadingScreen message="Checking Session..." />;
   }
 
+  const history = (thread?.messages ?? [])
+    .filter(m => m.role === 'assistant')
+    .map(m => convertMessageToQuestion(AssistantMessageSchema.parse(m)));
+  
+  // slice to prevent clogging. if ai is loading, the active becomes answered
+  const visibleHistory = history.slice(-2);
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6">
+    <div className="flex flex-col items-center justify-start min-h-screen bg-[#f8fafc] p-6 overflow-hidden pt-20">
       {!biometrics || !thread ? (
         <BiometricsForm onComplete={submitBio} />
       ) : (
-        <div className="w-full max-w-lg space-y-6">
-          {/* Progress / History visualizer */}
-          <div className="flex gap-1 justify-center">
-            {(thread?.messages ?? [])
-              .filter(m => m.role === 'assistant')
-              .map((_, i) => (
-                <div key={i} className="h-1 w-8 rounded bg-blue-600" />
-              ))
-            }
+        <div className="w-full max-w-xl flex flex-col gap-6">
+          {/* progress pips */}
+          <div className="flex gap-2 justify-center px-10 mb-4">
+            {history.map((_, i) => (
+              <motion.div 
+                key={i} 
+                layoutId={`pip-${i}`}
+                className="h-1.5 flex-1 rounded-full bg-blue-600" 
+              />
+            ))}
           </div>
 
-          <DynamicQuestionCard 
-            question={currentQuestion} 
-            onAnswer={nextQuestion} 
-            loading={isAiLoading} 
-          />
+          {/* THE SCROLL STACK */}
+          <div className="flex flex-col gap-6 transition-all duration-700">
+            {visibleHistory.map((q, index) => {
+              const isLast = index === visibleHistory.length - 1;
+              const fade = !isLast || isAiLoading;
+
+              return (
+                <motion.div
+                  key={q.questionText} // Use text as key for animation
+                  initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                  animate={{ 
+                    opacity: fade ? 0.4 : 1, 
+                    y: 0, 
+                    scale: fade ? 0.95 : 1,
+                    // When it's past, we shift it up slightly
+                    marginTop: fade ? "-20px" : "0px" 
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                >
+                  <DynamicQuestionCard 
+                    question={q} 
+                    onAnswer={nextQuestion} 
+                    loading={isAiLoading}
+                    fade={fade} 
+                  />
+                </motion.div>
+              );
+            })}
+
+            {/* AI THINKING CARD */}
+            {isAiLoading && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full"
+              >
+                <ThinkingCard />
+              </motion.div>
+            )}
+          </div>
         </div>
       )}
     </div>
