@@ -1,3 +1,9 @@
+import { ensureAction } from "@/lib/utils";
+import { updateBiometricsAction } from "@/lib/actions";
+import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { Biometrics, BiometricsSchema } from "@/lib/user/schema";
+
 export function BiometricsForm({ onComplete }: { onComplete: (data: any) => void }) {
   return (
     <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 w-full max-w-md">
@@ -81,4 +87,18 @@ export function BiometricsForm({ onComplete }: { onComplete: (data: any) => void
       </form>
     </div>
   );
+}
+
+export function SubmitBiometricsPage() {
+    const [biometrics, setBiometrics] = useState<Biometrics | null>(null);
+    const { data: session, status, update } = useSession();
+
+    async function submitBio(bio: Biometrics) {
+        const userId = session?.user?.id!
+        const updatedBioResult = await updateBiometricsAction(bio)
+        const updatedBio = ensureAction(updatedBioResult)
+        setBiometrics(BiometricsSchema.parse(updatedBio))
+    }
+
+    return <BiometricsForm onComplete = {submitBio} />
 }

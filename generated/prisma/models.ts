@@ -10,7 +10,7 @@
  */
 export type * from './models/Account'
 export type * from './models/User'
-export type * from './models/Baseline'
+export type * from './models/Baselines'
 export type * from './models/Biometrics'
 export type * from './models/State'
 export type * from './models/Module'

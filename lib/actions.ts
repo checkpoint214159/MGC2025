@@ -3,12 +3,13 @@
 import { auth } from "@/auth";
 import { getActiveState, generateNewState, updateModuleProgress } from "@/lib/state/service";
 import { Biometrics } from "@/lib/user/schema";
-import { setProfile, generateUserProfile, getExistingOnboardingData, deleteOnboardingData, setBiometric, updateThread  } from "@/lib/user/service"
+import { setProfile, generateUserProfile, getExistingOnboardingData, deleteOnboardingData, setBiometric, updateThread, generateQueryBaseline, getQueryBaseline, setQueryBaseline, setBaseline, getBaseline, generateBaseline  } from "@/lib/user/service"
 import { BaseMessage } from "./external/schemas/message";
 import { Thread, ThreadContext } from "@/lib/external/schemas/thread";
 import { prisma } from "./prisma";
 import { compileExternal } from "./external/service";
 import { State } from "./state/schemas/state";
+import { QueryBaselines } from "./user/baseline";
 
 
 // i love functors
@@ -36,6 +37,85 @@ export async function setProfileAction(profile: string) {
   return authenticatedAction(async (userId) => {return setProfile(userId, profile)})
 }
 
+export async function updateBiometricsAction(bio: Biometrics) {
+  return authenticatedAction(async (userId) => {
+    return await setBiometric(userId, bio);
+  });
+}
+
+export async function generateQueryBaselineAction(biometrics: Biometrics) {
+  return authenticatedAction(async (userId) => {
+    return await generateQueryBaseline(userId, biometrics);
+  });
+}
+
+export async function setQueryBaselineAction(queryBaseline: QueryBaselines) {
+  return authenticatedAction(async (userId) => {
+    return await setQueryBaseline(userId, queryBaseline);
+  })
+}
+export async function getQueryBaselineAction() {
+  return authenticatedAction(async (userId) => {
+    return await getQueryBaseline(userId);
+  })
+}
+
+export async function generateBaselineAction(biometrics: Biometrics, responses: Record<string, number>, queryBaseline: QueryBaselines) {
+  return authenticatedAction(async (userId) => {
+    return await generateBaseline(biometrics, responses, queryBaseline);
+  });
+}
+
+export async function setBaselineAction(queryBaseline: Baselines) {
+  return authenticatedAction(async (userId) => {
+    return await setBaseline(userId, queryBaseline);
+  })
+}
+export async function getBaselineAction() {
+  return authenticatedAction(async (userId) => {
+    return await getBaseline(userId);
+  })
+}
+
+export async function updateThreadAction({ threadId, threadType, messages }: {
+  threadId: string | null;
+  threadType: string | null;
+  messages: BaseMessage[];
+}) {
+  return authenticatedAction(async (userId) => {
+    return await updateThread(userId, threadId, threadType, messages);
+  });
+}
+
+export async function generateUserProfileAction({thread, biometrics}: {
+  thread: Thread,
+  biometrics: Biometrics,
+}) {
+  return authenticatedAction(async (userId) => {
+    return generateUserProfile({thread: thread, biometrics: biometrics})
+  })
+}
+
+export async function getOnBoardingAction() {
+  return authenticatedAction(async (userId) => {
+    return await getExistingOnboardingData(userId);
+  });
+}
+
+export async function deleteOnboardingDataAction() {
+  authenticatedAction(
+    async (userId) => {
+      return await deleteOnboardingData(userId);
+    });
+}
+
+export async function compileExternalAction(threadContext: ThreadContext, profile: string) {
+  return authenticatedAction(async (userId) => {
+    return await compileExternal(userId, threadContext, profile);
+  });
+}
+
+
 export async function fetchStateAction(date: Date, admin_force: boolean = false) {
   return await authenticatedAction(async (userId): Promise<State> => {
     console.log('fetchstate')
@@ -61,49 +141,5 @@ export async function updateProgressAction(
   return authenticatedAction(async () => {
     // Note: If updateModuleProgress requires userId for security, add it here
     return await updateModuleProgress(moduleId, updates);
-  });
-}
-
-export async function updateBiometricsAction(bio: Biometrics) {
-  return authenticatedAction(async (userId) => {
-    return await setBiometric(userId, bio);
-  });
-}
-
-export async function getOnBoardingAction() {
-  return authenticatedAction(async (userId) => {
-    return await getExistingOnboardingData(userId);
-  });
-}
-
-export async function deleteOnboardingDataAction() {
-  authenticatedAction(
-    async (userId) => {
-      return await deleteOnboardingData(userId);
-    });
-}
-
-export async function updateThreadAction({ threadId, threadType, messages }: {
-  threadId: string | null;
-  threadType: string | null;
-  messages: BaseMessage[];
-}) {
-  return authenticatedAction(async (userId) => {
-    return await updateThread(userId, threadId, threadType, messages);
-  });
-}
-
-export async function generateUserProfileAction({thread, biometrics}: {
-  thread: Thread,
-  biometrics: Biometrics,
-}) {
-  // console.log('GENERATE USER PROFILE ACTION CALLED')
-  // return 'test'
-  return generateUserProfile({thread: thread, biometrics: biometrics})
-}
-
-export async function compileExternalAction(threadContext: ThreadContext, profile: string) {
-  return authenticatedAction(async (userId) => {
-    return await compileExternal(userId, threadContext, profile);
   });
 }
