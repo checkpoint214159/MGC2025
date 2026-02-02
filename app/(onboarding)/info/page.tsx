@@ -1,18 +1,17 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSession, SessionProvider } from "next-auth/react";
 import { BaseQuestion, BaseQuestionSchema, BaseUserResponse } from "@/lib/llm/schemas/base"; // The Zod schema we built earlier
-import { Biometrics, Baseline, BiometricsSchema } from "@/lib/user/schema";
+import { Biometrics, BiometricsSchema } from "@/lib/user/schema";
 import { Thread, ThreadSchema } from "@/lib/external/schemas/thread";
 import { AssistantMessageSchema, convertMessageToQuestion, convertQuestionToMessage, convertResponseToMessage } from "@/lib/external/schemas/message";
-import { BiometricsForm } from "./BiometricsForm"
-import { DynamicQuestionCard, ThinkingCard } from "./QuestionCard"
+import { SubmitBiometricsPage } from "./BiometricsPage";
 import { getInitialLLMQuestion, getNextLLMQuestion } from "@/lib/llm/service";
-import { 
-  updateBiometricsAction, 
+import { Baselines, BaselinesSchema } from "@/lib/user/baseline";
+import {
   getOnBoardingAction, 
   updateThreadAction, 
   setProfileAction,
@@ -20,23 +19,23 @@ import {
 } from "@/lib/actions";
 import { ensureAction } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { BaselinePage } from "./BaselinePage";
+import { QuestionPage } from "./QuestionPage";
 
 export default function OnboardingFlow() {
   const { data: session, status, update } = useSession();
 
   const [biometrics, setBiometrics] = useState<Biometrics | null>(null);
   const [thread, setThread] = useState<Thread | null>()
-  
-  const [currentQuestion, setCurrentQuestion] = useState<BaseQuestion | null>(null);
-  const [isAiLoading, setIsAiLoading] = useState(false);
-  
+
   const router = useRouter();
 
-  const { data: onboardingData } = useQuery({
+  const { data: onboardingData, isLoading, isError, error } = useQuery({
       queryKey: ['onboarding', session?.user?.id],
       queryFn: async () => {
           if (!session?.user?.id) return null;
           const result = await getOnBoardingAction();
+          console.log('result from getonboard', result)
 
           if (!result.success || !result.data) {
             throw new Error(result.error || "Failed to fetch onboarding data");
@@ -47,183 +46,51 @@ export default function OnboardingFlow() {
           return {
               biometrics: data.biometrics ? BiometricsSchema.parse(data.biometrics) : null,
               thread: data.activeThread ? ThreadSchema.parse(data.activeThread) : null,
+              baselines: data.baselines ? BaselinesSchema.parse(data.baselines.data) : null,
           };
       },
       enabled: !!session?.user?.id,
   });
 
-  useEffect(() => {
-      if (onboardingData) {
-          if (onboardingData.biometrics) setBiometrics(onboardingData.biometrics);
-          if (onboardingData.thread) {
-              setThread(onboardingData.thread);
-              
-              // Derive the current question from the thread
-              const lastAssistantMsg = [...onboardingData.thread.messages ?? []]
-                  .reverse()
-                  .find(m => m.role === 'assistant');
-
-              if (lastAssistantMsg) {
-                  const validatedMsg = AssistantMessageSchema.parse(lastAssistantMsg);
-                  const question = convertMessageToQuestion(validatedMsg);
-                  setCurrentQuestion(BaseQuestionSchema.parse(question));
-              }
-          }
-      }
-  }, [onboardingData]);
-
-  // TODO: integrate baseline here
-  async function submitBio(bio: Biometrics) {
-    setBiometrics(bio)
-    setIsAiLoading(true)
-    
-    const userId = session?.user?.id!
-    const updatedBioResult = await updateBiometricsAction(bio)
-    const updatedBio = ensureAction(updatedBioResult)
-    console.log('updatedBio', updatedBio)
-    setBiometrics(BiometricsSchema.parse(updatedBio))
-
-    const q1 = await getInitialLLMQuestion(updatedBio) 
-    const q1Message = convertQuestionToMessage(q1, thread?.id ?? null, 'onboarding')
-
-    const threadResult = await updateThreadAction({
-      threadId: thread?.id ?? null,
-      threadType: 'onboarding',
-      messages: []
-    });
-
-    const newThread = ensureAction(threadResult)
-
-    const updatedResult = await updateThreadAction({
-      threadId: newThread?.id ?? null,
-      threadType: 'onboarding',
-      messages: [q1Message]
-    });
-
-    const updated = ensureAction(updatedResult)
-
-    setThread(updated);
-    setCurrentQuestion(q1);
-    setIsAiLoading(false);
-  }
-
-  async function nextQuestion(answer: string) {
-    if (!thread || !biometrics || !session?.user?.id) return;
-    setIsAiLoading(true)
-    
-    const userId = session?.user?.id!
-    
-    const userMsg = convertResponseToMessage(answer, thread.id, 'onboarding')
-    const updatedResult = await updateThreadAction({
-      threadId: thread.id,
-      threadType: 'onboarding',
-      messages: [userMsg]
-    });
-    const updated = ensureAction(updatedResult)
-    const nextQn = await getNextLLMQuestion(biometrics, updated) 
-    console.log('nextQn.inputType?', nextQn.inputType)
-    
-    // terminate
-    if (nextQn.inputType === 'terminateQuestioning') {
-      try {
-        const profile = await generateUserProfileAction({ thread: updated, biometrics: biometrics });
-        await setProfileAction(profile);
-        await update(); 
-        router.push('/');
-        return;
-      } catch (e) {
-        console.error("Finalization failed", e);
-      } finally {
-        setIsAiLoading(false);
-      }
-    }
-    
-    // here meants the llm did not terminate, so save latest to thread
-    const nextMsg = convertQuestionToMessage(nextQn, updated.id, 'onboarding')
-    const postLLMResult = await updateThreadAction({
-      threadId: updated.id,
-      threadType: 'onboarding',
-      messages: [nextMsg]
-    });
-    const postLLM = ensureAction(postLLMResult)
-    
-    setThread(postLLM)
-    setCurrentQuestion(nextQn)
-    setIsAiLoading(false);
-  }
-
-  if (status === "loading" && !onboardingData) {
-    return <LoadingScreen message="Checking Session..." />;
-  }
-
-  const history = (thread?.messages ?? [])
-    .filter(m => m.role === 'assistant')
-    .map(m => convertMessageToQuestion(AssistantMessageSchema.parse(m)));
+  const currentStep = useMemo(() => {
+    if (isLoading) return "LOADING";
+    if (isError) {
+      console.log('error??', error)
+      return "ERROR"
+    };
+    if (!onboardingData?.biometrics) return "BIOMETRICS";
+    if (!onboardingData?.baselines) return "BASELINES";
+    if (!session?.user.doneOnboarding) return "CONVERSATION";
+    return "DASHBOARD";
+  }, [onboardingData, isLoading, isError]);
+  console.log('current onboarding step', currentStep)
   
-  // slice to prevent clogging. if ai is loading, the active becomes answered
-  const visibleHistory = history.slice(-2);
+  const renderStep = () => {
+  switch (currentStep) {
+    case "BIOMETRICS":
+      return <SubmitBiometricsPage />;
+    
+    case "BASELINES":
+      if (!onboardingData?.biometrics) return null; 
+
+      return (<BaselinePage biometrics={onboardingData.biometrics} />);
+
+    case "CONVERSATION":
+      if (!onboardingData?.biometrics || !onboardingData?.baselines) return null; 
+    
+      return (<QuestionPage
+        biometrics={onboardingData.biometrics}
+        baselines={onboardingData.baselines}
+        thread={onboardingData.thread}
+      />)
+    }
+  }
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen bg-[#f8fafc] p-6 overflow-hidden pt-20">
-      {!biometrics || !thread ? (
-        <BiometricsForm onComplete={submitBio} />
-      ) : (
-        <div className="w-full max-w-xl flex flex-col gap-6">
-          {/* progress pips */}
-          <div className="flex gap-2 justify-center px-10 mb-4">
-            {history.map((_, i) => (
-              <motion.div 
-                key={i} 
-                layoutId={`pip-${i}`}
-                className="h-1.5 flex-1 rounded-full bg-blue-600" 
-              />
-            ))}
-          </div>
-
-          {/* THE SCROLL STACK */}
-          <div className="flex flex-col gap-6 transition-all duration-700">
-            {visibleHistory.map((q, index) => {
-              const isLast = index === visibleHistory.length - 1;
-              const fade = !isLast || isAiLoading;
-
-              return (
-                <motion.div
-                  key={q.questionText} // Use text as key for animation
-                  initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                  animate={{ 
-                    opacity: fade ? 0.4 : 1, 
-                    y: 0, 
-                    scale: fade ? 0.95 : 1,
-                    // When it's past, we shift it up slightly
-                    marginTop: fade ? "-20px" : "0px" 
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                >
-                  <DynamicQuestionCard 
-                    question={q} 
-                    onAnswer={nextQuestion} 
-                    loading={isAiLoading}
-                    fade={fade} 
-                  />
-                </motion.div>
-              );
-            })}
-
-            {/* AI THINKING CARD */}
-            {isAiLoading && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full"
-              >
-                <ThinkingCard />
-              </motion.div>
-            )}
-          </div>
-        </div>
-      )}
+    {renderStep()}
     </div>
-  );
+  )
 }
 
 
