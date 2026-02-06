@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { getActiveState, generateNewState, updateModuleProgress } from "@/lib/state/service";
 import { Biometrics } from "@/lib/user/schema";
-import { setProfile, generateUserProfile, getExistingOnboardingData, deleteOnboardingData, setBiometric, updateThread, generateQueryBaseline, getQueryBaseline, setQueryBaseline, setBaseline, getBaseline, generateBaseline  } from "@/lib/user/service"
+import { setProfile, generateUserProfile, getExistingOnboardingData, deleteOnboardingData, setBiometric, updateThread, generateQueryBaseline, getQueryBaseline, setQueryBaseline, setBaseline, getBaseline, generateBaseline, deleteBiometrics, deleteBaselines, deleteOnboardingThread  } from "@/lib/user/service"
 import { BaseMessage } from "./external/schemas/message";
 import { Thread, ThreadContext } from "@/lib/external/schemas/thread";
 import { prisma } from "./prisma";
@@ -108,6 +108,28 @@ export async function deleteOnboardingDataAction() {
       return await deleteOnboardingData(userId);
     });
 }
+
+export async function deleteBiometricsAction() {
+  authenticatedAction(
+    async (userId) => {
+      return await deleteBiometrics(userId);
+    });
+}
+
+export async function deleteBaselinesAction() {
+  authenticatedAction(
+    async (userId) => {
+      return await deleteBaselines(userId);
+    });
+}
+
+export async function deleteOnboardingThreadAction() {
+  authenticatedAction(
+    async (userId) => {
+      return await deleteOnboardingThread(userId);
+    });
+}
+
 
 export async function compileExternalAction(threadContext: ThreadContext, profile: string) {
   return authenticatedAction(async (userId) => {

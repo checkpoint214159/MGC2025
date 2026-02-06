@@ -386,7 +386,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Account: 'Account',
   User: 'User',
-  Baselines: 'Baselines',
+  Baseline: 'Baseline',
   Biometrics: 'Biometrics',
   State: 'State',
   Module: 'Module',
@@ -409,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "user" | "baselines" | "biometrics" | "state" | "module" | "progress" | "external" | "thread" | "message"
+    modelProps: "account" | "user" | "baseline" | "biometrics" | "state" | "module" | "progress" | "external" | "thread" | "message"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -561,77 +561,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    Baselines: {
-      payload: Prisma.$BaselinesPayload<ExtArgs>
-      fields: Prisma.BaselinesFieldRefs
+    Baseline: {
+      payload: Prisma.$BaselinePayload<ExtArgs>
+      fields: Prisma.BaselineFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.BaselinesFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinesPayload> | null
+          args: Prisma.BaselineFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinePayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.BaselinesFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinesPayload>
+          args: Prisma.BaselineFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinePayload>
         }
         findFirst: {
-          args: Prisma.BaselinesFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinesPayload> | null
+          args: Prisma.BaselineFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinePayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.BaselinesFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinesPayload>
+          args: Prisma.BaselineFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinePayload>
         }
         findMany: {
-          args: Prisma.BaselinesFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinesPayload>[]
+          args: Prisma.BaselineFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinePayload>[]
         }
         create: {
-          args: Prisma.BaselinesCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinesPayload>
+          args: Prisma.BaselineCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinePayload>
         }
         createMany: {
-          args: Prisma.BaselinesCreateManyArgs<ExtArgs>
+          args: Prisma.BaselineCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.BaselinesCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinesPayload>[]
+          args: Prisma.BaselineCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinePayload>[]
         }
         delete: {
-          args: Prisma.BaselinesDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinesPayload>
+          args: Prisma.BaselineDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinePayload>
         }
         update: {
-          args: Prisma.BaselinesUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinesPayload>
+          args: Prisma.BaselineUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinePayload>
         }
         deleteMany: {
-          args: Prisma.BaselinesDeleteManyArgs<ExtArgs>
+          args: Prisma.BaselineDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.BaselinesUpdateManyArgs<ExtArgs>
+          args: Prisma.BaselineUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.BaselinesUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinesPayload>[]
+          args: Prisma.BaselineUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinePayload>[]
         }
         upsert: {
-          args: Prisma.BaselinesUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinesPayload>
+          args: Prisma.BaselineUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BaselinePayload>
         }
         aggregate: {
-          args: Prisma.BaselinesAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateBaselines>
+          args: Prisma.BaselineAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBaseline>
         }
         groupBy: {
-          args: Prisma.BaselinesGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.BaselinesGroupByOutputType>[]
+          args: Prisma.BaselineGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BaselineGroupByOutputType>[]
         }
         count: {
-          args: Prisma.BaselinesCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.BaselinesCountAggregateOutputType> | number
+          args: Prisma.BaselineCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BaselineCountAggregateOutputType> | number
         }
       }
     }
@@ -1214,13 +1214,13 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-export const BaselinesScalarFieldEnum = {
+export const BaselineScalarFieldEnum = {
   id: 'id',
   data: 'data',
   userId: 'userId'
 } as const
 
-export type BaselinesScalarFieldEnum = (typeof BaselinesScalarFieldEnum)[keyof typeof BaselinesScalarFieldEnum]
+export type BaselineScalarFieldEnum = (typeof BaselineScalarFieldEnum)[keyof typeof BaselineScalarFieldEnum]
 
 
 export const BiometricsScalarFieldEnum = {
@@ -1550,7 +1550,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   account?: Prisma.AccountOmit
   user?: Prisma.UserOmit
-  baselines?: Prisma.BaselinesOmit
+  baseline?: Prisma.BaselineOmit
   biometrics?: Prisma.BiometricsOmit
   state?: Prisma.StateOmit
   module?: Prisma.ModuleOmit

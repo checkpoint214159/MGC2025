@@ -7,7 +7,7 @@ import { deleteOnboardingDataAction } from '@/lib/actions';
 
 export default function ForceOnboardingAction() {
     const [isPending, startTransition] = useTransition();
-    const { data:session ,update } = useSession();
+    const { data:session, update } = useSession();
 
     const handleDelOnboarding = () => {
         startTransition(async () => {

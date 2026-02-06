@@ -3,7 +3,7 @@ import { AssistantMessageSchema, convertMessageToQuestion, convertQuestionToMess
 import { Thread } from "@/lib/external/schemas/thread";
 import { BaseQuestion } from "@/lib/llm/schemas/base";
 import { getInitialLLMQuestion, getNextLLMQuestion } from "@/lib/llm/service";
-import { Baselines } from "@/lib/user/baseline";
+import { Baseline } from "@/lib/user/baseline";
 import { Biometrics } from "@/lib/user/schema";
 import { ensureAction } from "@/lib/utils";
 import { useSession } from "next-auth/react";
@@ -11,28 +11,30 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { DynamicQuestionCard, ThinkingCard } from "./QuestionCard"
 import { motion } from "framer-motion";
-import { BiometricsForm } from "./BiometricsPage";
 
 
-interface BaselinePageProps {
+interface QuestionPageProps {
   biometrics: Biometrics;
-  baselines: Baselines;
+  baseline: Baseline;
   thread: Thread | null;
 }
 
-export function QuestionPage({biometrics, baselines, thread}: BaselinePageProps) {
+export function QuestionPage({biometrics, baseline, thread}: QuestionPageProps) {
     const [currentQuestion, setCurrentQuestion] = useState<BaseQuestion | null>(null);
     const [isAiLoading, setIsAiLoading] = useState(false);
-    const { data: session, status, update } = useSession();
+    const { data: session, update } = useSession();
     const router = useRouter();
     const [activeThread, setActiveThread] = useState<Thread | null>(thread);
+    console.log('activeThread?', activeThread)
 
+    // question-initing effect
     useEffect(() => {
         const isThreadEmpty = !activeThread || activeThread.messages?.length === 0;
         if (isThreadEmpty) {
+            console.log('running nextQn log')
             nextQuestion(null);
         }
-    }, []);
+    }, [thread]);
 
     async function makeThread(existingThread: Thread | null) {
         if (existingThread?.id) return existingThread;
@@ -44,12 +46,9 @@ export function QuestionPage({biometrics, baselines, thread}: BaselinePageProps)
         return ensureAction(threadResult)
     }
 
-
     async function nextQuestion(answer: string | null) {
-        if (!thread || !biometrics || !session?.user?.id) return;
+        if (!biometrics || !session?.user?.id) return;
         setIsAiLoading(true)
-        
-        const userId = session?.user?.id!
 
         let currentThread = await makeThread(activeThread);
         let nextQn: BaseQuestion
@@ -71,11 +70,14 @@ export function QuestionPage({biometrics, baselines, thread}: BaselinePageProps)
             updated = ensureAction(result)
             nextQn = await getNextLLMQuestion(biometrics, updated) 
         }
+        const numQuestions = (currentThread?.messages ?? [])
+            .filter(m => m.role === 'assistant').length
+        console.log('numQuestions', numQuestions)
 
-        if (nextQn.inputType === 'terminateQuestioning') {
+        if (nextQn.inputType === 'terminateQuestioning' || numQuestions > 5) {
             try {
-                const profile = await generateUserProfileAction({ thread: updated, biometrics: biometrics });
-                await setProfileAction(profile);
+                const {data: profile} = await generateUserProfileAction({ thread: updated, biometrics: biometrics });
+                await setProfileAction(profile ?? "");
                 await update(); 
                 router.push('/');
                 return;
@@ -88,7 +90,7 @@ export function QuestionPage({biometrics, baselines, thread}: BaselinePageProps)
 
         const qnMsg = convertQuestionToMessage(nextQn, updated?.id ?? null, 'onboarding')
         const llmUpdated = await updateThreadAction({
-            threadId: activeThread.id,
+            threadId: currentThread.id,
             threadType: 'onboarding',
             messages: [qnMsg]
         });
