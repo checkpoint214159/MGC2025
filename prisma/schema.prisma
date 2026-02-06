@@ -28,7 +28,7 @@ model User {
   name String
 
   biometric     Biometrics?
-  baselines     Baselines?
+  baseline     Baseline?
   queryBaseline Json?
 
   profile String? // LLM generated profile
@@ -42,7 +42,7 @@ model User {
   externals External[]
 }
 
-model Baselines {
+model Baseline {
   id   String @id @default(cuid())
   data Json
 

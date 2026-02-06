@@ -38,17 +38,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
             // console.log('all?', { token, user, trigger, session })
             if (token?.id) {
+
                 if (!token.doneOnboarding || trigger === "update") {
-                    // updating token function
+
                     const [dbUser] = await Promise.all([
                         prisma.user.findUnique({
                             where: { id: token.id as string },
-                            select: { name: true, profile: true, biometric: true }
+                            select: { name: true,
+                                profile: true, biometric: true,
+                                baseline: true, threads: {
+                                    where: { type: "onboarding" },
+                                    include: { messages: { orderBy: { createdAt: 'asc' } } },
+                                    take: 1
+                                },
+                            }
                         })
                     ]);
+                    
                     if (dbUser) {
                         token.name = dbUser.name;
-                        token.doneOnboarding = !!dbUser.profile && !!dbUser.biometric;
+                        token.doneOnboarding = !!dbUser.profile && !!dbUser.biometric
+                            && !!dbUser.baseline && !!dbUser.threads;
                     }
                 }
             }

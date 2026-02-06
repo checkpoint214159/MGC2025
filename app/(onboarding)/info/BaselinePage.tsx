@@ -3,72 +3,77 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Biometrics } from "@/lib/user/schema";
-import { Baselines, BaselinesSchema, ICFEntrySchema, QueryBaselines, QueryBaselineSchema } from "@/lib/user/baseline"; // Our Zod schema
+import { Baseline, BaselineSchema, ICFEntrySchema, QueryBaseline, QueryBaselineSchema } from "@/lib/user/baseline"; // Our Zod schema
 import { Slider } from "@/components/ui/slider"; 
 import { Card } from "@/components/ui/Card";
 import { generateBaselineAction, generateQueryBaselineAction, getQueryBaselineAction, setBaselineAction, setQueryBaselineAction } from "@/lib/actions";
 import { Button } from "@/components/ui/Button";
 import { AlertCircle, Loader2, RefreshCcw } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { generateBaseline } from "@/lib/user/service";
 
 
 interface BaselinePageProps {
   biometrics: Biometrics;
+  queryBaseline: QueryBaseline | null;
 }
 
 
-export function BaselinePage({ biometrics }: BaselinePageProps) {
-  // --- State Management ---
+export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
+  // local state management
+  const queryClient = useQueryClient();
   const { data: session, status, update } = useSession();
-  const [ GenStatus, setGenStatus] = useState<"loading" | "error" | "success">("loading");
+  const [ queryGenStatus, setqueryGenStatus] = useState<"loading" | "error" | "success">("loading");
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const flatMetrics = useMemo(() => {
+    if (!queryBaseline?.axes) return [];
+    
+    return [
+    ...(queryBaseline.axes.biomechanical?.entries || []).map(e => ({ ...e, axis: 'A' })),
+    ...(queryBaseline.axes.functional?.entries || []).map(e => ({ ...e, axis: 'B' })),
+    ...(queryBaseline.axes.systemic?.entries || []).map(e => ({ ...e, axis: 'C' })),
+    ].filter(Boolean); // Ensure no null entries sneak in
+  }, [queryBaseline]);
+    // whenever flatmetrics change, populate responses accordingly
+  useEffect(() => {
+    if (flatMetrics.length > 0 && Object.keys(responses).length === 0) {
+      const initial = Object.fromEntries(flatMetrics.map(v => [v.code, v.range / 2]));
+      setResponses(initial);
+    }
+  }, [flatMetrics]);
+
   const [responses, setResponses] = useState<Record<string, number>>({});
     
-  // TODO currently queries are not saved to DB
-  const {data: queryBaseline } = useQuery({
-    queryKey: ['query-baseline', session?.user?.id, biometrics.treatment],
-    queryFn: async () => {
-
-        const actionResult = await getQueryBaselineAction();
-        console.log('actionResult?', actionResult)
-      
-        if (actionResult.success && actionResult.data?.queryBaseline) {
-            return QueryBaselineSchema.parse(actionResult.data.queryBaseline);
-        }
-
-        // 2. If no DB record, generate via LLM
+  // first-entry generate query
+  useEffect(() => {
+    const initQueryBaseline = async () => {
+      if (!queryBaseline) {
         const llmOutcome = await generateQueryBaselineAction(biometrics);
         if (!llmOutcome.success) throw new Error("LLM Generation failed");
 
         const validatedData = QueryBaselineSchema.parse(llmOutcome.data);
 
-        // 3. Save generated questions to DB (side effect)
         await setQueryBaselineAction(validatedData);
-        return validatedData;
-    },
-    enabled: !!session?.user?.id && !!biometrics.treatment,
-    staleTime: 1000 * 60 * 30,
-  })
+        await queryClient.invalidateQueries({ 
+          queryKey: ['onboarding', session?.user?.id] 
+        });
+        await update({session})
+      }
+    } 
+    initQueryBaseline()
+    }
+  , [queryBaseline])
 
   const createBaselines = async (biometrics, responses, queryBaseline) => {
     return await generateBaselineAction(biometrics, responses, queryBaseline)
   }
 
-  if (queryBaseline && GenStatus === "loading") {
-    setGenStatus("success")
+  if (queryBaseline && queryGenStatus === "loading") {
+    setqueryGenStatus("success")
   }
 
-    const flatMetrics = useMemo(() => {
-        if (!queryBaseline?.axes) return [];
-        
-        return [
-        ...(queryBaseline.axes.biomechanical?.entries || []).map(e => ({ ...e, axis: 'A' })),
-        ...(queryBaseline.axes.functional?.entries || []).map(e => ({ ...e, axis: 'B' })),
-        ...(queryBaseline.axes.systemic?.entries || []).map(e => ({ ...e, axis: 'C' })),
-        ].filter(Boolean); // Ensure no null entries sneak in
-    }, [queryBaseline]);
 
     const currentMetric = flatMetrics[currentIndex];
     const progress = ((currentIndex + 1) / flatMetrics.length) * 100;
@@ -79,16 +84,13 @@ export function BaselinePage({ biometrics }: BaselinePageProps) {
             setCurrentIndex(prev => prev + 1);
         } else {
             const result = await createBaselines(biometrics, responses, queryBaseline);
-            const baselines = BaselinesSchema.parse(result.data)
+            const baselines = BaselineSchema.parse(result.data)
             console.log('baselines', baselines)
             await setBaselineAction(baselines)
             await update();
         }
     };
 
-    const handleBack = () => {
-        if (currentIndex > 0) setCurrentIndex(prev => prev - 1);
-    };
 
   // Helper to get labels based on the specific ICF unit
   const getUnitLabels = (unit: string) => {
@@ -97,7 +99,7 @@ export function BaselinePage({ biometrics }: BaselinePageProps) {
     return ["Limited", "Full"];
   };
 
-  if (GenStatus === "loading") {
+  if (queryGenStatus === "loading") {
     return (
       <div className="max-w-xl w-full mx-auto p-12 flex flex-col items-center justify-center gap-4 text-center">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
@@ -110,7 +112,7 @@ export function BaselinePage({ biometrics }: BaselinePageProps) {
   }
 
   // 2. Error State
-  if (GenStatus === "error") {
+  if (queryGenStatus === "error") {
     return (
       <Card className="max-w-xl w-full mx-auto m-6 p-8 border-red-100 bg-red-50/30 text-center space-y-4">
         <AlertCircle className="h-10 w-10 text-red-500 mx-auto" />
@@ -123,7 +125,7 @@ export function BaselinePage({ biometrics }: BaselinePageProps) {
   }
 
   // 3. Empty Data State (LLM returned nothing)
-  if (GenStatus === "success" && flatMetrics.length === 0) {
+  if (queryGenStatus === "success" && flatMetrics.length === 0) {
     return (
       <Card className="max-w-xl w-full mx-auto m-6 p-8 text-center">
         <p className="text-slate-500">No specific metrics found for this procedure. Please contact your clinical lead.</p>
@@ -199,8 +201,8 @@ export function BaselinePage({ biometrics }: BaselinePageProps) {
                 min={0}
                 max={currentMetric.range}
                 step={1}
-                value={[responses[currentMetric.code] ?? Math.round(currentMetric.range / 2)]}
-                onValueChange={([val]) => setResponses({ ...responses, [currentMetric.code]: val })}
+                value={[responses[currentMetric.code] || Math.round(currentMetric.range / 2)]}
+                onValueChange={([val]) => setResponses(prev => ({ ...prev, [currentMetric.code]: val }))}
               />
               
               <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">

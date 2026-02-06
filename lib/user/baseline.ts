@@ -124,8 +124,8 @@ function BaselineGenerationSchema(schema: z.ZodObject) {
 }
 
 export const QueryBaselineSchema = BaselineGenerationSchema(AxisQuerySchema)
-export const BaselinesSchema = BaselineGenerationSchema(AxisAssessmentSchema)
+export const BaselineSchema = BaselineGenerationSchema(AxisAssessmentSchema)
 
-export type QueryBaselines = z.infer<typeof QueryBaselineSchema>
-export type Baselines = z.infer<typeof BaselinesSchema>
+export type QueryBaseline = z.infer<typeof QueryBaselineSchema>
+export type Baseline = z.infer<typeof BaselineSchema>
 

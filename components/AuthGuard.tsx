@@ -13,6 +13,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const isPublicRoute = publicRoutes.includes(pathname);
 
   useEffect(() => {
+    
     // todo: improve control flow
     if (status === "loading") return;
 
@@ -21,14 +22,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       return;
     }
     
-    if (session && !session.user.doneOnboarding && pathname !== "/info") {
-      console.log('test')
+    if (session && !session.user.doneOnboarding && !isPublicRoute) {
       router.replace("/info");
     }
 
-    if (session && session.user.doneOnboarding && pathname == "/info") {
-      router.replace('/')
-    }
   }, [status, session, router, pathname]);
 
   if (status === "loading") return <div>Loading Security...</div>;

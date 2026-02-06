@@ -28,10 +28,10 @@ export type Account = Prisma.AccountModel
  */
 export type User = Prisma.UserModel
 /**
- * Model Baselines
+ * Model Baseline
  * 
  */
-export type Baselines = Prisma.BaselinesModel
+export type Baseline = Prisma.BaselineModel
 /**
  * Model Biometrics
  * 

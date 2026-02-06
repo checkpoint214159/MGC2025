@@ -3,8 +3,11 @@ import { updateBiometricsAction } from "@/lib/actions";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Biometrics, BiometricsSchema } from "@/lib/user/schema";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function BiometricsForm({ onComplete }: { onComplete: (data: any) => void }) {
+
   return (
     <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 w-full max-w-md">
       <h2 className="text-2xl font-bold text-slate-800 mb-2">Patient Details</h2>
@@ -92,12 +95,20 @@ export function BiometricsForm({ onComplete }: { onComplete: (data: any) => void
 export function SubmitBiometricsPage() {
     const [biometrics, setBiometrics] = useState<Biometrics | null>(null);
     const { data: session, status, update } = useSession();
+    const queryClient = useQueryClient();
+    const router = useRouter()
 
     async function submitBio(bio: Biometrics) {
         const userId = session?.user?.id!
+        console.log('userId?', userId)
         const updatedBioResult = await updateBiometricsAction(bio)
         const updatedBio = ensureAction(updatedBioResult)
         setBiometrics(BiometricsSchema.parse(updatedBio))
+        await queryClient.invalidateQueries({ 
+            queryKey: ['onboarding', userId] 
+        });
+        await update({session})
+        router.refresh()
     }
 
     return <BiometricsForm onComplete = {submitBio} />

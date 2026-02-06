@@ -53,7 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Account: 'Account',
   User: 'User',
-  Baselines: 'Baselines',
+  Baseline: 'Baseline',
   Biometrics: 'Biometrics',
   State: 'State',
   Module: 'Module',
@@ -101,13 +101,13 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-export const BaselinesScalarFieldEnum = {
+export const BaselineScalarFieldEnum = {
   id: 'id',
   data: 'data',
   userId: 'userId'
 } as const
 
-export type BaselinesScalarFieldEnum = (typeof BaselinesScalarFieldEnum)[keyof typeof BaselinesScalarFieldEnum]
+export type BaselineScalarFieldEnum = (typeof BaselineScalarFieldEnum)[keyof typeof BaselineScalarFieldEnum]
 
 
 export const BiometricsScalarFieldEnum = {
