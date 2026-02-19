@@ -28,7 +28,7 @@ export default function RecoveryExerciseRenderer({
   const trackableId = trackable.id
   const [localValues, setLocalValues] = useState<Record<string, number>>(() => {
     return Object.fromEntries(
-      Object.entries(trackable.data).map(([key, metric]: [string, ExerciseMetrics]) => [key, metric.value || 0])
+      Object.entries(trackable.data).map(([key, metric]: [string, ExerciseMetrics]) => [key, metric.value])
     );
   });
   const [isSaving, setIsSaving] = useState(false);

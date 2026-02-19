@@ -56,7 +56,7 @@ export function QuestionPage({biometrics, baseline, thread}: QuestionPageProps) 
 
         if (!answer) {
             // first question
-            nextQn = await getInitialLLMQuestion(biometrics) 
+            nextQn = await getInitialLLMQuestion(biometrics, baseline) 
             updated = currentThread
         } else {
             // generate next qn
@@ -68,7 +68,7 @@ export function QuestionPage({biometrics, baseline, thread}: QuestionPageProps) 
             });
 
             updated = ensureAction(result)
-            nextQn = await getNextLLMQuestion(biometrics, updated) 
+            nextQn = await getNextLLMQuestion(biometrics, updated, baseline) 
         }
         const numQuestions = (currentThread?.messages ?? [])
             .filter(m => m.role === 'assistant').length
@@ -76,7 +76,7 @@ export function QuestionPage({biometrics, baseline, thread}: QuestionPageProps) 
 
         if (nextQn.inputType === 'terminateQuestioning' || numQuestions > 5) {
             try {
-                const {data: profile} = await generateUserProfileAction({ thread: updated, biometrics: biometrics });
+                const {data: profile} = await generateUserProfileAction({ thread: updated, biometrics: biometrics, baseline: baseline });
                 await setProfileAction(profile ?? "");
                 await update(); 
                 router.push('/');
