@@ -3,21 +3,22 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Biometrics } from "@/lib/user/schema";
-import { AxisQuery, Baseline, BaselineSchema, ICFEntrySchema, QueryBaseline, QueryBaselineSchema, QueryICFEntry } from "@/lib/user/baseline"; // Our Zod schema
+import { BaselineSchema, QueryBaseline, QueryBaselineSchema, QueryICFEntry } from "@/lib/user/baseline"; // Our Zod schema
 import { Slider } from "@/components/ui/slider"; 
 import { Card } from "@/components/ui/Card";
 import { generateBaselineAction, generateQueryBaselineAction, getQueryBaselineAction, setBaselineAction, setQueryBaselineAction } from "@/lib/actions";
 import { Button } from "@/components/ui/Button";
 import { AlertCircle, Loader2, RefreshCcw } from "lucide-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import { generateBaseline } from "@/lib/user/service";
+import { z } from "zod"
 
 
 interface BaselinePageProps {
   biometrics: Biometrics;
   queryBaseline: QueryBaseline | null;
 }
+
 
 
 export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
@@ -31,9 +32,9 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
     if (!queryBaseline?.axes) return [];
     
     return [
-    ...Object.values(queryBaseline.axes.biomechanical?.entries || {}).map(e => ({ ...e, axisType: 'A' })),
-    ...Object.values(queryBaseline.axes.functional?.entries || []).map(e => ({ ...e, axisType: 'B' })),
-    ...Object.values(queryBaseline.axes.systemic?.entries || []).map(e => ({ ...e, axisType: 'C' })),
+    ...Object.values(queryBaseline.axes.biomechanical?.entries || {}),
+    ...Object.values(queryBaseline.axes.functional?.entries || []),
+    ...Object.values(queryBaseline.axes.systemic?.entries || []),
     ];
   }, [queryBaseline]);
     // whenever flatmetrics change, populate responses accordingly
@@ -79,15 +80,18 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
     const progress = ((currentIndex + 1) / flatMetrics.length) * 100;
 
     const handleNext = async () => {
-        console.log('currentIndex?', currentIndex)
-        if (currentIndex < flatMetrics.length - 1) {
-            setCurrentIndex(prev => prev + 1);
+        if (!queryBaseline) {
+          alert("Error! handleNext was somehow called with null queryBaseline!")
         } else {
-            const result = await createBaselines(biometrics, responses, queryBaseline);
-            const baselines = BaselineSchema.parse(result.data)
-            console.log('baselines', baselines)
-            await setBaselineAction(baselines)
-            await update();
+          if (currentIndex < flatMetrics.length - 1) {
+              setCurrentIndex(prev => prev + 1);
+          } else {
+              const result = await createBaselines(biometrics, responses, queryBaseline);
+              const baselines = BaselineSchema.parse(result.data)
+              console.log('baselines', baselines)
+              await setBaselineAction(baselines)
+              await update();
+          }
         }
     };
 
@@ -168,12 +172,12 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
           <Card className="p-8 space-y-8 shadow-xl border-slate-200">
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white ${
+                {/* <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white ${
                   currentMetric.axisType === 'A' ? 'bg-orange-500' : 
                   currentMetric.axisType === 'B' ? 'bg-blue-500' : 'bg-emerald-500'
                 }`}>
                   AXISType {currentMetric.axisType}
-                </span>
+                </span> */}
                 <span className="text-[10px] font-mono text-slate-400">
                   {currentMetric.domain}
                 </span>

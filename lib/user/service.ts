@@ -6,6 +6,8 @@ import { Thread, ThreadSchema } from "@/lib/external/schemas/thread";
 import { getModel } from "../llm/model";
 import { BaseMessage } from "@/lib/external/schemas/message";
 import { Baseline, BaselineSchema, QueryBaseline, QueryBaselineSchema } from "./baseline";
+import { NullableJsonNullValueInput } from "@/generated/prisma/internal/prismaNamespace";
+import { Prisma } from "@/generated/prisma/client";
 
 export interface ProfileInput {
   thread: Thread;
@@ -106,7 +108,7 @@ export async function setQueryBaseline(userId: string, queryBaseline: QueryBasel
   return await prisma.user.update({
     where: {id: userId},
     data: {
-      queryBaseline: queryBaseline
+      queryBaseline: queryBaseline as unknown as Prisma.InputJsonValue,
     }
   })
 }
@@ -199,7 +201,7 @@ export async function deleteBaselines(userId: string) {
     where: { id: userId },
     data: {
       baseline: user?.baseline ? { delete: true } : undefined,
-      queryBaseline: null,
+      queryBaseline: null as unknown as NullableJsonNullValueInput,
     }
   });
 }

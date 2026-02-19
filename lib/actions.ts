@@ -66,7 +66,7 @@ export async function generateBaselineAction(biometrics: Biometrics, responses: 
   });
 }
 
-export async function setBaselineAction(queryBaseline: Baselines) {
+export async function setBaselineAction(queryBaseline: Baseline) {
   return authenticatedAction(async (userId) => {
     return await setBaseline(userId, queryBaseline);
   })
