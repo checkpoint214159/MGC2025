@@ -59,7 +59,7 @@ export async function getInitialLLMQuestion(biometrics: Biometrics, baseline: Ba
 
 export async function getNextLLMQuestion(biometrics: any, thread: Thread, baseline: Baseline): Promise<BaseQuestion> {
     
-    const questionCount = thread.messages.filter(m => m.role === 'assistant').length;
+    const questionCount = thread.messages?.filter(m => m.role === 'assistant').length || 0;
 
   // generateObject waits for the full response and validates it
     const { object } = await generateObject({

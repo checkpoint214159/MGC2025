@@ -1,14 +1,15 @@
 import { Utensils, Zap, ArrowRight, Flame, Droplets } from "lucide-react";
 import { DashboardCard, CardSlider, CardStat } from "./DashboardUtils";
+import { NutritionModule } from "@/lib/state/schemas/nutrition";
 
 
-export default function NutritionPreviewCard({ data, onClick }: { data: any, onClick: () => void }) {
+export default function NutritionPreviewCard({ data, onClick }: { data: NutritionModule, onClick: () => void }) {
 
   const previewMacros = ['calories', 'fats', 'protein', 'carbs']
 
   console.log('plan?', data)
   let macroPlans: Record<string, number> = {}
-  data.plan?.map(p  => {
+  data.plan.map(p => {
     for (const [k, v] of Object.entries(p.data)) {
       if (previewMacros.includes(k)) {
         macroPlans[k] = v.goal
@@ -18,7 +19,7 @@ export default function NutritionPreviewCard({ data, onClick }: { data: any, onC
 
   let previewMacroVals: Record<string, number> = {} 
   
-  data.progress.trackables?.map(t  => {
+  data.progress?.trackables.map(t  => {
     for (const [k, v] of Object.entries(t.data)) {
       if (previewMacros.includes(k)) {
         previewMacroVals[k] = v.value
