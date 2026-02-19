@@ -31,11 +31,8 @@ export const ExerciseCategoriesSchema = z.object({
     // Neuromuscular / Balance
     stability: ExerciseMetricsSchema.optional()
         .describe("For balance and coordination (e.g., sets, time per side)"),
-
-    // The "Safety Net" - equivalent to your old catchall but guided
-    custom: z.record(z.string(), ExerciseMetricsSchema).optional()
-        .describe("Any specific clinical metrics that don't fit the above categories")
 })
+.catchall(ExerciseMetricsSchema)
 
 export const ExerciseMetaSchema = BaseMetaObj.extend({
     intensity: z.enum(['blue', 'orange', 'red']),

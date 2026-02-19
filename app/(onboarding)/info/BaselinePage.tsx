@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Biometrics } from "@/lib/user/schema";
-import { Baseline, BaselineSchema, ICFEntrySchema, QueryBaseline, QueryBaselineSchema } from "@/lib/user/baseline"; // Our Zod schema
+import { AxisQuery, Baseline, BaselineSchema, ICFEntrySchema, QueryBaseline, QueryBaselineSchema, QueryICFEntry } from "@/lib/user/baseline"; // Our Zod schema
 import { Slider } from "@/components/ui/slider"; 
 import { Card } from "@/components/ui/Card";
 import { generateBaselineAction, generateQueryBaselineAction, getQueryBaselineAction, setBaselineAction, setQueryBaselineAction } from "@/lib/actions";
@@ -27,14 +27,14 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
   const [ queryGenStatus, setqueryGenStatus] = useState<"loading" | "error" | "success">("loading");
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const flatMetrics = useMemo(() => {
+  const flatMetrics: QueryICFEntry[] = useMemo(() => {
     if (!queryBaseline?.axes) return [];
     
     return [
-    ...(queryBaseline.axes.biomechanical?.entries || []).map(e => ({ ...e, axis: 'A' })),
-    ...(queryBaseline.axes.functional?.entries || []).map(e => ({ ...e, axis: 'B' })),
-    ...(queryBaseline.axes.systemic?.entries || []).map(e => ({ ...e, axis: 'C' })),
-    ].filter(Boolean); // Ensure no null entries sneak in
+    ...Object.values(queryBaseline.axes.biomechanical?.entries || {}).map(e => ({ ...e, axisType: 'A' })),
+    ...Object.values(queryBaseline.axes.functional?.entries || []).map(e => ({ ...e, axisType: 'B' })),
+    ...Object.values(queryBaseline.axes.systemic?.entries || []).map(e => ({ ...e, axisType: 'C' })),
+    ];
   }, [queryBaseline]);
     // whenever flatmetrics change, populate responses accordingly
   useEffect(() => {
@@ -66,7 +66,7 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
     }
   , [queryBaseline])
 
-  const createBaselines = async (biometrics, responses, queryBaseline) => {
+  const createBaselines = async (biometrics: Biometrics, responses: Record<string, number>, queryBaseline: QueryBaseline) => {
     return await generateBaselineAction(biometrics, responses, queryBaseline)
   }
 
@@ -169,10 +169,10 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white ${
-                  currentMetric.axis === 'A' ? 'bg-orange-500' : 
-                  currentMetric.axis === 'B' ? 'bg-blue-500' : 'bg-emerald-500'
+                  currentMetric.axisType === 'A' ? 'bg-orange-500' : 
+                  currentMetric.axisType === 'B' ? 'bg-blue-500' : 'bg-emerald-500'
                 }`}>
-                  AXIS {currentMetric.axis}
+                  AXISType {currentMetric.axisType}
                 </span>
                 <span className="text-[10px] font-mono text-slate-400">
                   {currentMetric.domain}

@@ -9,7 +9,7 @@ import { Thread, ThreadContext } from "@/lib/external/schemas/thread";
 import { prisma } from "./prisma";
 import { compileExternal } from "./external/service";
 import { State } from "./state/schemas/state";
-import { QueryBaselines } from "./user/baseline";
+import { Baseline, QueryBaseline } from "./user/baseline";
 
 
 // i love functors
@@ -49,7 +49,7 @@ export async function generateQueryBaselineAction(biometrics: Biometrics) {
   });
 }
 
-export async function setQueryBaselineAction(queryBaseline: QueryBaselines) {
+export async function setQueryBaselineAction(queryBaseline: QueryBaseline) {
   return authenticatedAction(async (userId) => {
     return await setQueryBaseline(userId, queryBaseline);
   })
@@ -60,7 +60,7 @@ export async function getQueryBaselineAction() {
   })
 }
 
-export async function generateBaselineAction(biometrics: Biometrics, responses: Record<string, number>, queryBaseline: QueryBaselines) {
+export async function generateBaselineAction(biometrics: Biometrics, responses: Record<string, number>, queryBaseline: QueryBaseline) {
   return authenticatedAction(async (userId) => {
     return await generateBaseline(biometrics, responses, queryBaseline);
   });
@@ -87,12 +87,13 @@ export async function updateThreadAction({ threadId, threadType, messages }: {
   });
 }
 
-export async function generateUserProfileAction({thread, biometrics}: {
+export async function generateUserProfileAction({thread, biometrics, baseline}: {
   thread: Thread,
   biometrics: Biometrics,
+  baseline: Baseline
 }) {
   return authenticatedAction(async (userId) => {
-    return generateUserProfile({thread: thread, biometrics: biometrics})
+    return generateUserProfile({thread: thread, biometrics: biometrics, baseline: baseline})
   })
 }
 

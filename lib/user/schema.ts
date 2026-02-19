@@ -8,11 +8,6 @@ export const BiometricsSchema = z.object({
   surgeryDate: z.coerce.date(),
 });
 
-export const BaselineSchema = z.object({
-  baseline: z.string(),
-  
-})
-
 // export const BaselineSchema = z.object({
 //   height: z.coerce.number().positive("Height is required"),
 //   weight: z.coerce.number().positive("Weight is required"),
@@ -24,5 +19,4 @@ export const BaselineSchema = z.object({
 // );
 
 export type Biometrics = z.infer<typeof BiometricsSchema>;
-export type Baseline = z.infer<typeof BaselineSchema>;
 

@@ -1,5 +1,5 @@
 {
-    "name": "my-llm-app-demo",
+    "name": "mgc-2025",
     "version": "0.1.0",
     "private": true,
     "scripts": {
@@ -47,6 +47,7 @@
         "@types/pg": "^8.16.0",
         "@types/react": "^19",
         "@types/react-dom": "^19",
+        "baseline-browser-mapping": "^2.9.19",
         "eslint": "^9",
         "eslint-config-next": "16.0.8",
         "nodemon": "^3.1.11",

@@ -10,6 +10,7 @@ import { Baseline, BaselineSchema, QueryBaseline, QueryBaselineSchema } from "./
 export interface ProfileInput {
   thread: Thread;
   biometrics: Biometrics;
+  baseline: Baseline;
 }
 
 // ------------------- BIOMETRICS -------------------
@@ -282,7 +283,7 @@ export async function deleteProfile(userId: string) {
   });
 }
 
-export async function generateUserProfile({ thread, biometrics }: ProfileInput): Promise<string> {
+export async function generateUserProfile({ thread, biometrics, baseline }: ProfileInput): Promise<string> {
   // Extracting conversational history for context
   const history = thread.messages
     ?.map((m) => `${m.role.toUpperCase()}: ${m.content}`)
@@ -327,6 +328,11 @@ export async function generateUserProfile({ thread, biometrics }: ProfileInput):
         You MUST abide by these biometrics fully. 
         Do NOT change ANY biometric data, especially age, sex and treatment type
         ${JSON.stringify(biometrics, null, 2)}
+
+        BASELINES:
+        These are baselines devised off the WHO-ICF functional capacity assessment framework. Analyse
+        carefully and account this into your generation.
+        ${JSON.stringify(baseline, null, 2)} 
       `,
       schema: z.object({
         summary: z.string().describe("The synthesized clinical profile of the patient."),
