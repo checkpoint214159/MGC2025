@@ -1,18 +1,31 @@
-import { auth } from "@/auth";
-import {fetchStateAction} from "@/lib/actions"
+"use client"
+
+import { useSession } from "next-auth/react";
+import { fetchStateAction } from "@/lib/actions"
 import RecoveryExerciseRenderer from "./ExerciseWidget"
 import { ExerciseModule, ExerciseProgress, ExercisePlan } from "@/lib/state/schemas/exercise";
-import { StateSchema } from "@/lib/state/schemas/state";
+import { useQuery } from "@tanstack/react-query";
+import { useAppDate } from "@/context/DateContext";
+import { ensureAction } from "@/lib/utils";
+import { getModuleFromState } from "@/lib/utils";
 
 
-export default async function FitnessPage() {
-  const session = await auth()
+export default function FitnessPage() {
+  const { data: session, status, update } = useSession();
+  
   if (!session) return <p>Access Denied</p>;
 
-  const fetch = await fetchStateAction();
-  const state = StateSchema.parse(fetch.data)
-  const exerciseModule: ExerciseModule = state.exercise
-  const moduleId: string = exerciseModule.id
+  const { normalizedDate, isSimulated, displayDate, isToday } = useAppDate();
+  
+  const { data: state, isLoading } = useQuery({
+      queryKey: ['recoveryState', session?.user?.id, normalizedDate],
+      queryFn: async () => {
+          const response = await fetchStateAction(normalizedDate);
+          return ensureAction(response)
+      },
+      enabled: status === "authenticated" && !!session?.user?.id,
+      staleTime: 1000 * 60 * 5, // Cache data for 5 minutes
+  });
 
   const fail = () => {
     return (
@@ -21,13 +34,16 @@ export default async function FitnessPage() {
       </div>
     );
   }
-  if (!exerciseModule.progress){
+
+  const exerciseModule: ExerciseModule | null = getModuleFromState(state, 'exercise')
+  console.log('exerciseModule??', exerciseModule)
+  if (!exerciseModule || !exerciseModule.progress || !exerciseModule.plan) {
     return fail()
   }
-  const exerciseProgress: ExerciseProgress = exerciseModule.progress
+  const { progress, plan, id: moduleId } = exerciseModule;
 
-  // console.log('state?', state.modules.exercise.tasks[0].props)
-  // console.log('exerciseTarget?', exerciseTarget.tasks[0].props)
+  console.log('progress,', progress)
+  console.log('plan', plan)
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -37,8 +53,8 @@ export default async function FitnessPage() {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {exerciseModule.plan.map((part: ExercisePlan) => {
-          const progressEntry = exerciseProgress.trackables.find(
+        {plan.map((part: ExercisePlan) => {
+          const progressEntry = progress.trackables.find(
             (t) => t.id === part.id
           );
           if (!progressEntry){

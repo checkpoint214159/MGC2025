@@ -1,19 +1,25 @@
-import { SessionProvider } from "next-auth/react"
-import './globals.css'; // Assuming this is where your Tailwind CSS is imported
+import Providers from "@/components/Providers"
+import { cookies } from 'next/headers';
+import { AuthGuard } from '@/components/AuthGuard';
+import React from "react";
+import './globals.css';
 
-export default function RootLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+interface RootLayoutProps {
+  children: React.ReactNode;
+}
+
+export default async function RootLayout({ children }: RootLayoutProps) {
+    const cookieStore = await cookies();
+    const initialDate = cookieStore.get('dev-simulated-date')?.value || new Date().toISOString();
+
     return (
         <html lang="en">
             <body>
-                {/* This {children} prop will be filled by EITHER:
-                  1. The (app)/layout.tsx (which includes the Sidebar/AuthProvider)
-                  2. OR The (auth)/layout.tsx (which includes the simple auth wrapper)
-                */}
-                <SessionProvider>{children}</SessionProvider>
+                <Providers initialDate={initialDate}>
+                    <AuthGuard>
+                        {children}
+                    </AuthGuard>
+                </Providers>
             </body>
         </html>
     );

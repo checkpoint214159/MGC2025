@@ -15,8 +15,6 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
 
-    
-
     const result = await signIn('credentials', {
       username,
       password,

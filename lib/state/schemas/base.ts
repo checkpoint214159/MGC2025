@@ -10,6 +10,11 @@ export const BaseMetricObj = z.object({
 
 export type BaseMetric = z.infer<typeof BaseMetricObj>
 
+export const createMetaSchema = <T extends string>(type: T) => z.object({
+  type: z.literal(type),
+  name: z.string().optional(),
+});
+
 export const BaseMetaObj = z.object({
   type: z.string(),
   name: z.string().optional(),
@@ -17,9 +22,16 @@ export const BaseMetaObj = z.object({
 
 export type BaseMeta = z.infer<typeof BaseMetaObj>
 
+export const BaseChecklistObj = z.object({
+    id: z.string(),
+    name: z.string(),
+});
+
+export type BaseChecklist = z.infer<typeof BaseChecklistObj>
 
 
-export type AnyCategoriesData = Record<string, BaseMetric>;
+
+export type AnyCategoriesData = Object;
 
 export interface AnyPlanData {
   id: string;
@@ -49,11 +61,11 @@ export function createCategoriesSchema<T extends z.ZodType<BaseMetric>>({
 }: {
   metricSchema: T;
 }) {
-  return z.object({}).catchall(metricSchema);
+  return z.record(z.string(), metricSchema);
 }
 
 export function createPlanSchema<
-  D extends z.ZodType<AnyCategoriesData>,
+  D extends z.ZodType<Object>,
   M extends z.ZodType<BaseMeta>,
   E extends z.ZodRawShape = {}
 >({
@@ -83,17 +95,29 @@ export function createProgressSchema<P extends z.ZodType<AnyPlanData>>({
     moduleId: z.string(),
     summary: z.string().optional().nullable(),
     trackables: z.array(planSchema),
+    checklistState: z.record(z.string(), z.boolean()).default({}),
   });
 }
 
-export function createModuleBlueprintSchema<P extends z.ZodType<AnyPlanData>>({
+
+export function createModuleBlueprintSchema
+<P extends z.ZodType<AnyPlanData>,
+Q extends z.ZodType<BaseChecklist>,
+T extends string,
+>({
+  type,
   planSchema,
+  checklistSchema,
 }: {
+  type: T,
   planSchema: P;
+  checklistSchema: Q,
 }) {
   return z.object({
+    type: z.literal(type),
     summary: z.string().optional().nullable(),
     plan: z.array(planSchema),
+    checklists: z.array(checklistSchema)
   });
 }
 

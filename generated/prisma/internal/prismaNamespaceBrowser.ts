@@ -53,11 +53,14 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Account: 'Account',
   User: 'User',
+  Baseline: 'Baseline',
+  Biometrics: 'Biometrics',
   State: 'State',
-  ExerciseModule: 'ExerciseModule',
-  ExerciseProgress: 'ExerciseProgress',
-  NutritionModule: 'NutritionModule',
-  NutritionProgress: 'NutritionProgress'
+  Module: 'Module',
+  Progress: 'Progress',
+  External: 'External',
+  Thread: 'Thread',
+  Message: 'Message'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -89,9 +92,7 @@ export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeo
 export const UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  age: 'age',
-  sex: 'sex',
-  treatment: 'treatment',
+  queryBaseline: 'queryBaseline',
   profile: 'profile',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -100,47 +101,54 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const BaselineScalarFieldEnum = {
+  id: 'id',
+  data: 'data',
+  userId: 'userId'
+} as const
+
+export type BaselineScalarFieldEnum = (typeof BaselineScalarFieldEnum)[keyof typeof BaselineScalarFieldEnum]
+
+
+export const BiometricsScalarFieldEnum = {
+  id: 'id',
+  age: 'age',
+  sex: 'sex',
+  treatment: 'treatment',
+  surgeryDate: 'surgeryDate',
+  userId: 'userId'
+} as const
+
+export type BiometricsScalarFieldEnum = (typeof BiometricsScalarFieldEnum)[keyof typeof BiometricsScalarFieldEnum]
+
+
 export const StateScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  dateCreated: 'dateCreated'
+  dateCreated: 'dateCreated',
+  createdAt: 'createdAt',
+  isActive: 'isActive',
+  causalStateId: 'causalStateId',
+  nextStateId: 'nextStateId',
+  causalXId: 'causalXId'
 } as const
 
 export type StateScalarFieldEnum = (typeof StateScalarFieldEnum)[keyof typeof StateScalarFieldEnum]
 
 
-export const ExerciseModuleScalarFieldEnum = {
+export const ModuleScalarFieldEnum = {
   id: 'id',
-  stateId: 'stateId',
-  summary: 'summary',
-  plan: 'plan'
-} as const
-
-export type ExerciseModuleScalarFieldEnum = (typeof ExerciseModuleScalarFieldEnum)[keyof typeof ExerciseModuleScalarFieldEnum]
-
-
-export const ExerciseProgressScalarFieldEnum = {
-  id: 'id',
-  moduleId: 'moduleId',
-  summary: 'summary',
-  trackables: 'trackables'
-} as const
-
-export type ExerciseProgressScalarFieldEnum = (typeof ExerciseProgressScalarFieldEnum)[keyof typeof ExerciseProgressScalarFieldEnum]
-
-
-export const NutritionModuleScalarFieldEnum = {
-  id: 'id',
+  type: 'type',
   stateId: 'stateId',
   summary: 'summary',
   plan: 'plan',
   checklists: 'checklists'
 } as const
 
-export type NutritionModuleScalarFieldEnum = (typeof NutritionModuleScalarFieldEnum)[keyof typeof NutritionModuleScalarFieldEnum]
+export type ModuleScalarFieldEnum = (typeof ModuleScalarFieldEnum)[keyof typeof ModuleScalarFieldEnum]
 
 
-export const NutritionProgressScalarFieldEnum = {
+export const ProgressScalarFieldEnum = {
   id: 'id',
   moduleId: 'moduleId',
   summary: 'summary',
@@ -148,7 +156,44 @@ export const NutritionProgressScalarFieldEnum = {
   checklistState: 'checklistState'
 } as const
 
-export type NutritionProgressScalarFieldEnum = (typeof NutritionProgressScalarFieldEnum)[keyof typeof NutritionProgressScalarFieldEnum]
+export type ProgressScalarFieldEnum = (typeof ProgressScalarFieldEnum)[keyof typeof ProgressScalarFieldEnum]
+
+
+export const ExternalScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  dateCreated: 'dateCreated',
+  threadContext: 'threadContext',
+  profile: 'profile'
+} as const
+
+export type ExternalScalarFieldEnum = (typeof ExternalScalarFieldEnum)[keyof typeof ExternalScalarFieldEnum]
+
+
+export const ThreadScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  type: 'type',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ThreadScalarFieldEnum = (typeof ThreadScalarFieldEnum)[keyof typeof ThreadScalarFieldEnum]
+
+
+export const MessageScalarFieldEnum = {
+  id: 'id',
+  creationSource: 'creationSource',
+  threadId: 'threadId',
+  role: 'role',
+  content: 'content',
+  context: 'context',
+  reasoning: 'reasoning',
+  createdAt: 'createdAt'
+} as const
+
+export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -159,19 +204,19 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
-export const JsonNullValueInput = {
-  JsonNull: 'JsonNull'
-} as const
-
-export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
-
-
 export const NullableJsonNullValueInput = {
   DbNull: 'DbNull',
   JsonNull: 'JsonNull'
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: 'JsonNull'
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -182,14 +227,6 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
 export const JsonNullValueFilter = {
   DbNull: 'DbNull',
   JsonNull: 'JsonNull',
@@ -197,4 +234,12 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

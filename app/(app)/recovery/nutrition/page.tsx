@@ -1,20 +1,31 @@
-import { auth } from "@/auth";
+"use client"
+
+import { useSession } from "next-auth/react";
 import { fetchStateAction } from "@/lib/actions"
-import { State, StateSchema } from "@/lib/state/schemas/state"
 import NutritionDashboard from "./NutritionWidget"
 import { NutritionModule } from "@/lib/state/schemas/nutrition";
+import { getModuleFromState } from "@/lib/utils";
+import { useAppDate } from "@/context/DateContext";
+import { useQuery } from "@tanstack/react-query";
+import { ensureAction } from "@/lib/utils";
 
 
-export default async function NutritionPage() {
-  const session = await auth()
+export default function NutritionPage() {
+  const { data: session, status, update } = useSession();
+  
   if (!session) return <p>Access Denied</p>;
 
-  const fetch = await fetchStateAction();
-  // console.log('fetched data nutrition', fetch.data)
-  const state = StateSchema.parse(fetch.data)
-  const nutritionModule: NutritionModule = state.nutrition
-  // console.log('after parse nutritionModule', nutritionModule.progress.trackables)
-  const moduleId: string = nutritionModule.id
+  const { normalizedDate, isSimulated, displayDate, isToday } = useAppDate();
+  
+  const { data: state, isLoading } = useQuery({
+      queryKey: ['recoveryState', session?.user?.id, normalizedDate],
+      queryFn: async () => {
+          const response = await fetchStateAction(normalizedDate);
+          return ensureAction(response)
+      },
+      enabled: status === "authenticated" && !!session?.user?.id,
+      staleTime: 1000 * 60 * 5, // Cache data for 5 minutes
+  });
 
   const fail = () => {
     return (
@@ -23,6 +34,13 @@ export default async function NutritionPage() {
       </div>
     );
   }
+
+  const nutritionModule: NutritionModule | null = getModuleFromState(state, 'nutrition')
+    if (!nutritionModule || !nutritionModule.progress || !nutritionModule.plan) {
+      return fail()
+    }
+    const { progress, plan, id: moduleId } = nutritionModule;
+  
   if (!nutritionModule.progress){
     return fail()
   }
