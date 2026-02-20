@@ -3,21 +3,30 @@ import { ExerciseModuleSchema, ExerciseModuleBlueprintSchema } from './exercise'
 import { NutritionModuleSchema, NutritionModuleBlueprintSchema } from './nutrition';
 
 
-export const StateBlueprintSchema = z.object({
+export const ModuleSchema = z.discriminatedUnion("type", [
+  ExerciseModuleSchema,
+  NutritionModuleSchema,
+])
+
+export const LLMBlueprintSchema = z.object({
   exercise: ExerciseModuleBlueprintSchema,
-  nutrition: NutritionModuleBlueprintSchema,
-});
-export type StateBlueprint = z.infer<typeof StateBlueprintSchema>;
+  nutrition: NutritionModuleBlueprintSchema
+})
 
 export const StateSchema = z.object({
   id: z.string(),
   userId: z.string(),
   dateCreated: z.coerce.date(),
-  exercise: ExerciseModuleSchema,
-  nutrition: NutritionModuleSchema,
-});
-export type State = z.infer<typeof StateSchema>;
 
+  causalStateId: z.string().optional().nullable(),
+  causalXId: z.string().optional().nullable(),
+  nextStateId: z.string().optional().nullable(),
+
+  modules: z.array(ModuleSchema).default([]),
+});
+
+export type State = z.infer<typeof StateSchema>;
+export type LLMBlueprint = z.infer<typeof LLMBlueprintSchema>
 
 
 

@@ -17,10 +17,10 @@ import type * as Prisma from "./prismaNamespace"
 
 const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
-  "clientVersion": "7.1.0",
-  "engineVersion": "ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba",
+  "clientVersion": "7.2.0",
+  "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
   "activeProvider": "postgresql",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Account {\n  id String @id @default(cuid())\n\n  email    String @unique\n  password String\n\n  user_id String @unique\n  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)\n}\n\nmodel User {\n  id        String  @id @default(cuid())\n  name      String\n  age       Int?\n  sex       String?\n  treatment String?\n  profile   String? // LLM generated profile\n\n  account   Account?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  states State[]\n}\n\nmodel State {\n  id          String   @id @default(cuid())\n  userId      String\n  dateCreated DateTime @default(now()) @db.Date\n\n  user User @relation(fields: [userId], references: [id])\n\n  exercise  ExerciseModule?\n  nutrition NutritionModule?\n\n  @@unique([userId, dateCreated])\n}\n\n// --- EXERCISE ---\nmodel ExerciseModule {\n  id      String @id @default(cuid())\n  stateId String @unique\n  state   State  @relation(fields: [stateId], references: [id])\n\n  summary String?\n  plan    Json\n\n  progress ExerciseProgress?\n}\n\nmodel ExerciseProgress {\n  id       String         @id @default(cuid())\n  moduleId String         @unique\n  module   ExerciseModule @relation(fields: [moduleId], references: [id])\n\n  summary    String?\n  trackables Json\n}\n\n// --- NUTRITION ---\nmodel NutritionModule {\n  id      String @id @default(cuid())\n  stateId String @unique\n  state   State  @relation(fields: [stateId], references: [id])\n\n  summary    String?\n  plan       Json\n  checklists Json?\n\n  progress NutritionProgress?\n}\n\nmodel NutritionProgress {\n  id       String          @id @default(cuid())\n  moduleId String          @unique\n  module   NutritionModule @relation(fields: [moduleId], references: [id])\n\n  summary        String?\n  trackables     Json\n  checklistState Json?\n}\n",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nenum Role {\n  user\n  assistant\n  system\n}\n\nmodel Account {\n  id String @id @default(cuid())\n\n  email    String @unique\n  password String\n\n  user_id String @unique\n  user    User   @relation(fields: [user_id], references: [id], onDelete: Cascade)\n}\n\nmodel User {\n  id   String @id @default(cuid())\n  name String\n\n  biometric     Biometrics?\n  baseline      Baseline?\n  queryBaseline Json?\n\n  profile String? // LLM generated profile\n\n  account   Account?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  states    State[]\n  threads   Thread[]\n  externals External[]\n}\n\nmodel Baseline {\n  id   String @id @default(cuid())\n  data Json\n\n  userId String @unique\n  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)\n}\n\nmodel Biometrics {\n  id          String   @id @default(cuid())\n  age         Int\n  sex         String\n  treatment   String\n  surgeryDate DateTime\n  // weightKg  Decimal\n  // heightCm  Decimal\n\n  userId String @unique\n  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)\n}\n\nmodel State {\n  id          String   @id @default(cuid())\n  userId      String\n  dateCreated DateTime @db.Date\n\n  createdAt DateTime @default(now())\n\n  isActive Boolean\n\n  user User @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  // links to states that created it / it helped create\n  causalStateId String? @unique\n  causalState   State?  @relation(\"StateHistory\", fields: [causalStateId], references: [id])\n  nextStateId   String? @unique\n  nextState     State?  @relation(\"StateHistory\") // Back-relation for Prisma\n\n  // links to X that created it\n  causalXId String?   @unique\n  causalX   External? @relation(fields: [causalXId], references: [id])\n\n  // all modules attached to the state\n  modules Module[]\n}\n\nmodel Module {\n  id      String @id @default(cuid())\n  type    String\n  stateId String\n  state   State  @relation(fields: [stateId], references: [id], onDelete: Cascade)\n\n  summary    String?\n  plan       Json\n  checklists Json?\n\n  progress Progress?\n}\n\nmodel Progress {\n  id       String @id @default(cuid())\n  moduleId String @unique\n  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)\n\n  summary        String?\n  trackables     Json\n  checklistState Json?\n}\n\nmodel External {\n  // TODO: add other fields, right now only houses threadContext\n  id     String @id @default(cuid())\n  userId String\n\n  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  dateCreated DateTime @default(now()) @db.Date\n\n  // here maybe some field for doctor input / update / advice / check-in\n  // doctorMessage String?\n\n  threadContext Json // redundancy but safety. lock an instance of thread once it is saved to external\n  profile       String\n\n  state State[]\n}\n\nmodel Thread {\n  // MUTABLE. should not be directly consumed by immutables like External\n  // since this will lead to versioning issues\n  id     String  @id @default(cuid())\n  userId String\n  title  String? // e.g., \"Post-Op Onboarding\" or \"Daily Symptom Log\"\n  type   String // 'onboarding', 'chat', 'doctor_note'\n\n  user      User      @relation(fields: [userId], references: [id])\n  messages  Message[]\n  createdAt DateTime  @default(now())\n  updatedAt DateTime  @updatedAt\n}\n\nmodel Message {\n  id             String @id @default(cuid())\n  creationSource String // e.g created by what component, by onboarding? chat?  etc\n  threadId       String\n  role           Role // 'user' | 'assistant' | 'system'\n  content        String\n\n  context Json?\n\n  // explainability?\n  reasoning String?\n\n  thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)\n  createdAt DateTime @default(now())\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -28,7 +28,7 @@ const config: runtime.GetPrismaClientConfig = {
   }
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Account\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"AccountToUser\"}],\"dbName\":null},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"age\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"sex\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"treatment\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"profile\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"account\",\"kind\":\"object\",\"type\":\"Account\",\"relationName\":\"AccountToUser\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"states\",\"kind\":\"object\",\"type\":\"State\",\"relationName\":\"StateToUser\"}],\"dbName\":null},\"State\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"dateCreated\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"StateToUser\"},{\"name\":\"exercise\",\"kind\":\"object\",\"type\":\"ExerciseModule\",\"relationName\":\"ExerciseModuleToState\"},{\"name\":\"nutrition\",\"kind\":\"object\",\"type\":\"NutritionModule\",\"relationName\":\"NutritionModuleToState\"}],\"dbName\":null},\"ExerciseModule\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"stateId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"state\",\"kind\":\"object\",\"type\":\"State\",\"relationName\":\"ExerciseModuleToState\"},{\"name\":\"summary\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"plan\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"progress\",\"kind\":\"object\",\"type\":\"ExerciseProgress\",\"relationName\":\"ExerciseModuleToExerciseProgress\"}],\"dbName\":null},\"ExerciseProgress\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"moduleId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"module\",\"kind\":\"object\",\"type\":\"ExerciseModule\",\"relationName\":\"ExerciseModuleToExerciseProgress\"},{\"name\":\"summary\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"trackables\",\"kind\":\"scalar\",\"type\":\"Json\"}],\"dbName\":null},\"NutritionModule\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"stateId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"state\",\"kind\":\"object\",\"type\":\"State\",\"relationName\":\"NutritionModuleToState\"},{\"name\":\"summary\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"plan\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"checklists\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"progress\",\"kind\":\"object\",\"type\":\"NutritionProgress\",\"relationName\":\"NutritionModuleToNutritionProgress\"}],\"dbName\":null},\"NutritionProgress\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"moduleId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"module\",\"kind\":\"object\",\"type\":\"NutritionModule\",\"relationName\":\"NutritionModuleToNutritionProgress\"},{\"name\":\"summary\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"trackables\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"checklistState\",\"kind\":\"scalar\",\"type\":\"Json\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Account\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"AccountToUser\"}],\"dbName\":null},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"biometric\",\"kind\":\"object\",\"type\":\"Biometrics\",\"relationName\":\"BiometricsToUser\"},{\"name\":\"baseline\",\"kind\":\"object\",\"type\":\"Baseline\",\"relationName\":\"BaselineToUser\"},{\"name\":\"queryBaseline\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"profile\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"account\",\"kind\":\"object\",\"type\":\"Account\",\"relationName\":\"AccountToUser\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"states\",\"kind\":\"object\",\"type\":\"State\",\"relationName\":\"StateToUser\"},{\"name\":\"threads\",\"kind\":\"object\",\"type\":\"Thread\",\"relationName\":\"ThreadToUser\"},{\"name\":\"externals\",\"kind\":\"object\",\"type\":\"External\",\"relationName\":\"ExternalToUser\"}],\"dbName\":null},\"Baseline\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"data\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"BaselineToUser\"}],\"dbName\":null},\"Biometrics\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"age\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"sex\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"treatment\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"surgeryDate\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"BiometricsToUser\"}],\"dbName\":null},\"State\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"dateCreated\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"StateToUser\"},{\"name\":\"causalStateId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"causalState\",\"kind\":\"object\",\"type\":\"State\",\"relationName\":\"StateHistory\"},{\"name\":\"nextStateId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nextState\",\"kind\":\"object\",\"type\":\"State\",\"relationName\":\"StateHistory\"},{\"name\":\"causalXId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"causalX\",\"kind\":\"object\",\"type\":\"External\",\"relationName\":\"ExternalToState\"},{\"name\":\"modules\",\"kind\":\"object\",\"type\":\"Module\",\"relationName\":\"ModuleToState\"}],\"dbName\":null},\"Module\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"stateId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"state\",\"kind\":\"object\",\"type\":\"State\",\"relationName\":\"ModuleToState\"},{\"name\":\"summary\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"plan\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"checklists\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"progress\",\"kind\":\"object\",\"type\":\"Progress\",\"relationName\":\"ModuleToProgress\"}],\"dbName\":null},\"Progress\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"moduleId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"module\",\"kind\":\"object\",\"type\":\"Module\",\"relationName\":\"ModuleToProgress\"},{\"name\":\"summary\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"trackables\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"checklistState\",\"kind\":\"scalar\",\"type\":\"Json\"}],\"dbName\":null},\"External\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ExternalToUser\"},{\"name\":\"dateCreated\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"threadContext\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"profile\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"state\",\"kind\":\"object\",\"type\":\"State\",\"relationName\":\"ExternalToState\"}],\"dbName\":null},\"Thread\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ThreadToUser\"},{\"name\":\"messages\",\"kind\":\"object\",\"type\":\"Message\",\"relationName\":\"MessageToThread\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Message\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"creationSource\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"threadId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"Role\"},{\"name\":\"content\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"context\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"reasoning\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"thread\",\"kind\":\"object\",\"type\":\"Thread\",\"relationName\":\"MessageToThread\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 
 async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Module> {
   const { Buffer } = await import('node:buffer')
@@ -195,6 +195,26 @@ export interface PrismaClient<
   get user(): Prisma.UserDelegate<ExtArgs, { omit: OmitOpts }>;
 
   /**
+   * `prisma.baseline`: Exposes CRUD operations for the **Baseline** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Baselines
+    * const baselines = await prisma.baseline.findMany()
+    * ```
+    */
+  get baseline(): Prisma.BaselineDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.biometrics`: Exposes CRUD operations for the **Biometrics** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Biometrics
+    * const biometrics = await prisma.biometrics.findMany()
+    * ```
+    */
+  get biometrics(): Prisma.BiometricsDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
    * `prisma.state`: Exposes CRUD operations for the **State** model.
     * Example usage:
     * ```ts
@@ -205,44 +225,54 @@ export interface PrismaClient<
   get state(): Prisma.StateDelegate<ExtArgs, { omit: OmitOpts }>;
 
   /**
-   * `prisma.exerciseModule`: Exposes CRUD operations for the **ExerciseModule** model.
+   * `prisma.module`: Exposes CRUD operations for the **Module** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more ExerciseModules
-    * const exerciseModules = await prisma.exerciseModule.findMany()
+    * // Fetch zero or more Modules
+    * const modules = await prisma.module.findMany()
     * ```
     */
-  get exerciseModule(): Prisma.ExerciseModuleDelegate<ExtArgs, { omit: OmitOpts }>;
+  get module(): Prisma.ModuleDelegate<ExtArgs, { omit: OmitOpts }>;
 
   /**
-   * `prisma.exerciseProgress`: Exposes CRUD operations for the **ExerciseProgress** model.
+   * `prisma.progress`: Exposes CRUD operations for the **Progress** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more ExerciseProgresses
-    * const exerciseProgresses = await prisma.exerciseProgress.findMany()
+    * // Fetch zero or more Progresses
+    * const progresses = await prisma.progress.findMany()
     * ```
     */
-  get exerciseProgress(): Prisma.ExerciseProgressDelegate<ExtArgs, { omit: OmitOpts }>;
+  get progress(): Prisma.ProgressDelegate<ExtArgs, { omit: OmitOpts }>;
 
   /**
-   * `prisma.nutritionModule`: Exposes CRUD operations for the **NutritionModule** model.
+   * `prisma.external`: Exposes CRUD operations for the **External** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more NutritionModules
-    * const nutritionModules = await prisma.nutritionModule.findMany()
+    * // Fetch zero or more Externals
+    * const externals = await prisma.external.findMany()
     * ```
     */
-  get nutritionModule(): Prisma.NutritionModuleDelegate<ExtArgs, { omit: OmitOpts }>;
+  get external(): Prisma.ExternalDelegate<ExtArgs, { omit: OmitOpts }>;
 
   /**
-   * `prisma.nutritionProgress`: Exposes CRUD operations for the **NutritionProgress** model.
+   * `prisma.thread`: Exposes CRUD operations for the **Thread** model.
     * Example usage:
     * ```ts
-    * // Fetch zero or more NutritionProgresses
-    * const nutritionProgresses = await prisma.nutritionProgress.findMany()
+    * // Fetch zero or more Threads
+    * const threads = await prisma.thread.findMany()
     * ```
     */
-  get nutritionProgress(): Prisma.NutritionProgressDelegate<ExtArgs, { omit: OmitOpts }>;
+  get thread(): Prisma.ThreadDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.message`: Exposes CRUD operations for the **Message** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Messages
+    * const messages = await prisma.message.findMany()
+    * ```
+    */
+  get message(): Prisma.MessageDelegate<ExtArgs, { omit: OmitOpts }>;
 }
 
 export function getPrismaClientClass(): PrismaClientConstructor {

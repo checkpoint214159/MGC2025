@@ -24,11 +24,11 @@ export default function RecoveryExerciseRenderer({
 }: RendererProps) {
   const { id, meta } = plan
   const { name, intensity, precaution } = meta
-
+  console.log('plan???', plan)
   const trackableId = trackable.id
   const [localValues, setLocalValues] = useState<Record<string, number>>(() => {
     return Object.fromEntries(
-      Object.entries(trackable.data).map(([key, metric]: [string, ExerciseMetrics]) => [key, metric.value || 0])
+      Object.entries(trackable.data).map(([key, metric]: [string, ExerciseMetrics]) => [key, metric.value])
     );
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -51,7 +51,7 @@ export default function RecoveryExerciseRenderer({
       ])
     );
 
-    const result = await updateProgressAction(moduleId, 'exercise', [
+    const result = await updateProgressAction(moduleId, [
       { 
         id: trackableId, 
         data: updatedTrackable
@@ -60,7 +60,7 @@ export default function RecoveryExerciseRenderer({
     
     if (!result.success) {
         console.log('error', result.error)
-        alert("Failed to save progress. Please check your connection.");
+        alert(`Failed to save progress, with error: ${result.error}`);
     }
     setIsSaving(false);
   }

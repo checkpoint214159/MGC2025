@@ -7,9 +7,15 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  user
+  assistant
+  system
+}
+
 model Account {
-  id       String @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   email    String @unique
   password String
 
@@ -18,73 +24,136 @@ model Account {
 }
 
 model User {
-  id        String  @id @default(cuid())
-  name      String
-  age       Int?
-  sex       String?
-  treatment String?
-  profile   String? // LLM generated profile
+  id   String @id @default(cuid())
+  name String
+
+  biometric     Biometrics?
+  baseline     Baseline?
+  queryBaseline Json?
+
+  profile String? // LLM generated profile
 
   account   Account?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   states    State[]
+  threads   Thread[]
+  externals External[]
+}
+
+model Baseline {
+  id   String @id @default(cuid())
+  data Json
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Biometrics {
+  id          String   @id @default(cuid())
+  age         Int
+  sex         String
+  treatment   String
+  surgeryDate DateTime
+  // weightKg  Decimal
+  // heightCm  Decimal
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model State {
-  id           String   @id @default(cuid())
-  userId       String
-  dateCreated  DateTime @db.Date @default(now())
+  id          String   @id @default(cuid())
+  userId      String
+  dateCreated DateTime @db.Date
 
-  user      User @relation(fields:[userId], references:[id])
-  
-  exercise     ExerciseModule?
-  nutrition    NutritionModule?
+  createdAt DateTime @default(now())
 
-  @@unique([userId, dateCreated])
+  isActive Boolean
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // links to states that created it / it helped create
+  causalStateId String? @unique
+  causalState   State?  @relation("StateHistory", fields: [causalStateId], references: [id])
+  nextStateId   String? @unique
+  nextState     State?  @relation("StateHistory") // Back-relation for Prisma
+
+  // links to X that created it
+  causalXId String?   @unique
+  causalX   External? @relation(fields: [causalXId], references: [id])
+
+  // all modules attached to the state
+  modules Module[]
 }
 
-// --- EXERCISE ---
-model ExerciseModule {
-  id          String    @id @default(cuid())
-  stateId     String    @unique
-  state       State @relation(fields: [stateId], references: [id])
-  
-  summary     String?
+model Module {
+  id      String @id @default(cuid())
+  type    String
+  stateId String
+  state   State  @relation(fields: [stateId], references: [id], onDelete: Cascade)
+
+  summary    String?
   plan       Json
-  
-  progress     ExerciseProgress?
+  checklists Json?
+
+  progress Progress?
 }
 
-model ExerciseProgress {
-  id          String         @id @default(cuid())
-  moduleId    String         @unique
-  module      ExerciseModule @relation(fields: [moduleId], references: [id])
-  
-  summary     String?
-  trackables  Json
-}
+model Progress {
+  id       String @id @default(cuid())
+  moduleId String @unique
+  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
-// --- NUTRITION ---
-model NutritionModule {
-  id          String    @id @default(cuid())
-  stateId     String    @unique
-  state       State @relation(fields: [stateId], references: [id])
-  
-  summary     String?
-  plan       Json      
-  checklists  Json?     
-  
-  progress     NutritionProgress?
-}
-
-model NutritionProgress {
-  id          String          @id @default(cuid())
-  moduleId    String         @unique
-  module      NutritionModule @relation(fields: [moduleId], references: [id])
-  
-  summary     String?
-  trackables  Json
+  summary        String?
+  trackables     Json
   checklistState Json?
+}
+
+model External {
+  // TODO: add other fields, right now only houses threadContext
+  id     String @id @default(cuid())
+  userId String
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dateCreated DateTime @default(now()) @db.Date
+
+  // here maybe some field for doctor input / update / advice / check-in
+  // doctorMessage String?
+
+  threadContext Json // redundancy but safety. lock an instance of thread once it is saved to external
+  profile       String
+
+  state State[]
+}
+
+model Thread {
+  // MUTABLE. should not be directly consumed by immutables like External
+  // since this will lead to versioning issues
+  id     String  @id @default(cuid())
+  userId String
+  title  String? // e.g., "Post-Op Onboarding" or "Daily Symptom Log"
+  type   String // 'onboarding', 'chat', 'doctor_note'
+
+  user      User      @relation(fields: [userId], references: [id])
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Message {
+  id             String @id @default(cuid())
+  creationSource String // e.g created by what component, by onboarding? chat?  etc
+  threadId       String
+  role           Role // 'user' | 'assistant' | 'system'
+  content        String
+
+  context Json?
+
+  // explainability?
+  reasoning String?
+
+  thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }

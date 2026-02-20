@@ -1,38 +1,57 @@
-import { Utensils, Zap } from "lucide-react";
+import { Utensils, Zap, ArrowRight, Flame, Droplets } from "lucide-react";
+import { DashboardCard, CardSlider, CardStat } from "./DashboardUtils";
+import { NutritionModule } from "@/lib/state/schemas/nutrition";
 
-export default function NutritionPreviewCard({ data, onClick }: { data: any, onClick: () => void }) {
+
+export default function NutritionPreviewCard({ data, onClick }: { data: NutritionModule, onClick: () => void }) {
+
+  const previewMacros = ['calories', 'fats', 'protein', 'carbs']
+
+  console.log('plan?', data)
+  let macroPlans: Record<string, number> = {}
+  data.plan.map(p => {
+    for (const [k, v] of Object.entries(p.data)) {
+      if (previewMacros.includes(k)) {
+        macroPlans[k] = v.goal
+      } 
+    }
+  })
+
+  let previewMacroVals: Record<string, number> = {} 
+  
+  data.progress?.trackables.map(t  => {
+    for (const [k, v] of Object.entries(t.data)) {
+      if (previewMacros.includes(k)) {
+        previewMacroVals[k] = v.value
+      } 
+    }
+  })
+  console.log('previewMacroVals?', previewMacroVals)
+  console.log('macroPlans?', macroPlans)
+
   return (
-    <div 
-      onClick={onClick}
-      className="bg-white border border-slate-200 p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
-    >
-      <div className="flex items-center gap-3 mb-4">
-        <div className="bg-orange-100 p-2 rounded-lg text-orange-600">
-          <Utensils size={20} />
-        </div>
-        <div>
-          <h3 className="font-bold text-slate-900">Nutrition Plan</h3>
-          <p className="text-xs text-slate-500 uppercase tracking-wide font-semibold">
-            {data.title}
-          </p>
-        </div>
-      </div>
+    <DashboardCard
+    title="Nutrition"
+    icon={Utensils}
+    iconColorClass="bg-orange-100 text-orange-600"
+    accentColorClass="border-l-orange-500"
+    onClick={onClick}
+  >
+    {/* Big Main Slider */}
+    <CardSlider label="Total Calories" current={previewMacroVals.calories} target={macroPlans.calories} colorClass="bg-orange-500" size="lg" />
 
-      {/* Calorie Bar Preview */}
-      <div className="space-y-2">
-        <div className="flex justify-between text-xs font-medium">
-          <span className="text-slate-500">Daily Target</span>
-          <span className="text-slate-900 font-bold">{data.goalCalories} kcal</span>
-        </div>
-        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-          <div className="bg-orange-400 h-full w-1/3 rounded-full" /> {/* Static preview of progress */}
-        </div>
-      </div>
-      
-      <div className="mt-4 flex items-center text-blue-600 text-xs font-bold gap-1">
-        <Zap size={12} />
-        VIEW MEALS & MACROS
-      </div>
+    {/* Multiple Small Sliders in a row */}
+    <div className="grid grid-cols-3 gap-4 mt-2">
+      <CardSlider label="Protein" current={previewMacroVals.protein} target={macroPlans.protein} colorClass="bg-blue-500" size="sm" />
+      <CardSlider label="Carbs" current={previewMacroVals.carbs} target={macroPlans.carbs} colorClass="bg-green-500" size="sm" />
+      <CardSlider label="Fats" current={previewMacroVals.fats} target={macroPlans.fats} colorClass="bg-yellow-500" size="sm" />
     </div>
+
+    {/* Random Icon Placement inside the body */}
+    {/* <div className="flex items-center gap-2 pt-2">
+      <CardStat label="Hydration" value="2.1L" icon={Droplets} />
+      <CardStat label="Fiber" value="25g" />
+    </div> */}
+  </DashboardCard>
   );
 }
