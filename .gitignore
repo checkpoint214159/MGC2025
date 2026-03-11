@@ -41,3 +41,7 @@ next-env.d.ts
 test_data
 credentials.json
 service_account.json
+
+
+# python
+**__pycache__**
