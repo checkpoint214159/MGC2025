@@ -3,15 +3,32 @@ from dotenv import load_dotenv
 from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
-# from langchain_pinecone import PineconeVectorStore
+
 from pinecone import Pinecone
 
 # 1. Setup
 load_dotenv()
-index_name = "medical-index"  # Must match the name in your console
 
-# 2. Load all PDFs from your local folder
-print("Loading documents...")
+
+api_key = os.getenv("PINECONE_KEY")
+hostname = os.getenv("INDEX_HOST")
+print('api_key', api_key)
+
+pc = Pinecone(api_key=api_key)
+index = pc.Index(hostname)
+
+index.upsert_records(
+    hostname,
+    [
+        {
+            "_id": "rec1",
+            "chunk_text": "Apples are a great source of dietary fiber, which supports digestion and helps maintain a healthy gut.",
+            "category": "digestive system", 
+            "other": "metafield"
+        },
+    ]
+)
+
 loader = DirectoryLoader("/root/MGC2025/test_data", glob="**/*.pdf", loader_cls=PyPDFLoader)
 docs = loader.load()
 
