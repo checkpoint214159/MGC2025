@@ -2,6 +2,25 @@ import { NextResponse } from "next/server";
 const bcrypt = require("bcryptjs");
 import { prisma } from "@/lib/prisma";
 
+// Helper function to determine if an email should be given admin role
+function isAdminEmail(email: string): boolean {
+  // Check if email is in the ADMIN_EMAILS list from environment
+  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
+  if (adminEmails.includes(email.toLowerCase())) {
+    return true;
+  }
+
+  // Check if email matches one of the admin domains
+  const adminDomains = process.env.ADMIN_EMAIL_DOMAINS?.split(',').map(d => d.trim().toLowerCase()) || [];
+  for (const domain of adminDomains) {
+    if (email.toLowerCase().endsWith(`@${domain}`)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 export async function POST(request: Request) {
     /**
      * Handles validation and posting to database
@@ -33,9 +52,14 @@ export async function POST(request: Request) {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
+        
+        // Determine role based on email
+        const role = isAdminEmail(email) ? 'admin' : 'patient';
+
         const newUser = await prisma.user.create({
             data: {
                 name: username,
+                role: role,
                 account: {
                     create: {
                         email: email,
@@ -62,6 +86,7 @@ export async function POST(request: Request) {
         return NextResponse.json(
             {
                 message: "Account created successfully",
+                role: role
             },
             { status: 201 },
         );

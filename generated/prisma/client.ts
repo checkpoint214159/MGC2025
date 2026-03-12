@@ -50,6 +50,11 @@ export type Account = Prisma.AccountModel
  */
 export type User = Prisma.UserModel
 /**
+ * Model AdminPatientRelation
+ * 
+ */
+export type AdminPatientRelation = Prisma.AdminPatientRelationModel
+/**
  * Model Baseline
  * 
  */

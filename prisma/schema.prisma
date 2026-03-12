@@ -13,6 +13,11 @@ enum Role {
   system
 }
 
+enum UserRole {
+  patient
+  admin
+}
+
 model Account {
   id String @id @default(cuid())
 
@@ -26,6 +31,7 @@ model Account {
 model User {
   id   String @id @default(cuid())
   name String
+  role UserRole @default(patient) // patient or admin (doctor)
 
   biometric     Biometrics?
   baseline     Baseline?
@@ -40,6 +46,24 @@ model User {
   states    State[]
   threads   Thread[]
   externals External[]
+
+  // Admin relations: one doctor manages many patients
+  adminManagedPatients AdminPatientRelation[] @relation("AdminToPatients")
+  // Back-relation for patient to know which admin manages them
+  managedByAdmin       AdminPatientRelation? @relation("PatientToAdmin")
+}
+
+model AdminPatientRelation {
+  id        String @id @default(cuid())
+  adminId   String
+  patientId String @unique
+
+  admin   User @relation("AdminToPatients", fields: [adminId], references: [id], onDelete: Cascade)
+  patient User @relation("PatientToAdmin", fields: [patientId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([adminId, patientId])
 }
 
 model Baseline {

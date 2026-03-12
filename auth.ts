@@ -36,29 +36,39 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (user) {
                 token.id = user.id;
             }
-            // console.log('all?', { token, user, trigger, session })
+            
             if (token?.id) {
-
-                if (!token.doneOnboarding || trigger === "update") {
-
-                    const [dbUser] = await Promise.all([
-                        prisma.user.findUnique({
-                            where: { id: token.id as string },
-                            select: { name: true,
-                                profile: true, biometric: true,
-                                baseline: true, threads: {
-                                    where: { type: "onboarding" },
-                                    include: { messages: { orderBy: { createdAt: 'asc' } } },
-                                    take: 1
-                                },
+                // Fetch user role and admin relations on first login or session update
+                if (!token.role || trigger === "update") {
+                    const dbUser = await prisma.user.findUnique({
+                        where: { id: token.id as string },
+                        select: {
+                            name: true,
+                            role: true,
+                            profile: true,
+                            biometric: true,
+                            baseline: true,
+                            threads: {
+                                where: { type: "onboarding" },
+                                include: { messages: { orderBy: { createdAt: 'asc' } } },
+                                take: 1
+                            },
+                            adminManagedPatients: {
+                                select: { patientId: true }
                             }
-                        })
-                    ]);
+                        }
+                    });
                     
                     if (dbUser) {
                         token.name = dbUser.name;
+                        token.role = dbUser.role;
                         token.doneOnboarding = !!dbUser.profile && !!dbUser.biometric
                             && !!dbUser.baseline && !!dbUser.threads;
+                        
+                        // If admin, include managed patient IDs
+                        if (dbUser.role === 'admin') {
+                            token.adminManagedPatientIds = dbUser.adminManagedPatients.map(rel => rel.patientId);
+                        }
                     }
                 }
             }
@@ -67,9 +77,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         async session({ session, token }) {
             if (session.user) {
                 session.user.id = token.id as string;
-                session.hasTodayState = token.hasTodayState as boolean;
-                // Expose the boolean to the client UI
+                session.user.role = token.role as 'patient' | 'admin';
                 session.user.doneOnboarding = token.doneOnboarding as boolean;
+                session.hasTodayState = token.hasTodayState as boolean;
+                
+                // Expose admin managed patient IDs if user is admin
+                if (token.role === 'admin' && token.adminManagedPatientIds) {
+                    session.user.adminManagedPatientIds = token.adminManagedPatientIds as string[];
+                }
             }
             return session;
         }
