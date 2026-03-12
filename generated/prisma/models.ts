@@ -10,6 +10,7 @@
  */
 export type * from './models/Account'
 export type * from './models/User'
+export type * from './models/AdminPatientRelation'
 export type * from './models/Baseline'
 export type * from './models/Biometrics'
 export type * from './models/State'

@@ -10,6 +10,7 @@ import { prisma } from "./prisma";
 import { compileExternal } from "./external/service";
 import { State } from "./state/schemas/state";
 import { Baseline, QueryBaseline } from "./user/baseline";
+import { requireRole, requirePatientAccess, getAdminManagedPatientIds } from "@/lib/auth-utils";
 
 
 // i love functors
@@ -164,5 +165,86 @@ export async function updateProgressAction(
   return authenticatedAction(async () => {
     // Note: If updateModuleProgress requires userId for security, add it here
     return await updateModuleProgress(moduleId, updates);
+  });
+}
+
+// ============= ADMIN-ONLY ACTIONS =============
+
+/**
+ * Get all patient IDs that the logged-in admin manages.
+ * Requires admin role.
+ */
+export async function getAdminManagedPatientsAction() {
+  return authenticatedAction(async (userId) => {
+    await requireRole('admin');
+    return await getAdminManagedPatientIds(userId);
+  });
+}
+
+/**
+ * Get full patient details including biometrics, baseline, threads, and latest state.
+ * Requires admin role and admin must manage the specified patient.
+ */
+export async function getPatientDetailsForAdminAction(patientId: string) {
+  return authenticatedAction(async (userId) => {
+    await requireRole('admin');
+    await requirePatientAccess(userId, patientId);
+
+    const patient = await prisma.user.findUnique({
+      where: { id: patientId },
+      include: {
+        biometric: true,
+        baseline: true,
+        threads: {
+          include: {
+            messages: {
+              orderBy: { createdAt: 'asc' }
+            }
+          }
+        },
+        states: {
+          where: { isActive: true },
+          include: {
+            modules: {
+              include: {
+                progress: true
+              }
+            }
+          },
+          take: 1
+        }
+      }
+    });
+
+    if (!patient) {
+      throw new Error(`Patient ${patientId} not found`);
+    }
+
+    return patient;
+  });
+}
+
+/**
+ * Get onboarding/conversation threads for a patient.
+ * Requires admin role and admin must manage the specified patient.
+ */
+export async function getPatientThreadsForAdminAction(patientId: string) {
+  return authenticatedAction(async (userId) => {
+    await requireRole('admin');
+    await requirePatientAccess(userId, patientId);
+
+    const threads = await prisma.thread.findMany({
+      where: {
+        userId: patientId,
+        type: 'onboarding' // Can expand to include other types if needed
+      },
+      include: {
+        messages: {
+          orderBy: { createdAt: 'asc' }
+        }
+      }
+    });
+
+    return threads;
   });
 }

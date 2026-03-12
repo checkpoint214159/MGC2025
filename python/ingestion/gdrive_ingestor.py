@@ -63,8 +63,21 @@ class GDriveIngestor:
             self.folder_service, id, filename)
         
         chunks: list[Document] = self._chunkify(id, doc)
-        for chunk in chunks:
-            self.pinecone_client.insert_entry(chunk)
+
+        # --- parallelize insertion to Pinecone ---
+        # we'll batch the documents via the wrapper and also
+        # fire off threads for network-bound calls.
+        try:
+            # first attempt a bulk upsert if available
+            self.pinecone_client.insert_entries(chunks)
+        except AttributeError:
+            # fallback: use a thread pool to insert one-by-one
+            from concurrent.futures import ThreadPoolExecutor, as_completed
+            with ThreadPoolExecutor(max_workers=8) as exe:
+                futures = [exe.submit(self.pinecone_client.insert_entry, c) for c in chunks]
+                for fut in as_completed(futures):
+                    # propagate exceptions here so callers see them
+                    fut.result()
 
         return chunks
         

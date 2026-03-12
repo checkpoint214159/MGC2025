@@ -27,6 +27,7 @@ export type AggregateUser = {
 export type UserMinAggregateOutputType = {
   id: string | null
   name: string | null
+  role: $Enums.UserRole | null
   profile: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -35,6 +36,7 @@ export type UserMinAggregateOutputType = {
 export type UserMaxAggregateOutputType = {
   id: string | null
   name: string | null
+  role: $Enums.UserRole | null
   profile: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -43,6 +45,7 @@ export type UserMaxAggregateOutputType = {
 export type UserCountAggregateOutputType = {
   id: number
   name: number
+  role: number
   queryBaseline: number
   profile: number
   createdAt: number
@@ -54,6 +57,7 @@ export type UserCountAggregateOutputType = {
 export type UserMinAggregateInputType = {
   id?: true
   name?: true
+  role?: true
   profile?: true
   createdAt?: true
   updatedAt?: true
@@ -62,6 +66,7 @@ export type UserMinAggregateInputType = {
 export type UserMaxAggregateInputType = {
   id?: true
   name?: true
+  role?: true
   profile?: true
   createdAt?: true
   updatedAt?: true
@@ -70,6 +75,7 @@ export type UserMaxAggregateInputType = {
 export type UserCountAggregateInputType = {
   id?: true
   name?: true
+  role?: true
   queryBaseline?: true
   profile?: true
   createdAt?: true
@@ -152,6 +158,7 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type UserGroupByOutputType = {
   id: string
   name: string
+  role: $Enums.UserRole
   queryBaseline: runtime.JsonValue | null
   profile: string | null
   createdAt: Date
@@ -182,6 +189,7 @@ export type UserWhereInput = {
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.StringFilter<"User"> | string
   name?: Prisma.StringFilter<"User"> | string
+  role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   queryBaseline?: Prisma.JsonNullableFilter<"User">
   profile?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -192,11 +200,14 @@ export type UserWhereInput = {
   states?: Prisma.StateListRelationFilter
   threads?: Prisma.ThreadListRelationFilter
   externals?: Prisma.ExternalListRelationFilter
+  adminManagedPatients?: Prisma.AdminPatientRelationListRelationFilter
+  managedByAdmin?: Prisma.XOR<Prisma.AdminPatientRelationNullableScalarRelationFilter, Prisma.AdminPatientRelationWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  role?: Prisma.SortOrder
   queryBaseline?: Prisma.SortOrderInput | Prisma.SortOrder
   profile?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -207,6 +218,8 @@ export type UserOrderByWithRelationInput = {
   states?: Prisma.StateOrderByRelationAggregateInput
   threads?: Prisma.ThreadOrderByRelationAggregateInput
   externals?: Prisma.ExternalOrderByRelationAggregateInput
+  adminManagedPatients?: Prisma.AdminPatientRelationOrderByRelationAggregateInput
+  managedByAdmin?: Prisma.AdminPatientRelationOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -215,6 +228,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   name?: Prisma.StringFilter<"User"> | string
+  role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   queryBaseline?: Prisma.JsonNullableFilter<"User">
   profile?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -225,11 +239,14 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   states?: Prisma.StateListRelationFilter
   threads?: Prisma.ThreadListRelationFilter
   externals?: Prisma.ExternalListRelationFilter
+  adminManagedPatients?: Prisma.AdminPatientRelationListRelationFilter
+  managedByAdmin?: Prisma.XOR<Prisma.AdminPatientRelationNullableScalarRelationFilter, Prisma.AdminPatientRelationWhereInput> | null
 }, "id">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  role?: Prisma.SortOrder
   queryBaseline?: Prisma.SortOrderInput | Prisma.SortOrder
   profile?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -245,6 +262,7 @@ export type UserScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"User"> | string
   name?: Prisma.StringWithAggregatesFilter<"User"> | string
+  role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
   queryBaseline?: Prisma.JsonNullableWithAggregatesFilter<"User">
   profile?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -254,6 +272,7 @@ export type UserScalarWhereWithAggregatesInput = {
 export type UserCreateInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -264,11 +283,14 @@ export type UserCreateInput = {
   states?: Prisma.StateCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
 }
 
 export type UserUncheckedCreateInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -279,11 +301,14 @@ export type UserUncheckedCreateInput = {
   states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
 }
 
 export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -294,11 +319,14 @@ export type UserUpdateInput = {
   states?: Prisma.StateUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -309,11 +337,14 @@ export type UserUncheckedUpdateInput = {
   states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
 }
 
 export type UserCreateManyInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -323,6 +354,7 @@ export type UserCreateManyInput = {
 export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -332,6 +364,7 @@ export type UserUpdateManyMutationInput = {
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -346,6 +379,7 @@ export type UserScalarRelationFilter = {
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  role?: Prisma.SortOrder
   queryBaseline?: Prisma.SortOrder
   profile?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -355,6 +389,7 @@ export type UserCountOrderByAggregateInput = {
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  role?: Prisma.SortOrder
   profile?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -363,6 +398,7 @@ export type UserMaxOrderByAggregateInput = {
 export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  role?: Prisma.SortOrder
   profile?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -382,12 +418,44 @@ export type UserUpdateOneRequiredWithoutAccountNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAccountInput, Prisma.UserUpdateWithoutAccountInput>, Prisma.UserUncheckedUpdateWithoutAccountInput>
 }
 
+export type EnumUserRoleFieldUpdateOperationsInput = {
+  set?: $Enums.UserRole
+}
+
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type UserCreateNestedOneWithoutAdminManagedPatientsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdminManagedPatientsInput, Prisma.UserUncheckedCreateWithoutAdminManagedPatientsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdminManagedPatientsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutManagedByAdminInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutManagedByAdminInput, Prisma.UserUncheckedCreateWithoutManagedByAdminInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManagedByAdminInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAdminManagedPatientsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdminManagedPatientsInput, Prisma.UserUncheckedCreateWithoutAdminManagedPatientsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdminManagedPatientsInput
+  upsert?: Prisma.UserUpsertWithoutAdminManagedPatientsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAdminManagedPatientsInput, Prisma.UserUpdateWithoutAdminManagedPatientsInput>, Prisma.UserUncheckedUpdateWithoutAdminManagedPatientsInput>
+}
+
+export type UserUpdateOneRequiredWithoutManagedByAdminNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutManagedByAdminInput, Prisma.UserUncheckedCreateWithoutManagedByAdminInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutManagedByAdminInput
+  upsert?: Prisma.UserUpsertWithoutManagedByAdminInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutManagedByAdminInput, Prisma.UserUpdateWithoutManagedByAdminInput>, Prisma.UserUncheckedUpdateWithoutManagedByAdminInput>
 }
 
 export type UserCreateNestedOneWithoutBaselineInput = {
@@ -463,6 +531,7 @@ export type UserUpdateOneRequiredWithoutThreadsNestedInput = {
 export type UserCreateWithoutAccountInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -472,11 +541,14 @@ export type UserCreateWithoutAccountInput = {
   states?: Prisma.StateCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutAccountInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -486,6 +558,8 @@ export type UserUncheckedCreateWithoutAccountInput = {
   states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutAccountInput = {
@@ -507,6 +581,7 @@ export type UserUpdateToOneWithWhereWithoutAccountInput = {
 export type UserUpdateWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -516,11 +591,14 @@ export type UserUpdateWithoutAccountInput = {
   states?: Prisma.StateUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -530,11 +608,182 @@ export type UserUncheckedUpdateWithoutAccountInput = {
   states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
+}
+
+export type UserCreateWithoutAdminManagedPatientsInput = {
+  id?: string
+  name: string
+  role?: $Enums.UserRole
+  queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  profile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput
+  baseline?: Prisma.BaselineCreateNestedOneWithoutUserInput
+  account?: Prisma.AccountCreateNestedOneWithoutUserInput
+  states?: Prisma.StateCreateNestedManyWithoutUserInput
+  threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
+  managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
+}
+
+export type UserUncheckedCreateWithoutAdminManagedPatientsInput = {
+  id?: string
+  name: string
+  role?: $Enums.UserRole
+  queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  profile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput
+  baseline?: Prisma.BaselineUncheckedCreateNestedOneWithoutUserInput
+  account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput
+  states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
+  threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
+}
+
+export type UserCreateOrConnectWithoutAdminManagedPatientsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAdminManagedPatientsInput, Prisma.UserUncheckedCreateWithoutAdminManagedPatientsInput>
+}
+
+export type UserCreateWithoutManagedByAdminInput = {
+  id?: string
+  name: string
+  role?: $Enums.UserRole
+  queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  profile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput
+  baseline?: Prisma.BaselineCreateNestedOneWithoutUserInput
+  account?: Prisma.AccountCreateNestedOneWithoutUserInput
+  states?: Prisma.StateCreateNestedManyWithoutUserInput
+  threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
+}
+
+export type UserUncheckedCreateWithoutManagedByAdminInput = {
+  id?: string
+  name: string
+  role?: $Enums.UserRole
+  queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  profile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput
+  baseline?: Prisma.BaselineUncheckedCreateNestedOneWithoutUserInput
+  account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput
+  states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
+  threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
+}
+
+export type UserCreateOrConnectWithoutManagedByAdminInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutManagedByAdminInput, Prisma.UserUncheckedCreateWithoutManagedByAdminInput>
+}
+
+export type UserUpsertWithoutAdminManagedPatientsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAdminManagedPatientsInput, Prisma.UserUncheckedUpdateWithoutAdminManagedPatientsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAdminManagedPatientsInput, Prisma.UserUncheckedCreateWithoutAdminManagedPatientsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAdminManagedPatientsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAdminManagedPatientsInput, Prisma.UserUncheckedUpdateWithoutAdminManagedPatientsInput>
+}
+
+export type UserUpdateWithoutAdminManagedPatientsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput
+  baseline?: Prisma.BaselineUpdateOneWithoutUserNestedInput
+  account?: Prisma.AccountUpdateOneWithoutUserNestedInput
+  states?: Prisma.StateUpdateManyWithoutUserNestedInput
+  threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAdminManagedPatientsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput
+  baseline?: Prisma.BaselineUncheckedUpdateOneWithoutUserNestedInput
+  account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput
+  states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
+  threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
+}
+
+export type UserUpsertWithoutManagedByAdminInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutManagedByAdminInput, Prisma.UserUncheckedUpdateWithoutManagedByAdminInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutManagedByAdminInput, Prisma.UserUncheckedCreateWithoutManagedByAdminInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutManagedByAdminInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutManagedByAdminInput, Prisma.UserUncheckedUpdateWithoutManagedByAdminInput>
+}
+
+export type UserUpdateWithoutManagedByAdminInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput
+  baseline?: Prisma.BaselineUpdateOneWithoutUserNestedInput
+  account?: Prisma.AccountUpdateOneWithoutUserNestedInput
+  states?: Prisma.StateUpdateManyWithoutUserNestedInput
+  threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
+}
+
+export type UserUncheckedUpdateWithoutManagedByAdminInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput
+  baseline?: Prisma.BaselineUncheckedUpdateOneWithoutUserNestedInput
+  account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput
+  states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
+  threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
 }
 
 export type UserCreateWithoutBaselineInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -544,11 +793,14 @@ export type UserCreateWithoutBaselineInput = {
   states?: Prisma.StateCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutBaselineInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -558,6 +810,8 @@ export type UserUncheckedCreateWithoutBaselineInput = {
   states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutBaselineInput = {
@@ -579,6 +833,7 @@ export type UserUpdateToOneWithWhereWithoutBaselineInput = {
 export type UserUpdateWithoutBaselineInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -588,11 +843,14 @@ export type UserUpdateWithoutBaselineInput = {
   states?: Prisma.StateUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBaselineInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -602,11 +860,14 @@ export type UserUncheckedUpdateWithoutBaselineInput = {
   states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutBiometricInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -616,11 +877,14 @@ export type UserCreateWithoutBiometricInput = {
   states?: Prisma.StateCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutBiometricInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -630,6 +894,8 @@ export type UserUncheckedCreateWithoutBiometricInput = {
   states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutBiometricInput = {
@@ -651,6 +917,7 @@ export type UserUpdateToOneWithWhereWithoutBiometricInput = {
 export type UserUpdateWithoutBiometricInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -660,11 +927,14 @@ export type UserUpdateWithoutBiometricInput = {
   states?: Prisma.StateUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBiometricInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -674,11 +944,14 @@ export type UserUncheckedUpdateWithoutBiometricInput = {
   states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutStatesInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -688,11 +961,14 @@ export type UserCreateWithoutStatesInput = {
   account?: Prisma.AccountCreateNestedOneWithoutUserInput
   threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutStatesInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -702,6 +978,8 @@ export type UserUncheckedCreateWithoutStatesInput = {
   account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput
   threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutStatesInput = {
@@ -723,6 +1001,7 @@ export type UserUpdateToOneWithWhereWithoutStatesInput = {
 export type UserUpdateWithoutStatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -732,11 +1011,14 @@ export type UserUpdateWithoutStatesInput = {
   account?: Prisma.AccountUpdateOneWithoutUserNestedInput
   threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -746,11 +1028,14 @@ export type UserUncheckedUpdateWithoutStatesInput = {
   account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput
   threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutExternalsInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -760,11 +1045,14 @@ export type UserCreateWithoutExternalsInput = {
   account?: Prisma.AccountCreateNestedOneWithoutUserInput
   states?: Prisma.StateCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutExternalsInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -774,6 +1062,8 @@ export type UserUncheckedCreateWithoutExternalsInput = {
   account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput
   states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
   threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutExternalsInput = {
@@ -795,6 +1085,7 @@ export type UserUpdateToOneWithWhereWithoutExternalsInput = {
 export type UserUpdateWithoutExternalsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -804,11 +1095,14 @@ export type UserUpdateWithoutExternalsInput = {
   account?: Prisma.AccountUpdateOneWithoutUserNestedInput
   states?: Prisma.StateUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExternalsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -818,11 +1112,14 @@ export type UserUncheckedUpdateWithoutExternalsInput = {
   account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput
   states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
   threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutThreadsInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -832,11 +1129,14 @@ export type UserCreateWithoutThreadsInput = {
   account?: Prisma.AccountCreateNestedOneWithoutUserInput
   states?: Prisma.StateCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutThreadsInput = {
   id?: string
   name: string
+  role?: $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: string | null
   createdAt?: Date | string
@@ -846,6 +1146,8 @@ export type UserUncheckedCreateWithoutThreadsInput = {
   account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput
   states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutThreadsInput = {
@@ -867,6 +1169,7 @@ export type UserUpdateToOneWithWhereWithoutThreadsInput = {
 export type UserUpdateWithoutThreadsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -876,11 +1179,14 @@ export type UserUpdateWithoutThreadsInput = {
   account?: Prisma.AccountUpdateOneWithoutUserNestedInput
   states?: Prisma.StateUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutThreadsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   queryBaseline?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -890,6 +1196,8 @@ export type UserUncheckedUpdateWithoutThreadsInput = {
   account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput
   states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
 }
 
 
@@ -901,12 +1209,14 @@ export type UserCountOutputType = {
   states: number
   threads: number
   externals: number
+  adminManagedPatients: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   states?: boolean | UserCountOutputTypeCountStatesArgs
   threads?: boolean | UserCountOutputTypeCountThreadsArgs
   externals?: boolean | UserCountOutputTypeCountExternalsArgs
+  adminManagedPatients?: boolean | UserCountOutputTypeCountAdminManagedPatientsArgs
 }
 
 /**
@@ -940,10 +1250,18 @@ export type UserCountOutputTypeCountExternalsArgs<ExtArgs extends runtime.Types.
   where?: Prisma.ExternalWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAdminManagedPatientsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AdminPatientRelationWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  role?: boolean
   queryBaseline?: boolean
   profile?: boolean
   createdAt?: boolean
@@ -954,12 +1272,15 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   states?: boolean | Prisma.User$statesArgs<ExtArgs>
   threads?: boolean | Prisma.User$threadsArgs<ExtArgs>
   externals?: boolean | Prisma.User$externalsArgs<ExtArgs>
+  adminManagedPatients?: boolean | Prisma.User$adminManagedPatientsArgs<ExtArgs>
+  managedByAdmin?: boolean | Prisma.User$managedByAdminArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  role?: boolean
   queryBaseline?: boolean
   profile?: boolean
   createdAt?: boolean
@@ -969,6 +1290,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  role?: boolean
   queryBaseline?: boolean
   profile?: boolean
   createdAt?: boolean
@@ -978,13 +1300,14 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type UserSelectScalar = {
   id?: boolean
   name?: boolean
+  role?: boolean
   queryBaseline?: boolean
   profile?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "queryBaseline" | "profile" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "role" | "queryBaseline" | "profile" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   biometric?: boolean | Prisma.User$biometricArgs<ExtArgs>
   baseline?: boolean | Prisma.User$baselineArgs<ExtArgs>
@@ -992,6 +1315,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   states?: boolean | Prisma.User$statesArgs<ExtArgs>
   threads?: boolean | Prisma.User$threadsArgs<ExtArgs>
   externals?: boolean | Prisma.User$externalsArgs<ExtArgs>
+  adminManagedPatients?: boolean | Prisma.User$adminManagedPatientsArgs<ExtArgs>
+  managedByAdmin?: boolean | Prisma.User$managedByAdminArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1006,10 +1331,13 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     states: Prisma.$StatePayload<ExtArgs>[]
     threads: Prisma.$ThreadPayload<ExtArgs>[]
     externals: Prisma.$ExternalPayload<ExtArgs>[]
+    adminManagedPatients: Prisma.$AdminPatientRelationPayload<ExtArgs>[]
+    managedByAdmin: Prisma.$AdminPatientRelationPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    role: $Enums.UserRole
     queryBaseline: runtime.JsonValue | null
     profile: string | null
     createdAt: Date
@@ -1414,6 +1742,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   states<T extends Prisma.User$statesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$statesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   threads<T extends Prisma.User$threadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$threadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ThreadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   externals<T extends Prisma.User$externalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$externalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExternalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  adminManagedPatients<T extends Prisma.User$adminManagedPatientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminManagedPatientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminPatientRelationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  managedByAdmin<T extends Prisma.User$managedByAdminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$managedByAdminArgs<ExtArgs>>): Prisma.Prisma__AdminPatientRelationClient<runtime.Types.Result.GetResult<Prisma.$AdminPatientRelationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1445,6 +1775,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'String'>
   readonly name: Prisma.FieldRef<"User", 'String'>
+  readonly role: Prisma.FieldRef<"User", 'UserRole'>
   readonly queryBaseline: Prisma.FieldRef<"User", 'Json'>
   readonly profile: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
@@ -1963,6 +2294,49 @@ export type User$externalsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.ExternalScalarFieldEnum | Prisma.ExternalScalarFieldEnum[]
+}
+
+/**
+ * User.adminManagedPatients
+ */
+export type User$adminManagedPatientsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AdminPatientRelation
+   */
+  select?: Prisma.AdminPatientRelationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AdminPatientRelation
+   */
+  omit?: Prisma.AdminPatientRelationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminPatientRelationInclude<ExtArgs> | null
+  where?: Prisma.AdminPatientRelationWhereInput
+  orderBy?: Prisma.AdminPatientRelationOrderByWithRelationInput | Prisma.AdminPatientRelationOrderByWithRelationInput[]
+  cursor?: Prisma.AdminPatientRelationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AdminPatientRelationScalarFieldEnum | Prisma.AdminPatientRelationScalarFieldEnum[]
+}
+
+/**
+ * User.managedByAdmin
+ */
+export type User$managedByAdminArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AdminPatientRelation
+   */
+  select?: Prisma.AdminPatientRelationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AdminPatientRelation
+   */
+  omit?: Prisma.AdminPatientRelationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminPatientRelationInclude<ExtArgs> | null
+  where?: Prisma.AdminPatientRelationWhereInput
 }
 
 /**

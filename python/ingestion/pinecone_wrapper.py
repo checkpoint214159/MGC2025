@@ -51,6 +51,18 @@ class PineconeWrapper:
         self.validify_nonexist(datas=[data])
         return self.upsert_entry(data, namespace, **metadata)
 
+    def insert_entries(self, docs: list[Document], namespace: str = 'default'):
+        """
+        Batch insert many documents in one network round‑trip.
+        Raises an error if any ids already exist (same check as `insert_entry`).
+        """
+        records = []
+        for doc in docs:
+            data, metadata = self._document_to_pinecone_data(doc)
+            records.append(data)
+        self.validify_nonexist(datas=records, namespace=namespace)
+        return self.index.upsert_records(namespace=namespace, records=records)
+
     def upsert_entry(self, data:dict, namespace: str = 'default', **metadata):
         return self.index.upsert_records(
             namespace=namespace,
@@ -60,4 +72,5 @@ class PineconeWrapper:
             # **metadata,
         )
     
-    # TODO: make it multiple entries in the future
+    # NOTE: insert_entries handles batching; parallel threads are now
+    # mostly unused unless the wrapper is missing

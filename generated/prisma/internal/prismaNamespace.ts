@@ -386,6 +386,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Account: 'Account',
   User: 'User',
+  AdminPatientRelation: 'AdminPatientRelation',
   Baseline: 'Baseline',
   Biometrics: 'Biometrics',
   State: 'State',
@@ -409,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "user" | "baseline" | "biometrics" | "state" | "module" | "progress" | "external" | "thread" | "message"
+    modelProps: "account" | "user" | "adminPatientRelation" | "baseline" | "biometrics" | "state" | "module" | "progress" | "external" | "thread" | "message"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -558,6 +559,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    AdminPatientRelation: {
+      payload: Prisma.$AdminPatientRelationPayload<ExtArgs>
+      fields: Prisma.AdminPatientRelationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AdminPatientRelationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminPatientRelationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AdminPatientRelationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminPatientRelationPayload>
+        }
+        findFirst: {
+          args: Prisma.AdminPatientRelationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminPatientRelationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AdminPatientRelationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminPatientRelationPayload>
+        }
+        findMany: {
+          args: Prisma.AdminPatientRelationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminPatientRelationPayload>[]
+        }
+        create: {
+          args: Prisma.AdminPatientRelationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminPatientRelationPayload>
+        }
+        createMany: {
+          args: Prisma.AdminPatientRelationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AdminPatientRelationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminPatientRelationPayload>[]
+        }
+        delete: {
+          args: Prisma.AdminPatientRelationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminPatientRelationPayload>
+        }
+        update: {
+          args: Prisma.AdminPatientRelationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminPatientRelationPayload>
+        }
+        deleteMany: {
+          args: Prisma.AdminPatientRelationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AdminPatientRelationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AdminPatientRelationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminPatientRelationPayload>[]
+        }
+        upsert: {
+          args: Prisma.AdminPatientRelationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminPatientRelationPayload>
+        }
+        aggregate: {
+          args: Prisma.AdminPatientRelationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAdminPatientRelation>
+        }
+        groupBy: {
+          args: Prisma.AdminPatientRelationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminPatientRelationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AdminPatientRelationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminPatientRelationCountAggregateOutputType> | number
         }
       }
     }
@@ -1205,6 +1280,7 @@ export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeo
 export const UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  role: 'role',
   queryBaseline: 'queryBaseline',
   profile: 'profile',
   createdAt: 'createdAt',
@@ -1212,6 +1288,16 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const AdminPatientRelationScalarFieldEnum = {
+  id: 'id',
+  adminId: 'adminId',
+  patientId: 'patientId',
+  createdAt: 'createdAt'
+} as const
+
+export type AdminPatientRelationScalarFieldEnum = (typeof AdminPatientRelationScalarFieldEnum)[keyof typeof AdminPatientRelationScalarFieldEnum]
 
 
 export const BaselineScalarFieldEnum = {
@@ -1374,6 +1460,20 @@ export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
  * Reference to a field of type 'String[]'
  */
 export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
+    
+
+
+/**
+ * Reference to a field of type 'UserRole'
+ */
+export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
+    
+
+
+/**
+ * Reference to a field of type 'UserRole[]'
+ */
+export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
     
 
 
@@ -1550,6 +1650,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   account?: Prisma.AccountOmit
   user?: Prisma.UserOmit
+  adminPatientRelation?: Prisma.AdminPatientRelationOmit
   baseline?: Prisma.BaselineOmit
   biometrics?: Prisma.BiometricsOmit
   state?: Prisma.StateOmit
