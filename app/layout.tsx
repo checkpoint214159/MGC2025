@@ -1,6 +1,6 @@
-import Providers from "@/components/Providers"
+import Providers from "@/components/providers/Providers"
 import { cookies } from 'next/headers';
-import { AuthGuard } from '@/components/AuthGuard';
+import { AuthGuard } from '@/components/guards/AuthGuard';
 import React from "react";
 import './globals.css';
 

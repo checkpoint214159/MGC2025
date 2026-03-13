@@ -1,24 +1,16 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
-import { AuthProvider } from "../providers";
 import Sidebar from '@/components/layout/Sidebar'; 
 import { auth } from "@/auth"
-import { redirect } from "next/navigation";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
 
-  if (!session) {
-    redirect("/login"); // Global kick-out for this folder group
-  }
-
   return (
     <div>
-        <Sidebar /> {/* The fixed sidebar */}
-        <main className="ml-16 transition-all duration-300 ease-in-out"> 
-        {/* ml-16 creates space for the collapsed sidebar */}
-        {children}
+        <main className="ml-16 transition-all duration-300 ease-in-out">
+            {children}
         </main>
     </div>
   );

@@ -4,13 +4,6 @@ import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-/**
- * Global guard ensuring user is authenticated.
- * Redirects unauthenticated users to /login.
- * 
- * Onboarding flow is handled separately by OnboardingGuard.
- * Role-based access is handled by AdminGuard.
- */
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -22,7 +15,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (status === "loading") return;
 
-    // Redirect unauthenticated users to login (except on public routes)
     if (status === "unauthenticated" && !isPublicRoute) {
       router.replace("/login");
     }

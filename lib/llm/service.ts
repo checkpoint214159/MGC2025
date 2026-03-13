@@ -79,17 +79,17 @@ export async function getNextLLMQuestion(biometrics: any, thread: Thread, baseli
         or if you have reached the last question, you MUST use "terminateQuestioning".
         `,
     });
-    console.log('PROMPT??', `
-        CURRENT QUESTION COUNT: ${questionCount} of 5.
-        User Biometrics: ${JSON.stringify(biometrics)}
-        Conversation History: ${JSON.stringify(thread.messages)}
+    // console.log('PROMPT??', `
+    //     CURRENT QUESTION COUNT: ${questionCount} of 5.
+    //     User Biometrics: ${JSON.stringify(biometrics)}
+    //     Conversation History: ${JSON.stringify(thread.messages)}
         
-        Provide the next logical question in the assessment.
-        If you have enough information to understand their safety and general mobility, 
-        or if you have reached the last question, you MUST use "terminateQuestioning".
-        `,)
-    console.log('system prompt?', SYSTEM_PROMPT)
-    console.log('bio???', biometrics)
-    console.log('nextqnllm', object)
+    //     Provide the next logical question in the assessment.
+    //     If you have enough information to understand their safety and general mobility, 
+    //     or if you have reached the last question, you MUST use "terminateQuestioning".
+    //     `,)
+    // console.log('system prompt?', SYSTEM_PROMPT)
+    // console.log('bio???', biometrics)
+    // console.log('nextqnllm', object)
   return object; 
 }

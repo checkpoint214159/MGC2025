@@ -2,31 +2,25 @@ import { NextResponse } from "next/server";
 const bcrypt = require("bcryptjs");
 import { prisma } from "@/lib/prisma";
 
-// Helper function to determine if an email should be given admin role
+// determine if email is accepted under accepted admin emails
 function isAdminEmail(email: string): boolean {
-  // Check if email is in the ADMIN_EMAILS list from environment
   const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
   if (adminEmails.includes(email.toLowerCase())) {
     return true;
   }
 
-  // Check if email matches one of the admin domains
-  const adminDomains = process.env.ADMIN_EMAIL_DOMAINS?.split(',').map(d => d.trim().toLowerCase()) || [];
-  for (const domain of adminDomains) {
-    if (email.toLowerCase().endsWith(`@${domain}`)) {
-      return true;
-    }
-  }
+//   // Check if email matches one of the admin domains
+//   const adminDomains = process.env.ADMIN_EMAIL_DOMAINS?.split(',').map(d => d.trim().toLowerCase()) || [];
+//   for (const domain of adminDomains) {
+//     if (email.toLowerCase().endsWith(`@${domain}`)) {
+//       return true;
+//     }
+//   }
 
   return false;
 }
 
 export async function POST(request: Request) {
-    /**
-     * Handles validation and posting to database
-     * uses prisma ORM, since I am a db newbie and refuse to learn sql to do allat
-     * better for use case too, since vercel offers it off the shelf
-     */
     try {
         const { email, username, password } = await request.json();
 

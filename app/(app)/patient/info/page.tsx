@@ -23,7 +23,7 @@ import {
 } from "@/lib/actions";
 import { BaselinePage } from "./BaselinePage";
 import { QuestionPage } from "./QuestionPage";
-import ForceOnboardingAction from "@/components/admin/ForceOnboarding";
+import ForceOnboardingAction from "@/components/development/ForceOnboarding";
 import { getQueryBaseline } from "@/lib/user/service";
 
 export default function OnboardingFlow() {

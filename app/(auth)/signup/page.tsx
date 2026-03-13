@@ -1,4 +1,4 @@
-"use client"; // Must be a Client Component to use hooks like useState and signIn
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
