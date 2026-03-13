@@ -141,6 +141,11 @@ export async function compileExternalAction(threadContext: ThreadContext, profil
 
 
 export async function fetchStateAction(date: Date, admin_force: boolean = false) {
+  // server sided fetch state, which checks if state exists and is active for the user,
+  // and if not generates a new one with the appropriate context
+  // note that forcing state generation is an admin thing, otherwise behaviour for client components
+  // to 'ask to generate state' is not supported. That should be handled by server.
+
   return await authenticatedAction(async (userId): Promise<State> => {
     console.log('fetchstate')
     let state = await getActiveState(userId, date);

@@ -64,7 +64,12 @@ These notes are written for any OpenAI/CoPilot/agent that lands in this repo. Th
 
 * **Date logic**: the normalized date is used as a primary key for states.  `getNormalizedAppDate()` (in `lib/date-utils.ts`) returns the current simulated or real date for server‑side logic.
 
-* **Authentication redirection**: `AuthGuard` (client component) checks session status and `doneOnboarding` and pushes users to `/login` or `/info`.  Public routes are defined in `AuthGuard`.
+* **Authentication redirection**: Authentication is managed through specialized guard components (client-side) and server-side checks (layout wrappers). Each guard has a single responsibility:
+  - **AuthGuard** (top-level wrapper) – ensures user is authenticated; redirects unauthenticated users to `/login`. Used in global layout.
+  - **OnboardingGuard** (wraps `/app` routes) – ensures user has completed onboarding; redirects incomplete users to `/info`. Also redirects admins to `/admin` (since patient dashboard is not for admins). Used in `app/(app)/layout.tsx`.
+  - **AdminGuard** (wraps `/admin` routes) – ensures user has admin role; redirects non-admins to `/`. Used in `app/(app)/admin/layout.tsx`.
+  - **Server-side check** (in layout.tsx async components) – uses `await auth()` for initial server-side validation; redirects early if not authenticated.
+  - **Pages are "dumb"** – individual pages (e.g., `page.tsx`) contain no redirect logic; they just render content. All routing decisions are delegated to parent guards/layouts.
 
 ---
 ## Integration Points & External Dependencies
@@ -85,9 +90,96 @@ These notes are written for any OpenAI/CoPilot/agent that lands in this repo. Th
 | LLM schemas | `lib/llm/schemas/*`, `lib/user/baseline.ts` |
 | State generation | `lib/state/service.ts`, `lib/state/services/full.ts` |
 | RAG logic | `lib/rag.ts`, `app/api/chat/route.ts`, `app/api/ingest/route.ts` |
-| Onboarding UI | `app/(onboarding)/info/*`, `components/admin/ForceOnboarding.tsx` |
-| Providers & context | `components/Providers.tsx`, `context/DateContext.tsx` |
+| Onboarding UI | `app/(onboarding)/info/*` |
+| Admin system | `lib/auth-utils.ts`, `components/guards/AdminGuard.tsx`, `app/(app)/admin/*` |
+| Route guards | `components/guards/` (AuthGuard, OnboardingGuard, AdminGuard) |
+| Recovery components | `components/recovery/` (UserDashboard, DashboardRenderer, widgets) |
+| Admin components | `components/admin/` (AdminDashboard, PatientDetailView) |
+| Development tools | `components/development/` (DevDateSwitcher, ForceStateGeneration, ForceOnboarding) |
+| Layout components | `components/layout/` (Sidebar) |
+| Provider wrappers | `components/providers/` (Providers) |
+| UI primitives | `components/ui/` (Button, Card, Input, etc.) |
 | Utilities | `lib/utils.ts`, `lib/date-utils.ts` |
+
+---
+## Admin System (Doctor/Patient Tiers)
+
+MGC2025 supports two user roles: `patient` (default) and `admin` (doctor). Admins can view and manage recovery data for assigned patients.
+
+### Database Schema
+- **UserRole enum**: `patient` or `admin` in `User.role`
+- **AdminPatientRelation** join table: tracks which admin manages which patient
+  - One admin can manage many patients
+  - Patients have back-relation `managedByAdmin` (array of doctor records)
+  - Unique constraint on `(adminId, patientId)` prevents duplicates
+
+### Authentication & Permissions
+- **Role assignment**: on signup, if email is in `ADMIN_EMAILS` env var (comma-separated), user is created with `role='admin'`; otherwise `role='patient'`
+- **JWT strategy**: role is stored in JWT (via callback in `auth.ts`) and DB for performance; JWT is cryptographically signed so client tampering is cryptographically impossible
+- **Permission utilities** in `lib/auth-utils.ts` (all marked `"use server"`):
+  - `requireRole(role)` – throws if session role doesn't match
+  - `requirePatientAccess(userId, targetPatientId)` – allows if user is patient OR admin managing them
+  - `getAdminManagedPatientIds(adminId)` – fetches list of patient IDs for admin
+- **All sensitive actions** in `lib/actions.ts` must call `requireRole()` or `requirePatientAccess()` before querying database
+
+### Frontend Admin UI
+- **AdminGuard** (`components/AdminGuard.tsx`): route guard checking `session.user.role === 'admin'`; redirects non-admins to home page or login
+- **Admin routes** live under `app/(app)/admin/*` and are wrapped with `<AdminGuard>`
+  - `/admin` – dashboard listing all managed patients with search/filter
+  - `/admin/patients/[patientId]` – patient detail view with tabs (Overview, Progress, Threads, Baseline)
+- **Data fetching** uses React Query with proper keys (`['admin', 'patients']`, `['admin', 'patient-details', ...]`); all calls routed through actions which enforce server-side permissions
+
+### Configuration
+Set in `.env.local`:
+```
+ADMIN_EMAILS=doctor@hospital.com,admin@example.com
+```
+
+### Extending Admin Features
+When adding new admin-only actions:
+1. Add action to `lib/actions.ts` and wrap with `authenticatedAction()`
+2. Call `requireRole('admin')` or `requirePatientAccess()` before database access
+3. Return `{ success: boolean; data?: T; error?: string }` following existing pattern
+4. On client, use React Query with admin-scoped keys (e.g., `['admin', 'feature']`)
+5. Protect route with `<AdminGuard>` if user-facing
+
+---
+## Component Architecture
+
+All client-side UI and presentation logic is centralized in `components/` directory with a clear domain-based structure:
+
+### Directory Structure
+```
+components/
+├── ui/                     # Atomic UI primitives (Button, Card, Input, etc.)
+├── guards/                 # Route guards (AuthGuard, OnboardingGuard, AdminGuard)
+├── layout/                 # Site-wide layout wrappers (Sidebar)
+├── recovery/               # Patient recovery dashboard components (UserDashboard, widgets)
+├── admin/                  # Doctor/admin dashboard components (AdminDashboard, PatientDetailView)
+├── development/            # Dev-only tools (DevDateSwitcher, ForceStateGeneration, ForceOnboarding)
+├── providers/              # Root context providers (Providers)
+└── REFACTOR_COMPONENTS.md  # Component organization guidelines
+```
+
+### "Dumb Pages" Pattern
+- **Pages** (`app/**/page.tsx`) are **thin wrappers** that import and render a single component
+- **Components** contain all JSX, hooks, data fetching, and business logic
+- Example:
+  ```tsx
+  // app/(app)/admin/page.tsx — just 3 lines
+  import { AdminDashboard } from "@/components/admin/AdminDashboard";
+  export default function Page() {
+    return <AdminDashboard />;
+  }
+  ```
+
+### Component Organization Rules
+- ✅ Extract components if a page file exceeds 100 lines
+- ✅ Extract components if they're reused in 2+ places
+- ✅ Keep UI primitives (`ui/`) for small, single-responsibility components
+- ✅ Group domain-specific components by feature (recovery/, admin/)
+- ❌ Don't embed complex JSX in page files
+- ❌ Don't put routing logic in components (redirects belong in layouts)
 
 ---
 ## Writing New Code
