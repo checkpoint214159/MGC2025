@@ -3,7 +3,12 @@
 import { auth } from "@/auth";
 import { getActiveState, generateNewState, updateModuleProgress } from "@/lib/state/service";
 import { Biometrics } from "@/lib/user/schema";
-import { setProfile, generateUserProfile, getExistingOnboardingData, deleteOnboardingData, setBiometric, updateThread, generateQueryBaseline, getQueryBaseline, setQueryBaseline, setBaseline, getBaseline, generateBaseline, deleteBiometrics, deleteBaselines, deleteOnboardingThread  } from "@/lib/user/service"
+import { setProfile,
+  getExistingOnboardingData, deleteOnboardingData,
+  setBiometric,
+  updateThread,
+  getQueryBaseline, setQueryBaseline, setBaseline, getBaseline,
+  deleteBiometrics, deleteBaselines, deleteOnboardingThread  } from "@/lib/user/service"
 import { BaseMessage } from "./external/schemas/message";
 import { Thread, ThreadContext } from "@/lib/external/schemas/thread";
 import { prisma } from "./prisma";
@@ -11,6 +16,11 @@ import { compileExternal } from "./external/service";
 import { State } from "./state/schemas/state";
 import { Baseline, QueryBaseline } from "./user/baseline";
 import { requireRole, requirePatientAccess, getAdminManagedPatientIds } from "@/lib/auth-utils";
+import { semanticSearch } from "@/lib/rag/service";
+import { MetadataFilter } from "@/lib/rag/schemas/rag";
+import { selectAndBuildQuery } from "@/lib/rag/rag_query";
+import { generateQueryBaseline, generateBaseline } from "@/lib/onboarding/baselines"
+import { generateUserProfile } from "@/lib/onboarding/profile"
 
 
 // i love functors
@@ -251,5 +261,73 @@ export async function getPatientThreadsForAdminAction(patientId: string) {
     });
 
     return threads;
+  });
+}
+
+
+export async function semanticSearchAction(
+  query: string,
+  options?: {
+    topK?: number;
+    filter?: MetadataFilter;
+    namespace?: string;
+    rerank? : boolean;
+  }
+) {
+  return authenticatedAction(async () => {
+    return await semanticSearch(query, options?.topK, options?.filter, options?.namespace, options?.rerank);
+  });
+}
+
+/**
+ * Advanced semantic search with intelligent query optimization.
+ * Automatically generates optimized search queries based on patient context.
+ *
+ * Uses hybrid strategy:
+ * 1. Attempts to generate context-aware query using LLM (dynamic)
+ * 2. Falls back to template-based query on LLM failure (hardcoded)
+ * 
+ * Useful for: patient-specific recovery guidance, symptom-based searches,
+ * adaptive query generation without manual intervention
+ */
+export async function semanticSearchWithContextAction(
+  queryContext: {
+    surgeryType: string;
+    recoveryWeek: number;
+    biometrics?: Record<string, number>;
+    symptoms?: string[];
+    additionalContext?: string;
+  },
+  options?: {
+    topK?: number;
+    filter?: MetadataFilter;
+    namespace?: string;
+    disableDynamicQuery?: boolean;
+  }
+) {
+  return authenticatedAction(async () => {
+    // Step 1: Intelligently build query (dynamic with fallback to hardcoded)
+    const queryResult = await selectAndBuildQuery(queryContext, {
+      disableDynamic: options?.disableDynamicQuery,
+      devMode: process.env.NODE_ENV === "development",
+    });
+
+    // Step 2: Execute semantic search with the generated query
+    const searchResults = await semanticSearch(
+      queryResult.query,
+      options?.topK,
+      options?.filter,
+      options?.namespace
+    );
+
+    // Step 3: Return enriched response with query metadata
+    return {
+      ...searchResults,
+      queryMetadata: {
+        source: queryResult.source,
+        generatedQuery: queryResult.query,
+        fallbackReason: queryResult.fallbackReason,
+      },
+    };
   });
 }

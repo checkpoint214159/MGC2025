@@ -1,13 +1,12 @@
 "use server"
 
-import { prisma } from "@/lib/prisma";
 import { generateObject } from 'ai';
 import { BaseQuestionSchema, type BaseQuestion } from '@/lib/llm/schemas/base';
 import { Thread } from '@/lib/external/schemas/thread';
 
-import { getModel } from "./model";
-import { Biometrics } from "../user/schema";
-import { Baseline } from "../user/baseline";
+import { getModel } from "@/lib/llm/model";
+import { Biometrics } from "@/lib/user/schema";
+import { Baseline } from "@/lib/user/baseline";
 
 const SYSTEM_PROMPT = `
 ### IDENTITY
