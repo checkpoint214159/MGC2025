@@ -22,7 +22,7 @@ index.upsert_records(
     [
         {
             "_id": "rec1",
-            "chunk_text": "Apples are a great source of dietary fiber, which supports digestion and helps maintain a healthy gut.",
+            "text": "Apples are a great source of dietary fiber, which supports digestion and helps maintain a healthy gut.",
             "category": "digestive system", 
             "other": "metafield"
         },

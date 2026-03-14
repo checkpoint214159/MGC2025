@@ -2,7 +2,7 @@ import { generateUserProfileAction, setProfileAction, updateThreadAction } from 
 import { AssistantMessageSchema, convertMessageToQuestion, convertQuestionToMessage, convertResponseToMessage } from "@/lib/external/schemas/message";
 import { Thread } from "@/lib/external/schemas/thread";
 import { BaseQuestion } from "@/lib/llm/schemas/base";
-import { getInitialLLMQuestion, getNextLLMQuestion } from "@/lib/llm/service";
+import { getInitialLLMQuestion, getNextLLMQuestion } from "@/lib/onboarding/questioning";
 import { Baseline } from "@/lib/user/baseline";
 import { Biometrics } from "@/lib/user/schema";
 import { ensureAction } from "@/lib/utils";

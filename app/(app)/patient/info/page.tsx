@@ -9,7 +9,7 @@ import { Biometrics, BiometricsSchema } from "@/lib/user/schema";
 import { Thread, ThreadSchema } from "@/lib/external/schemas/thread";
 import { AssistantMessageSchema, convertMessageToQuestion, convertQuestionToMessage, convertResponseToMessage } from "@/lib/external/schemas/message";
 import { SubmitBiometricsPage } from "./BiometricsPage";
-import { getInitialLLMQuestion, getNextLLMQuestion } from "@/lib/llm/service";
+import { getInitialLLMQuestion, getNextLLMQuestion } from "@/lib/onboarding/questioning";
 import { Baseline, BaselineSchema, QueryBaselineSchema } from "@/lib/user/baseline";
 import {
   getOnBoardingAction, 

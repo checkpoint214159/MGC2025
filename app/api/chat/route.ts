@@ -1,5 +1,5 @@
 import { streamText, convertToModelMessages } from "ai";
-import { getContext } from "@/lib/rag";
+import { getContext } from "@/lib/rag/service";
 
 export const maxDuration = 30;
 
