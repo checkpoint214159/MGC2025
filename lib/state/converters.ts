@@ -1,7 +1,9 @@
 import { ExercisePlan } from "./schemas/exercise";
 import { NutritionPlan, NutritionChecklist } from "./schemas/nutrition"
+import { SleepPlan } from "./schemas/sleep";
+import { SymptomCheckItem } from "./schemas/symptoms";
 
-export function createInitialProgress(plan: (ExercisePlan | NutritionPlan)[]): any {
+export function createInitialProgress(plan: (ExercisePlan | NutritionPlan | SleepPlan)[]): any {
   return plan.map(part => {
       const rawMetrics = part.data;
 
@@ -33,6 +35,17 @@ export function createInitialProgress(plan: (ExercisePlan | NutritionPlan)[]): a
 
 export function createInitialChecklistState(checklists: NutritionChecklist[]): Record<string, boolean> {
   return Object.fromEntries(checklists.map((cl) => [cl.id, false]));
+}
+
+export function createInitialSymptomPeriods(checklist: SymptomCheckItem[]) {
+  const freshChecklist = checklist.map(item => ({
+    ...item,
+    response: null,
+  }));
+  return {
+    morning: { checklist: structuredClone(freshChecklist), logs: [], completed: false },
+    evening: { checklist: structuredClone(freshChecklist), logs: [], completed: false },
+  };
 }
 
 // /** Extracts the lean Trackable from an Exercise Plan */

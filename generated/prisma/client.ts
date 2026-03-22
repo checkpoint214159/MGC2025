@@ -74,3 +74,23 @@ export type NutritionModule = Prisma.NutritionModuleModel
  * 
  */
 export type NutritionProgress = Prisma.NutritionProgressModel
+/**
+ * Model SleepModule
+ * 
+ */
+export type SleepModule = Prisma.SleepModuleModel
+/**
+ * Model SleepProgress
+ * 
+ */
+export type SleepProgress = Prisma.SleepProgressModel
+/**
+ * Model SymptomModule
+ * 
+ */
+export type SymptomModule = Prisma.SymptomModuleModel
+/**
+ * Model SymptomProgress
+ * 
+ */
+export type SymptomProgress = Prisma.SymptomProgressModel

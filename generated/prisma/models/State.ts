@@ -169,6 +169,8 @@ export type StateWhereInput = {
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   exercise?: Prisma.XOR<Prisma.ExerciseModuleNullableScalarRelationFilter, Prisma.ExerciseModuleWhereInput> | null
   nutrition?: Prisma.XOR<Prisma.NutritionModuleNullableScalarRelationFilter, Prisma.NutritionModuleWhereInput> | null
+  sleep?: Prisma.XOR<Prisma.SleepModuleNullableScalarRelationFilter, Prisma.SleepModuleWhereInput> | null
+  symptoms?: Prisma.XOR<Prisma.SymptomModuleNullableScalarRelationFilter, Prisma.SymptomModuleWhereInput> | null
 }
 
 export type StateOrderByWithRelationInput = {
@@ -178,6 +180,8 @@ export type StateOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   exercise?: Prisma.ExerciseModuleOrderByWithRelationInput
   nutrition?: Prisma.NutritionModuleOrderByWithRelationInput
+  sleep?: Prisma.SleepModuleOrderByWithRelationInput
+  symptoms?: Prisma.SymptomModuleOrderByWithRelationInput
 }
 
 export type StateWhereUniqueInput = Prisma.AtLeast<{
@@ -191,6 +195,8 @@ export type StateWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   exercise?: Prisma.XOR<Prisma.ExerciseModuleNullableScalarRelationFilter, Prisma.ExerciseModuleWhereInput> | null
   nutrition?: Prisma.XOR<Prisma.NutritionModuleNullableScalarRelationFilter, Prisma.NutritionModuleWhereInput> | null
+  sleep?: Prisma.XOR<Prisma.SleepModuleNullableScalarRelationFilter, Prisma.SleepModuleWhereInput> | null
+  symptoms?: Prisma.XOR<Prisma.SymptomModuleNullableScalarRelationFilter, Prisma.SymptomModuleWhereInput> | null
 }, "id" | "userId_dateCreated">
 
 export type StateOrderByWithAggregationInput = {
@@ -217,6 +223,8 @@ export type StateCreateInput = {
   user: Prisma.UserCreateNestedOneWithoutStatesInput
   exercise?: Prisma.ExerciseModuleCreateNestedOneWithoutStateInput
   nutrition?: Prisma.NutritionModuleCreateNestedOneWithoutStateInput
+  sleep?: Prisma.SleepModuleCreateNestedOneWithoutStateInput
+  symptoms?: Prisma.SymptomModuleCreateNestedOneWithoutStateInput
 }
 
 export type StateUncheckedCreateInput = {
@@ -225,6 +233,8 @@ export type StateUncheckedCreateInput = {
   dateCreated?: Date | string
   exercise?: Prisma.ExerciseModuleUncheckedCreateNestedOneWithoutStateInput
   nutrition?: Prisma.NutritionModuleUncheckedCreateNestedOneWithoutStateInput
+  sleep?: Prisma.SleepModuleUncheckedCreateNestedOneWithoutStateInput
+  symptoms?: Prisma.SymptomModuleUncheckedCreateNestedOneWithoutStateInput
 }
 
 export type StateUpdateInput = {
@@ -233,6 +243,8 @@ export type StateUpdateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
   exercise?: Prisma.ExerciseModuleUpdateOneWithoutStateNestedInput
   nutrition?: Prisma.NutritionModuleUpdateOneWithoutStateNestedInput
+  sleep?: Prisma.SleepModuleUpdateOneWithoutStateNestedInput
+  symptoms?: Prisma.SymptomModuleUpdateOneWithoutStateNestedInput
 }
 
 export type StateUncheckedUpdateInput = {
@@ -241,6 +253,8 @@ export type StateUncheckedUpdateInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   exercise?: Prisma.ExerciseModuleUncheckedUpdateOneWithoutStateNestedInput
   nutrition?: Prisma.NutritionModuleUncheckedUpdateOneWithoutStateNestedInput
+  sleep?: Prisma.SleepModuleUncheckedUpdateOneWithoutStateNestedInput
+  symptoms?: Prisma.SymptomModuleUncheckedUpdateOneWithoutStateNestedInput
 }
 
 export type StateCreateManyInput = {
@@ -368,11 +382,41 @@ export type StateUpdateOneRequiredWithoutNutritionNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StateUpdateToOneWithWhereWithoutNutritionInput, Prisma.StateUpdateWithoutNutritionInput>, Prisma.StateUncheckedUpdateWithoutNutritionInput>
 }
 
+export type StateCreateNestedOneWithoutSleepInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutSleepInput, Prisma.StateUncheckedCreateWithoutSleepInput>
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutSleepInput
+  connect?: Prisma.StateWhereUniqueInput
+}
+
+export type StateUpdateOneRequiredWithoutSleepNestedInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutSleepInput, Prisma.StateUncheckedCreateWithoutSleepInput>
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutSleepInput
+  upsert?: Prisma.StateUpsertWithoutSleepInput
+  connect?: Prisma.StateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StateUpdateToOneWithWhereWithoutSleepInput, Prisma.StateUpdateWithoutSleepInput>, Prisma.StateUncheckedUpdateWithoutSleepInput>
+}
+
+export type StateCreateNestedOneWithoutSymptomsInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutSymptomsInput, Prisma.StateUncheckedCreateWithoutSymptomsInput>
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutSymptomsInput
+  connect?: Prisma.StateWhereUniqueInput
+}
+
+export type StateUpdateOneRequiredWithoutSymptomsNestedInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutSymptomsInput, Prisma.StateUncheckedCreateWithoutSymptomsInput>
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutSymptomsInput
+  upsert?: Prisma.StateUpsertWithoutSymptomsInput
+  connect?: Prisma.StateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StateUpdateToOneWithWhereWithoutSymptomsInput, Prisma.StateUpdateWithoutSymptomsInput>, Prisma.StateUncheckedUpdateWithoutSymptomsInput>
+}
+
 export type StateCreateWithoutUserInput = {
   id?: string
   dateCreated?: Date | string
   exercise?: Prisma.ExerciseModuleCreateNestedOneWithoutStateInput
   nutrition?: Prisma.NutritionModuleCreateNestedOneWithoutStateInput
+  sleep?: Prisma.SleepModuleCreateNestedOneWithoutStateInput
+  symptoms?: Prisma.SymptomModuleCreateNestedOneWithoutStateInput
 }
 
 export type StateUncheckedCreateWithoutUserInput = {
@@ -380,6 +424,8 @@ export type StateUncheckedCreateWithoutUserInput = {
   dateCreated?: Date | string
   exercise?: Prisma.ExerciseModuleUncheckedCreateNestedOneWithoutStateInput
   nutrition?: Prisma.NutritionModuleUncheckedCreateNestedOneWithoutStateInput
+  sleep?: Prisma.SleepModuleUncheckedCreateNestedOneWithoutStateInput
+  symptoms?: Prisma.SymptomModuleUncheckedCreateNestedOneWithoutStateInput
 }
 
 export type StateCreateOrConnectWithoutUserInput = {
@@ -422,6 +468,8 @@ export type StateCreateWithoutExerciseInput = {
   dateCreated?: Date | string
   user: Prisma.UserCreateNestedOneWithoutStatesInput
   nutrition?: Prisma.NutritionModuleCreateNestedOneWithoutStateInput
+  sleep?: Prisma.SleepModuleCreateNestedOneWithoutStateInput
+  symptoms?: Prisma.SymptomModuleCreateNestedOneWithoutStateInput
 }
 
 export type StateUncheckedCreateWithoutExerciseInput = {
@@ -429,6 +477,8 @@ export type StateUncheckedCreateWithoutExerciseInput = {
   userId: string
   dateCreated?: Date | string
   nutrition?: Prisma.NutritionModuleUncheckedCreateNestedOneWithoutStateInput
+  sleep?: Prisma.SleepModuleUncheckedCreateNestedOneWithoutStateInput
+  symptoms?: Prisma.SymptomModuleUncheckedCreateNestedOneWithoutStateInput
 }
 
 export type StateCreateOrConnectWithoutExerciseInput = {
@@ -452,6 +502,8 @@ export type StateUpdateWithoutExerciseInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
   nutrition?: Prisma.NutritionModuleUpdateOneWithoutStateNestedInput
+  sleep?: Prisma.SleepModuleUpdateOneWithoutStateNestedInput
+  symptoms?: Prisma.SymptomModuleUpdateOneWithoutStateNestedInput
 }
 
 export type StateUncheckedUpdateWithoutExerciseInput = {
@@ -459,6 +511,8 @@ export type StateUncheckedUpdateWithoutExerciseInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   nutrition?: Prisma.NutritionModuleUncheckedUpdateOneWithoutStateNestedInput
+  sleep?: Prisma.SleepModuleUncheckedUpdateOneWithoutStateNestedInput
+  symptoms?: Prisma.SymptomModuleUncheckedUpdateOneWithoutStateNestedInput
 }
 
 export type StateCreateWithoutNutritionInput = {
@@ -466,6 +520,8 @@ export type StateCreateWithoutNutritionInput = {
   dateCreated?: Date | string
   user: Prisma.UserCreateNestedOneWithoutStatesInput
   exercise?: Prisma.ExerciseModuleCreateNestedOneWithoutStateInput
+  sleep?: Prisma.SleepModuleCreateNestedOneWithoutStateInput
+  symptoms?: Prisma.SymptomModuleCreateNestedOneWithoutStateInput
 }
 
 export type StateUncheckedCreateWithoutNutritionInput = {
@@ -473,6 +529,8 @@ export type StateUncheckedCreateWithoutNutritionInput = {
   userId: string
   dateCreated?: Date | string
   exercise?: Prisma.ExerciseModuleUncheckedCreateNestedOneWithoutStateInput
+  sleep?: Prisma.SleepModuleUncheckedCreateNestedOneWithoutStateInput
+  symptoms?: Prisma.SymptomModuleUncheckedCreateNestedOneWithoutStateInput
 }
 
 export type StateCreateOrConnectWithoutNutritionInput = {
@@ -496,6 +554,8 @@ export type StateUpdateWithoutNutritionInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
   exercise?: Prisma.ExerciseModuleUpdateOneWithoutStateNestedInput
+  sleep?: Prisma.SleepModuleUpdateOneWithoutStateNestedInput
+  symptoms?: Prisma.SymptomModuleUpdateOneWithoutStateNestedInput
 }
 
 export type StateUncheckedUpdateWithoutNutritionInput = {
@@ -503,6 +563,112 @@ export type StateUncheckedUpdateWithoutNutritionInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   exercise?: Prisma.ExerciseModuleUncheckedUpdateOneWithoutStateNestedInput
+  sleep?: Prisma.SleepModuleUncheckedUpdateOneWithoutStateNestedInput
+  symptoms?: Prisma.SymptomModuleUncheckedUpdateOneWithoutStateNestedInput
+}
+
+export type StateCreateWithoutSleepInput = {
+  id?: string
+  dateCreated?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutStatesInput
+  exercise?: Prisma.ExerciseModuleCreateNestedOneWithoutStateInput
+  nutrition?: Prisma.NutritionModuleCreateNestedOneWithoutStateInput
+  symptoms?: Prisma.SymptomModuleCreateNestedOneWithoutStateInput
+}
+
+export type StateUncheckedCreateWithoutSleepInput = {
+  id?: string
+  userId: string
+  dateCreated?: Date | string
+  exercise?: Prisma.ExerciseModuleUncheckedCreateNestedOneWithoutStateInput
+  nutrition?: Prisma.NutritionModuleUncheckedCreateNestedOneWithoutStateInput
+  symptoms?: Prisma.SymptomModuleUncheckedCreateNestedOneWithoutStateInput
+}
+
+export type StateCreateOrConnectWithoutSleepInput = {
+  where: Prisma.StateWhereUniqueInput
+  create: Prisma.XOR<Prisma.StateCreateWithoutSleepInput, Prisma.StateUncheckedCreateWithoutSleepInput>
+}
+
+export type StateUpsertWithoutSleepInput = {
+  update: Prisma.XOR<Prisma.StateUpdateWithoutSleepInput, Prisma.StateUncheckedUpdateWithoutSleepInput>
+  create: Prisma.XOR<Prisma.StateCreateWithoutSleepInput, Prisma.StateUncheckedCreateWithoutSleepInput>
+  where?: Prisma.StateWhereInput
+}
+
+export type StateUpdateToOneWithWhereWithoutSleepInput = {
+  where?: Prisma.StateWhereInput
+  data: Prisma.XOR<Prisma.StateUpdateWithoutSleepInput, Prisma.StateUncheckedUpdateWithoutSleepInput>
+}
+
+export type StateUpdateWithoutSleepInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
+  exercise?: Prisma.ExerciseModuleUpdateOneWithoutStateNestedInput
+  nutrition?: Prisma.NutritionModuleUpdateOneWithoutStateNestedInput
+  symptoms?: Prisma.SymptomModuleUpdateOneWithoutStateNestedInput
+}
+
+export type StateUncheckedUpdateWithoutSleepInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  exercise?: Prisma.ExerciseModuleUncheckedUpdateOneWithoutStateNestedInput
+  nutrition?: Prisma.NutritionModuleUncheckedUpdateOneWithoutStateNestedInput
+  symptoms?: Prisma.SymptomModuleUncheckedUpdateOneWithoutStateNestedInput
+}
+
+export type StateCreateWithoutSymptomsInput = {
+  id?: string
+  dateCreated?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutStatesInput
+  exercise?: Prisma.ExerciseModuleCreateNestedOneWithoutStateInput
+  nutrition?: Prisma.NutritionModuleCreateNestedOneWithoutStateInput
+  sleep?: Prisma.SleepModuleCreateNestedOneWithoutStateInput
+}
+
+export type StateUncheckedCreateWithoutSymptomsInput = {
+  id?: string
+  userId: string
+  dateCreated?: Date | string
+  exercise?: Prisma.ExerciseModuleUncheckedCreateNestedOneWithoutStateInput
+  nutrition?: Prisma.NutritionModuleUncheckedCreateNestedOneWithoutStateInput
+  sleep?: Prisma.SleepModuleUncheckedCreateNestedOneWithoutStateInput
+}
+
+export type StateCreateOrConnectWithoutSymptomsInput = {
+  where: Prisma.StateWhereUniqueInput
+  create: Prisma.XOR<Prisma.StateCreateWithoutSymptomsInput, Prisma.StateUncheckedCreateWithoutSymptomsInput>
+}
+
+export type StateUpsertWithoutSymptomsInput = {
+  update: Prisma.XOR<Prisma.StateUpdateWithoutSymptomsInput, Prisma.StateUncheckedUpdateWithoutSymptomsInput>
+  create: Prisma.XOR<Prisma.StateCreateWithoutSymptomsInput, Prisma.StateUncheckedCreateWithoutSymptomsInput>
+  where?: Prisma.StateWhereInput
+}
+
+export type StateUpdateToOneWithWhereWithoutSymptomsInput = {
+  where?: Prisma.StateWhereInput
+  data: Prisma.XOR<Prisma.StateUpdateWithoutSymptomsInput, Prisma.StateUncheckedUpdateWithoutSymptomsInput>
+}
+
+export type StateUpdateWithoutSymptomsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
+  exercise?: Prisma.ExerciseModuleUpdateOneWithoutStateNestedInput
+  nutrition?: Prisma.NutritionModuleUpdateOneWithoutStateNestedInput
+  sleep?: Prisma.SleepModuleUpdateOneWithoutStateNestedInput
+}
+
+export type StateUncheckedUpdateWithoutSymptomsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  exercise?: Prisma.ExerciseModuleUncheckedUpdateOneWithoutStateNestedInput
+  nutrition?: Prisma.NutritionModuleUncheckedUpdateOneWithoutStateNestedInput
+  sleep?: Prisma.SleepModuleUncheckedUpdateOneWithoutStateNestedInput
 }
 
 export type StateCreateManyUserInput = {
@@ -515,6 +681,8 @@ export type StateUpdateWithoutUserInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   exercise?: Prisma.ExerciseModuleUpdateOneWithoutStateNestedInput
   nutrition?: Prisma.NutritionModuleUpdateOneWithoutStateNestedInput
+  sleep?: Prisma.SleepModuleUpdateOneWithoutStateNestedInput
+  symptoms?: Prisma.SymptomModuleUpdateOneWithoutStateNestedInput
 }
 
 export type StateUncheckedUpdateWithoutUserInput = {
@@ -522,6 +690,8 @@ export type StateUncheckedUpdateWithoutUserInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   exercise?: Prisma.ExerciseModuleUncheckedUpdateOneWithoutStateNestedInput
   nutrition?: Prisma.NutritionModuleUncheckedUpdateOneWithoutStateNestedInput
+  sleep?: Prisma.SleepModuleUncheckedUpdateOneWithoutStateNestedInput
+  symptoms?: Prisma.SymptomModuleUncheckedUpdateOneWithoutStateNestedInput
 }
 
 export type StateUncheckedUpdateManyWithoutUserInput = {
@@ -538,6 +708,8 @@ export type StateSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   exercise?: boolean | Prisma.State$exerciseArgs<ExtArgs>
   nutrition?: boolean | Prisma.State$nutritionArgs<ExtArgs>
+  sleep?: boolean | Prisma.State$sleepArgs<ExtArgs>
+  symptoms?: boolean | Prisma.State$symptomsArgs<ExtArgs>
 }, ExtArgs["result"]["state"]>
 
 export type StateSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -565,6 +737,8 @@ export type StateInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   exercise?: boolean | Prisma.State$exerciseArgs<ExtArgs>
   nutrition?: boolean | Prisma.State$nutritionArgs<ExtArgs>
+  sleep?: boolean | Prisma.State$sleepArgs<ExtArgs>
+  symptoms?: boolean | Prisma.State$symptomsArgs<ExtArgs>
 }
 export type StateIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -579,6 +753,8 @@ export type $StatePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     user: Prisma.$UserPayload<ExtArgs>
     exercise: Prisma.$ExerciseModulePayload<ExtArgs> | null
     nutrition: Prisma.$NutritionModulePayload<ExtArgs> | null
+    sleep: Prisma.$SleepModulePayload<ExtArgs> | null
+    symptoms: Prisma.$SymptomModulePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -981,6 +1157,8 @@ export interface Prisma__StateClient<T, Null = never, ExtArgs extends runtime.Ty
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   exercise<T extends Prisma.State$exerciseArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$exerciseArgs<ExtArgs>>): Prisma.Prisma__ExerciseModuleClient<runtime.Types.Result.GetResult<Prisma.$ExerciseModulePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   nutrition<T extends Prisma.State$nutritionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$nutritionArgs<ExtArgs>>): Prisma.Prisma__NutritionModuleClient<runtime.Types.Result.GetResult<Prisma.$NutritionModulePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  sleep<T extends Prisma.State$sleepArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$sleepArgs<ExtArgs>>): Prisma.Prisma__SleepModuleClient<runtime.Types.Result.GetResult<Prisma.$SleepModulePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  symptoms<T extends Prisma.State$symptomsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$symptomsArgs<ExtArgs>>): Prisma.Prisma__SymptomModuleClient<runtime.Types.Result.GetResult<Prisma.$SymptomModulePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1444,6 +1622,44 @@ export type State$nutritionArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.NutritionModuleInclude<ExtArgs> | null
   where?: Prisma.NutritionModuleWhereInput
+}
+
+/**
+ * State.sleep
+ */
+export type State$sleepArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SleepModule
+   */
+  select?: Prisma.SleepModuleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SleepModule
+   */
+  omit?: Prisma.SleepModuleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SleepModuleInclude<ExtArgs> | null
+  where?: Prisma.SleepModuleWhereInput
+}
+
+/**
+ * State.symptoms
+ */
+export type State$symptomsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SymptomModule
+   */
+  select?: Prisma.SymptomModuleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SymptomModule
+   */
+  omit?: Prisma.SymptomModuleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SymptomModuleInclude<ExtArgs> | null
+  where?: Prisma.SymptomModuleWhereInput
 }
 
 /**

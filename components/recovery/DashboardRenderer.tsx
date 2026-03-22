@@ -1,7 +1,10 @@
-import { redirect } from "next/navigation";
+"use client"
+
 import { State } from "@/lib/state/schemas/state";
 import ExercisePreviewCard from "@/components/ui/ExercisePreviewCard";
 import NutritionPreviewCard from "@/components/ui/NutritionPreviewCard";
+import SleepPreviewCard from "@/components/ui/SleepPreviewCard";
+import SymptomsPreviewCard from "@/components/ui/SymptomsPreviewCard";
 
 export default function DashboardRenderer({ config }: { config: State | null }) {
   if (!config) {
@@ -11,23 +14,23 @@ export default function DashboardRenderer({ config }: { config: State | null }) 
       </div>
     );
   }
-  
+
   return (
-    <div className="grid gap-6">
-      {/* explicitly render for now */}
-      
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {config.exercise && (
-        <ExercisePreviewCard 
-          data={config.exercise} 
-          onClick={() => redirect('/recovery/exercise')} 
-        />
+        <ExercisePreviewCard data={config.exercise} />
       )}
 
       {config.nutrition && (
-        <NutritionPreviewCard 
-          data={config.nutrition} 
-          onClick={() => redirect('/recovery/nutrition')}
-        />
+        <NutritionPreviewCard data={config.nutrition} />
+      )}
+
+      {config.sleep && (
+        <SleepPreviewCard data={config.sleep} />
+      )}
+
+      {config.symptoms && (
+        <SymptomsPreviewCard data={config.symptoms} />
       )}
     </div>
   );

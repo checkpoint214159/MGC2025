@@ -2,6 +2,7 @@
 import { StateBlueprint, StateSchema, State, StateBlueprintSchema } from './schemas/state';
 import { prisma } from "@/lib/prisma";
 import { createInitialProgress, createInitialChecklistState } from "@/lib/state/converters"
+import { createInitialSymptomPeriods } from "@/lib/state/converters";
 import { isDeepStrictEqual } from "util";
 
 const EXAMPLE_WIDGET_OUTPUT: StateBlueprint = {
@@ -92,18 +93,29 @@ const EXAMPLE_WIDGET_OUTPUT: StateBlueprint = {
           }
         }
       ]
+    },
+    "sleep": {
+      "summary": "Aim for 7-8 hours of uninterrupted sleep to support tissue repair.",
+      "plan": [{
+        "id": "sleep-daily",
+        "meta": { "type": "sleep", "name": "Daily Sleep Log" },
+        "data": {
+          "hoursSlept": { "goal": 8, "value": 0, "unit": "hours" },
+          "sleepQuality": { "goal": 8, "value": 0, "unit": "rating" },
+          "disturbances": { "goal": 0, "value": 0, "unit": "count" }
+        }
+      }]
+    },
+    "symptoms": {
+      "summary": "Monitor surgical site and track post-op symptoms.",
+      "emergencyProtocol": "Call your surgeon immediately if fever exceeds 38.5°C or if you notice heavy bleeding.",
+      "checklist": [
+        { "id": "sym-1", "label": "Is the incision site red or leaking?", "critical": true, "response": null },
+        { "id": "sym-2", "label": "Have you had a bowel movement today?", "critical": false, "response": null },
+        { "id": "sym-3", "label": "Any nausea or vomiting?", "critical": false, "response": null }
+      ]
     }
 }
-    // "symptoms": {
-    //   "emergencyProtocol": "Call your surgeon immediately if fever exceeds 38.5°C or if you notice heavy bleeding.",
-    //   "dailyChecks": [
-    //     { "id": "sym-1", "label": "Is the incision site red or leaking?", "critical": true },
-    //     { "id": "sym-2", "label": "Have you had a bowel movement today?", "critical": false },
-    //     { "id": "sym-3", "label": "Rate your pain from 1-10", "critical": false }
-    //   ]
-    // }
-//   }
-// }
 
 const schema = StateSchema
 
@@ -117,7 +129,9 @@ export async function getOrGenerateFullState(userId: string) {
         where: { userId_dateCreated: { userId, dateCreated: today } },
         include: {
             exercise: { include: { progress: true } },
-            nutrition: { include: { progress: true } }
+            nutrition: { include: { progress: true } },
+            sleep: { include: { progress: true } },
+            symptoms: { include: { progress: true } },
         }
     });
 
@@ -128,7 +142,7 @@ export async function getOrGenerateFullState(userId: string) {
     
     const prevRecord = await prisma.state.findUnique({
         where: { userId_dateCreated: { userId, dateCreated: yesterday } },
-        include: { exercise: { include: { progress: true } }, nutrition: { include: { progress: true } } }
+        include: { exercise: { include: { progress: true } }, nutrition: { include: { progress: true } }, sleep: { include: { progress: true } }, symptoms: { include: { progress: true } } }
     });
 
     const [ generatedPlan ] = await LLMGenerateState(prevRecord as any, null, userId);
@@ -163,16 +177,43 @@ export async function getOrGenerateFullState(userId: string) {
                           }
                     }
                 }
-            }
+            },
+            ...(generatedPlan.sleep ? {
+                sleep: {
+                    create: {
+                        summary: generatedPlan.sleep.summary,
+                        plan: generatedPlan.sleep.plan as any,
+                        progress: {
+                            create: {
+                                trackables: createInitialProgress(generatedPlan.sleep.plan)
+                            }
+                        }
+                    }
+                }
+            } : {}),
+            ...(generatedPlan.symptoms ? {
+                symptoms: {
+                    create: {
+                        summary: generatedPlan.symptoms.summary,
+                        emergencyProtocol: generatedPlan.symptoms.emergencyProtocol,
+                        checklist: generatedPlan.symptoms.checklist as any,
+                        progress: {
+                            create: createInitialSymptomPeriods(generatedPlan.symptoms.checklist)
+                        }
+                    }
+                }
+            } : {}),
         },
         include: {
             exercise: { include: { progress: true } },
-            nutrition: { include: { progress: true } }
+            nutrition: { include: { progress: true } },
+            sleep: { include: { progress: true } },
+            symptoms: { include: { progress: true } },
         }
     });
 }
 
-type ModuleType = 'exercise' | 'nutrition';
+type ModuleType = 'exercise' | 'nutrition' | 'sleep';
 
 export async function getModule(userId: string, type: ModuleType) {
   const today = new Date();
@@ -196,6 +237,11 @@ export async function getModule(userId: string, type: ModuleType) {
         where: { stateId: stateRecord.id },
         include: { progress: true }
       });
+    case 'sleep':
+      return await prisma.sleepModule.findUnique({
+        where: { stateId: stateRecord.id },
+        include: { progress: true }
+      });
     default:
       throw new Error(`Unknown module type: ${type}`);
   }
@@ -204,13 +250,14 @@ export async function getModule(userId: string, type: ModuleType) {
 const ProgressActions = {
   exercise: prisma.exerciseProgress,
   nutrition: prisma.nutritionProgress,
+  sleep: prisma.sleepProgress,
 } as const;
 
 
 
 export async function updateModuleProgress(
   moduleId: string,
-  type: 'exercise' | 'nutrition',
+  type: 'exercise' | 'nutrition' | 'sleep',
   updates: { id: string; data: any }[]
 ) {
   const delegateProgress = ProgressActions[type] as any;
@@ -260,12 +307,13 @@ async function LLMGenerateState(in_state: State | null, x: null, userId:string )
   **/
   const outschema = StateBlueprintSchema
   const systemPrompt = `
-    You are a medical recovery expert. Based on the patient's data, 
-    select exactly 2-3 recovery widgets from the available list.
-    
+    You are a medical recovery expert. Based on the patient's data,
+    select recovery widgets from the available list.
+
     Available Widget Types:
     - EXERCISE_TRACKER: For physical movements or PT.
     - NUTRITION_PLAN: For dietary restrictions.
+    - SLEEP_TRACKER: For sleep quality and duration monitoring.
     - SYMPTOM_CHECKER: For tracking pain or red flags.
 
     For NUTRITION_PLAN widgets, prioritize High-Protein targets (1.5g/kg) and Low-Residue diet items.
@@ -281,7 +329,88 @@ async function LLMGenerateState(in_state: State | null, x: null, userId:string )
 //             schema: schema,
 //         });
   const stateBlueprint: StateBlueprint = EXAMPLE_WIDGET_OUTPUT
-    
+
   return [ stateBlueprint ]
+}
+
+export async function getSymptomModule(userId: string) {
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
+  const stateRecord = await prisma.state.findUnique({
+    where: { userId_dateCreated: { userId, dateCreated: today } },
+    select: { id: true }
+  });
+
+  if (!stateRecord) return null;
+
+  return await prisma.symptomModule.findUnique({
+    where: { stateId: stateRecord.id },
+    include: { progress: true }
+  });
+}
+
+export async function updateSymptomChecklist(
+  moduleId: string,
+  period: 'morning' | 'evening',
+  itemId: string,
+  response: boolean
+) {
+  const current = await prisma.symptomProgress.findUnique({
+    where: { moduleId },
+  });
+  if (!current) throw new Error(`Symptom progress for module ${moduleId} not found.`);
+
+  const periodData = current[period] as any;
+  const updatedChecklist = periodData.checklist.map((item: any) =>
+    item.id === itemId ? { ...item, response } : item
+  );
+
+  return await prisma.symptomProgress.update({
+    where: { moduleId },
+    data: {
+      [period]: { ...periodData, checklist: updatedChecklist },
+    },
+  });
+}
+
+export async function addSymptomLog(
+  moduleId: string,
+  period: 'morning' | 'evening',
+  logEntry: { id: string; site: string; description: string; intensity: number; timestamp: string }
+) {
+  const current = await prisma.symptomProgress.findUnique({
+    where: { moduleId },
+  });
+  if (!current) throw new Error(`Symptom progress for module ${moduleId} not found.`);
+
+  const periodData = current[period] as any;
+  const updatedLogs = [...periodData.logs, logEntry];
+
+  return await prisma.symptomProgress.update({
+    where: { moduleId },
+    data: {
+      [period]: { ...periodData, logs: updatedLogs },
+    },
+  });
+}
+
+export async function completeSymptomPeriod(
+  moduleId: string,
+  period: 'morning' | 'evening'
+) {
+  const current = await prisma.symptomProgress.findUnique({
+    where: { moduleId },
+  });
+  if (!current) throw new Error(`Symptom progress for module ${moduleId} not found.`);
+
+  const periodData = current[period] as any;
+
+  return await prisma.symptomProgress.update({
+    where: { moduleId },
+    data: {
+      [period]: { ...periodData, completed: true },
+    },
+  });
 }
 

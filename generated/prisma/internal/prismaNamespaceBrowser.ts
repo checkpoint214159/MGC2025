@@ -57,7 +57,11 @@ export const ModelName = {
   ExerciseModule: 'ExerciseModule',
   ExerciseProgress: 'ExerciseProgress',
   NutritionModule: 'NutritionModule',
-  NutritionProgress: 'NutritionProgress'
+  NutritionProgress: 'NutritionProgress',
+  SleepModule: 'SleepModule',
+  SleepProgress: 'SleepProgress',
+  SymptomModule: 'SymptomModule',
+  SymptomProgress: 'SymptomProgress'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -149,6 +153,47 @@ export const NutritionProgressScalarFieldEnum = {
 } as const
 
 export type NutritionProgressScalarFieldEnum = (typeof NutritionProgressScalarFieldEnum)[keyof typeof NutritionProgressScalarFieldEnum]
+
+
+export const SleepModuleScalarFieldEnum = {
+  id: 'id',
+  stateId: 'stateId',
+  summary: 'summary',
+  plan: 'plan'
+} as const
+
+export type SleepModuleScalarFieldEnum = (typeof SleepModuleScalarFieldEnum)[keyof typeof SleepModuleScalarFieldEnum]
+
+
+export const SleepProgressScalarFieldEnum = {
+  id: 'id',
+  moduleId: 'moduleId',
+  summary: 'summary',
+  trackables: 'trackables'
+} as const
+
+export type SleepProgressScalarFieldEnum = (typeof SleepProgressScalarFieldEnum)[keyof typeof SleepProgressScalarFieldEnum]
+
+
+export const SymptomModuleScalarFieldEnum = {
+  id: 'id',
+  stateId: 'stateId',
+  summary: 'summary',
+  emergencyProtocol: 'emergencyProtocol',
+  checklist: 'checklist'
+} as const
+
+export type SymptomModuleScalarFieldEnum = (typeof SymptomModuleScalarFieldEnum)[keyof typeof SymptomModuleScalarFieldEnum]
+
+
+export const SymptomProgressScalarFieldEnum = {
+  id: 'id',
+  moduleId: 'moduleId',
+  morning: 'morning',
+  evening: 'evening'
+} as const
+
+export type SymptomProgressScalarFieldEnum = (typeof SymptomProgressScalarFieldEnum)[keyof typeof SymptomProgressScalarFieldEnum]
 
 
 export const SortOrder = {

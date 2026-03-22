@@ -41,6 +41,8 @@ model State {
   
   exercise     ExerciseModule?
   nutrition    NutritionModule?
+  sleep        SleepModule?
+  symptoms     SymptomModule?
 
   @@unique([userId, dateCreated])
 }
@@ -83,8 +85,45 @@ model NutritionProgress {
   id          String          @id @default(cuid())
   moduleId    String         @unique
   module      NutritionModule @relation(fields: [moduleId], references: [id])
-  
+
   summary     String?
   trackables  Json
   checklistState Json?
+}
+
+// --- SLEEP ---
+model SleepModule {
+  id       String  @id @default(cuid())
+  stateId  String  @unique
+  state    State   @relation(fields: [stateId], references: [id])
+  summary  String?
+  plan     Json
+  progress SleepProgress?
+}
+
+model SleepProgress {
+  id         String      @id @default(cuid())
+  moduleId   String      @unique
+  module     SleepModule @relation(fields: [moduleId], references: [id])
+  summary    String?
+  trackables Json
+}
+
+// --- SYMPTOMS ---
+model SymptomModule {
+  id                String  @id @default(cuid())
+  stateId           String  @unique
+  state             State   @relation(fields: [stateId], references: [id])
+  summary           String?
+  emergencyProtocol String
+  checklist         Json
+  progress          SymptomProgress?
+}
+
+model SymptomProgress {
+  id       String        @id @default(cuid())
+  moduleId String        @unique
+  module   SymptomModule @relation(fields: [moduleId], references: [id])
+  morning  Json
+  evening  Json
 }

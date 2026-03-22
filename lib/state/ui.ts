@@ -39,3 +39,15 @@ export const NUTRITION_THEMES = {
   default: { icon: "🍽️", color: "text-slate-600", bg: "bg-slate-50" }
 } as const;
 
+export const SLEEP_THEME = {
+  icon: "🌙",
+  color: "text-indigo-600",
+  bg: "bg-indigo-50",
+  barColor: "#6366f1",
+} as const;
+
+export const SYMPTOM_THEMES = {
+  default: { icon: "💓", color: "text-rose-600", bg: "bg-rose-50" },
+  critical: { icon: "🚨", color: "text-red-700", bg: "bg-red-50" },
+} as const;
+

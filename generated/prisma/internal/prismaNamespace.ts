@@ -390,7 +390,11 @@ export const ModelName = {
   ExerciseModule: 'ExerciseModule',
   ExerciseProgress: 'ExerciseProgress',
   NutritionModule: 'NutritionModule',
-  NutritionProgress: 'NutritionProgress'
+  NutritionProgress: 'NutritionProgress',
+  SleepModule: 'SleepModule',
+  SleepProgress: 'SleepProgress',
+  SymptomModule: 'SymptomModule',
+  SymptomProgress: 'SymptomProgress'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -406,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "user" | "state" | "exerciseModule" | "exerciseProgress" | "nutritionModule" | "nutritionProgress"
+    modelProps: "account" | "user" | "state" | "exerciseModule" | "exerciseProgress" | "nutritionModule" | "nutritionProgress" | "sleepModule" | "sleepProgress" | "symptomModule" | "symptomProgress"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -928,6 +932,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SleepModule: {
+      payload: Prisma.$SleepModulePayload<ExtArgs>
+      fields: Prisma.SleepModuleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SleepModuleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepModulePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SleepModuleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepModulePayload>
+        }
+        findFirst: {
+          args: Prisma.SleepModuleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepModulePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SleepModuleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepModulePayload>
+        }
+        findMany: {
+          args: Prisma.SleepModuleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepModulePayload>[]
+        }
+        create: {
+          args: Prisma.SleepModuleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepModulePayload>
+        }
+        createMany: {
+          args: Prisma.SleepModuleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SleepModuleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepModulePayload>[]
+        }
+        delete: {
+          args: Prisma.SleepModuleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepModulePayload>
+        }
+        update: {
+          args: Prisma.SleepModuleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepModulePayload>
+        }
+        deleteMany: {
+          args: Prisma.SleepModuleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SleepModuleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SleepModuleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepModulePayload>[]
+        }
+        upsert: {
+          args: Prisma.SleepModuleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepModulePayload>
+        }
+        aggregate: {
+          args: Prisma.SleepModuleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSleepModule>
+        }
+        groupBy: {
+          args: Prisma.SleepModuleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SleepModuleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SleepModuleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SleepModuleCountAggregateOutputType> | number
+        }
+      }
+    }
+    SleepProgress: {
+      payload: Prisma.$SleepProgressPayload<ExtArgs>
+      fields: Prisma.SleepProgressFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SleepProgressFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepProgressPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SleepProgressFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepProgressPayload>
+        }
+        findFirst: {
+          args: Prisma.SleepProgressFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepProgressPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SleepProgressFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepProgressPayload>
+        }
+        findMany: {
+          args: Prisma.SleepProgressFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepProgressPayload>[]
+        }
+        create: {
+          args: Prisma.SleepProgressCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepProgressPayload>
+        }
+        createMany: {
+          args: Prisma.SleepProgressCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SleepProgressCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepProgressPayload>[]
+        }
+        delete: {
+          args: Prisma.SleepProgressDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepProgressPayload>
+        }
+        update: {
+          args: Prisma.SleepProgressUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepProgressPayload>
+        }
+        deleteMany: {
+          args: Prisma.SleepProgressDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SleepProgressUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SleepProgressUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepProgressPayload>[]
+        }
+        upsert: {
+          args: Prisma.SleepProgressUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SleepProgressPayload>
+        }
+        aggregate: {
+          args: Prisma.SleepProgressAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSleepProgress>
+        }
+        groupBy: {
+          args: Prisma.SleepProgressGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SleepProgressGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SleepProgressCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SleepProgressCountAggregateOutputType> | number
+        }
+      }
+    }
+    SymptomModule: {
+      payload: Prisma.$SymptomModulePayload<ExtArgs>
+      fields: Prisma.SymptomModuleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SymptomModuleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomModulePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SymptomModuleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomModulePayload>
+        }
+        findFirst: {
+          args: Prisma.SymptomModuleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomModulePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SymptomModuleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomModulePayload>
+        }
+        findMany: {
+          args: Prisma.SymptomModuleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomModulePayload>[]
+        }
+        create: {
+          args: Prisma.SymptomModuleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomModulePayload>
+        }
+        createMany: {
+          args: Prisma.SymptomModuleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SymptomModuleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomModulePayload>[]
+        }
+        delete: {
+          args: Prisma.SymptomModuleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomModulePayload>
+        }
+        update: {
+          args: Prisma.SymptomModuleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomModulePayload>
+        }
+        deleteMany: {
+          args: Prisma.SymptomModuleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SymptomModuleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SymptomModuleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomModulePayload>[]
+        }
+        upsert: {
+          args: Prisma.SymptomModuleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomModulePayload>
+        }
+        aggregate: {
+          args: Prisma.SymptomModuleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSymptomModule>
+        }
+        groupBy: {
+          args: Prisma.SymptomModuleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SymptomModuleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SymptomModuleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SymptomModuleCountAggregateOutputType> | number
+        }
+      }
+    }
+    SymptomProgress: {
+      payload: Prisma.$SymptomProgressPayload<ExtArgs>
+      fields: Prisma.SymptomProgressFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SymptomProgressFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomProgressPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SymptomProgressFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomProgressPayload>
+        }
+        findFirst: {
+          args: Prisma.SymptomProgressFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomProgressPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SymptomProgressFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomProgressPayload>
+        }
+        findMany: {
+          args: Prisma.SymptomProgressFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomProgressPayload>[]
+        }
+        create: {
+          args: Prisma.SymptomProgressCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomProgressPayload>
+        }
+        createMany: {
+          args: Prisma.SymptomProgressCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SymptomProgressCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomProgressPayload>[]
+        }
+        delete: {
+          args: Prisma.SymptomProgressDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomProgressPayload>
+        }
+        update: {
+          args: Prisma.SymptomProgressUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomProgressPayload>
+        }
+        deleteMany: {
+          args: Prisma.SymptomProgressDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SymptomProgressUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SymptomProgressUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomProgressPayload>[]
+        }
+        upsert: {
+          args: Prisma.SymptomProgressUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SymptomProgressPayload>
+        }
+        aggregate: {
+          args: Prisma.SymptomProgressAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSymptomProgress>
+        }
+        groupBy: {
+          args: Prisma.SymptomProgressGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SymptomProgressGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SymptomProgressCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SymptomProgressCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1040,6 +1340,47 @@ export const NutritionProgressScalarFieldEnum = {
 } as const
 
 export type NutritionProgressScalarFieldEnum = (typeof NutritionProgressScalarFieldEnum)[keyof typeof NutritionProgressScalarFieldEnum]
+
+
+export const SleepModuleScalarFieldEnum = {
+  id: 'id',
+  stateId: 'stateId',
+  summary: 'summary',
+  plan: 'plan'
+} as const
+
+export type SleepModuleScalarFieldEnum = (typeof SleepModuleScalarFieldEnum)[keyof typeof SleepModuleScalarFieldEnum]
+
+
+export const SleepProgressScalarFieldEnum = {
+  id: 'id',
+  moduleId: 'moduleId',
+  summary: 'summary',
+  trackables: 'trackables'
+} as const
+
+export type SleepProgressScalarFieldEnum = (typeof SleepProgressScalarFieldEnum)[keyof typeof SleepProgressScalarFieldEnum]
+
+
+export const SymptomModuleScalarFieldEnum = {
+  id: 'id',
+  stateId: 'stateId',
+  summary: 'summary',
+  emergencyProtocol: 'emergencyProtocol',
+  checklist: 'checklist'
+} as const
+
+export type SymptomModuleScalarFieldEnum = (typeof SymptomModuleScalarFieldEnum)[keyof typeof SymptomModuleScalarFieldEnum]
+
+
+export const SymptomProgressScalarFieldEnum = {
+  id: 'id',
+  moduleId: 'moduleId',
+  morning: 'morning',
+  evening: 'evening'
+} as const
+
+export type SymptomProgressScalarFieldEnum = (typeof SymptomProgressScalarFieldEnum)[keyof typeof SymptomProgressScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1267,6 +1608,10 @@ export type GlobalOmitConfig = {
   exerciseProgress?: Prisma.ExerciseProgressOmit
   nutritionModule?: Prisma.NutritionModuleOmit
   nutritionProgress?: Prisma.NutritionProgressOmit
+  sleepModule?: Prisma.SleepModuleOmit
+  sleepProgress?: Prisma.SleepProgressOmit
+  symptomModule?: Prisma.SymptomModuleOmit
+  symptomProgress?: Prisma.SymptomProgressOmit
 }
 
 /* Types for Logging */
