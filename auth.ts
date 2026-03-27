@@ -33,26 +33,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     ],
     callbacks: {
         async jwt({ token, user, trigger }) {
+            console.log("[JWT CALLBACK] trigger:", trigger, "token.id:", token?.id);
             if (user) {
                 token.id = user.id;
             }
             
             if (token?.id) {
-                // Fetch user role and admin relations on first login or session update
-                if (!token.role || trigger === "update") {
+                // Fetch user role and admin relations on first login only
+                // doneOnboarding is now always checked fresh in session callback
+                if (!token.role) {
+                    console.log("[JWT CALLBACK] Fetching user data from DB");
                     const dbUser = await prisma.user.findUnique({
                         where: { id: token.id as string },
                         select: {
                             name: true,
                             role: true,
-                            profile: true,
-                            biometric: true,
-                            baseline: true,
-                            threads: {
-                                where: { type: "onboarding" },
-                                include: { messages: { orderBy: { createdAt: 'asc' } } },
-                                take: 1
-                            },
                             adminManagedPatients: {
                                 select: { patientId: true }
                             }
@@ -62,8 +57,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     if (dbUser) {
                         token.name = dbUser.name;
                         token.role = dbUser.role;
-                        token.doneOnboarding = !!dbUser.profile && !!dbUser.biometric
-                            && !!dbUser.baseline && !!dbUser.threads;
                         
                         // If admin, include managed patient IDs
                         if (dbUser.role === 'admin') {
@@ -78,8 +71,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (session.user) {
                 session.user.id = token.id as string;
                 session.user.role = token.role as 'patient' | 'admin';
-                session.user.doneOnboarding = token.doneOnboarding as boolean;
                 session.hasTodayState = token.hasTodayState as boolean;
+                
+                // Always fetch fresh doneOnboarding state from DB
+                // This ensures profile updates from setProfileAction are picked up immediately
+                try {
+                    const dbUser = await prisma.user.findUnique({
+                        where: { id: token.id as string },
+                        select: {
+                            profile: true,
+                            biometric: true,
+                            baseline: true,
+                            threads: {
+                                where: { type: "onboarding" },
+                                take: 1
+                            }
+                        }
+                    });
+                    
+                    if (dbUser) {
+                        session.user.doneOnboarding = !!dbUser.profile && !!dbUser.biometric
+                            && !!dbUser.baseline && !!dbUser.threads;
+                    }
+                } catch (error) {
+                    console.error("[SESSION] Failed to fetch doneOnboarding state:", error);
+                    session.user.doneOnboarding = token.doneOnboarding as boolean;
+                }
                 
                 // Expose admin managed patient IDs if user is admin
                 if (token.role === 'admin' && token.adminManagedPatientIds) {

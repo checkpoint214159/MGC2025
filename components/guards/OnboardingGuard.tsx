@@ -17,12 +17,11 @@ import { useEffect } from "react";
 export function OnboardingGuard({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const router = useRouter();
-    console.log("Onboardingguard running! after going to /")
   useEffect(() => {
     if (status === "loading") return;
 
     if (session && !session.user.doneOnboarding) {
-      router.replace("/user/info");
+      router.replace("/patient/info");
       return;
     }
 

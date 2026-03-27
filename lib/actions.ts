@@ -157,7 +157,6 @@ export async function fetchStateAction(date: Date, admin_force: boolean = false)
   // to 'ask to generate state' is not supported. That should be handled by server.
 
   return await authenticatedAction(async (userId): Promise<State> => {
-    console.log('fetchstate')
     let state = await getActiveState(userId, date);
     if (!state || admin_force) {
       // Get necessary context for generation
@@ -196,10 +195,7 @@ export async function getAdminManagedPatientsAction() {
   });
 }
 
-/**
- * Get full patient details including biometrics, baseline, threads, and latest state.
- * Requires admin role and admin must manage the specified patient.
- */
+
 export async function getPatientDetailsForAdminAction(patientId: string) {
   return authenticatedAction(async (userId) => {
     await requireRole('admin');
@@ -261,6 +257,69 @@ export async function getPatientThreadsForAdminAction(patientId: string) {
     });
 
     return threads;
+  });
+}
+
+/**
+ * Assign (or reassign) a patient to an admin.
+ * Requires admin role. Only available in development mode.
+ * Logs a warning whenever this is called.
+ */
+export async function assignPatientToAdminAction(patientId: string, adminId: string) {
+  if (process.env.NODE_ENV !== "development") {
+    return { success: false, error: "This action is only available in development mode" };
+  }
+
+  return authenticatedAction(async (userId) => {
+    await requireRole("admin");
+
+    // Verify that we're not assigning to a non-existent admin
+    const adminExists = await prisma.user.findUnique({
+      where: { id: adminId },
+    });
+
+    if (!adminExists || adminExists.role !== "admin") {
+      throw new Error("Admin not found or user is not an admin");
+    }
+
+    // Verify patient exists
+    const patientExists = await prisma.user.findUnique({
+      where: { id: patientId },
+    });
+
+    if (!patientExists || patientExists.role !== "patient") {
+      throw new Error("Patient not found or user is not a patient");
+    }
+
+    // Delete existing admin relation if one exists
+    const existing = await prisma.adminPatientRelation.findFirst({
+      where: { patientId },
+    });
+
+    if (existing) {
+      await prisma.adminPatientRelation.delete({
+        where: { id: existing.id },
+      });
+    }
+
+    // Create new relation
+    const relation = await prisma.adminPatientRelation.create({
+      data: {
+        adminId,
+        patientId,
+      },
+      include: {
+        admin: { select: { name: true, id: true } },
+        patient: { select: { name: true, id: true } },
+      },
+    });
+
+    console.warn(
+      `[DEV] ⚠️  Reassigned patient "${relation.patient.name}" (${patientId}) ` +
+      `to admin "${relation.admin.name}" (${adminId})`
+    );
+
+    return relation;
   });
 }
 

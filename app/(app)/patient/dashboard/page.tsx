@@ -12,34 +12,32 @@ import ForceOnboardingAction from "@/components/development/ForceOnboarding";
 import { State } from "@/lib/state/schemas/state";
 
 
-export function UserDashboard() {
+export default function UserDashboard() {
     const { normalizedDate, isSimulated } = useAppDate();
     const { data: session, status } = useSession();
 
-    // Fetch recovery state for the current date
-    let state: State | null = null
-    let isLoading = false;
+    // Fetch recovery state for the current date (moved outside conditional)
+    const { data: state, isLoading: queryLoading } = useQuery({
+        queryKey: ['recoveryState', session?.user?.id, normalizedDate],
+        queryFn: async () => {
+            const response = await fetchStateAction(normalizedDate);
+            return ensureAction(response)
+        },
+        enabled: status === "authenticated" && !!session?.user?.id,
+        staleTime: 1 // Cache data for 5 minutes
+    });
 
     // Render loading state
-    if (status === "loading" || isLoading) {
+    if (status === "loading" || queryLoading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen p-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
                 <h2 className="text-xl font-semibold">Retrieving goodies...</h2>
             </div>
         );
-    } else if (session?.user.doneOnboarding) {
-        const { data: state, isLoading } = useQuery({
-            queryKey: ['recoveryState', session?.user?.id, normalizedDate],
-            queryFn: async () => {
-                const response = await fetchStateAction(normalizedDate);
-                return ensureAction(response)
-            },
-            enabled: status === "authenticated" && !!session?.user?.id,
-            staleTime: 1000 * 60 * 5, // Cache data for 5 minutes
-        });
     }
 
+    console.log("state", state)
     // Render dashboard content
     return (
         <div className="p-8 max-w-5xl mx-auto pb-20">
