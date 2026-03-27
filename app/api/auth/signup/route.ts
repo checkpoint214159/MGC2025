@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 const bcrypt = require("bcryptjs");
 import { prisma } from "@/lib/prisma";
+import { getDevAdminId } from "@/lib/dev/init";
 
 // determine if email is accepted under accepted admin emails
 function isAdminEmail(email: string): boolean {
@@ -65,6 +66,29 @@ export async function POST(request: Request) {
                 account: true
             }
         });
+
+        // Auto-assign patient to dev admin in development mode
+        if (process.env.NODE_ENV === "development" && role === "patient") {
+            const devAdminId = await getDevAdminId();
+            if (devAdminId) {
+                try {
+                    await prisma.adminPatientRelation.create({
+                        data: {
+                            adminId: devAdminId,
+                            patientId: newUser.id,
+                        },
+                    });
+                    console.warn(
+                        `[DEV] ⚠️  Auto-assigned patient "${email}" to dev admin`
+                    );
+                } catch (error: any) {
+                    // Silently ignore if relation already exists
+                    if (error.code !== "P2002") {
+                        console.error("[DEV] Failed to auto-assign patient to dev admin:", error);
+                    }
+                }
+            }
+        }
         
         const accounts = await prisma.account.findMany({
             select: {

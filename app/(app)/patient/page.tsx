@@ -7,6 +7,7 @@ export default async function Page() {
 
   if (session && !session.user.doneOnboarding) {
     redirect("/patient/info");
+  } else {
+    redirect("/patient/dashboard")
   }
-  return <UserDashboard />;
 }

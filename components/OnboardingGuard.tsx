@@ -19,7 +19,7 @@ export async function OnboardingGuard({ children }: { children: React.ReactNode 
 
     // If onboarding not complete, send to onboarding flow
     if (session && !session.user.doneOnboarding) {
-      redirect("/user/info");
+      redirect("/patient/info");
       return;
     }
 

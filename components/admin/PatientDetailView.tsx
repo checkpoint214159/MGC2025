@@ -9,7 +9,7 @@ import { getPatientThreadsForAdminAction } from "@/lib/actions";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ensureAction } from "@/lib/utils";
-import DashboardRenderer from "@/components/recovery/DashboardRenderer";
+import DashboardRenderer from "@/app/(app)/patient/dashboard/DashboardRenderer";
 
 interface PatientDetailViewProps {
   patientId: string;

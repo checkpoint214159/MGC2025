@@ -78,6 +78,7 @@ export function QuestionPage({biometrics, baseline, thread}: QuestionPageProps) 
             try {
                 const {data: profile} = await generateUserProfileAction({ thread: updated, biometrics: biometrics, baseline: baseline });
                 await setProfileAction(profile ?? "");
+                console.log("calling update()")
                 await update(); 
                 router.push('/');
                 return;

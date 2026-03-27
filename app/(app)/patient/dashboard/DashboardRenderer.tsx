@@ -1,12 +1,14 @@
 import { useRouter } from "next/navigation"; // Use router for client-side navigation
+import { usePathname } from "next/navigation";
 import { State } from "@/lib/state/schemas/state";
 import ExercisePreviewCard from "@/components/ui/ExercisePreviewCard";
 import NutritionPreviewCard from "@/components/ui/NutritionPreviewCard";
-import SymptomPreviewCard from "../ui/SymptomsPreviewCard";
-import SleepPreviewCard from "../ui/SleepPreviewCard";
+import SymptomPreviewCard from "@/components/ui/SymptomsPreviewCard";
+import SleepPreviewCard from "@/components/ui/SleepPreviewCard";
 
 export default function DashboardRenderer({ config }: { config: State | null }) {
   const router = useRouter();
+  const pathname = usePathname(); // Current path: /patient/dashboard
 
   if (!config) {
     return (
@@ -30,7 +32,7 @@ export default function DashboardRenderer({ config }: { config: State | null }) 
             <ExercisePreviewCard 
               key={module.id} 
               data={module} 
-              onClick={() => router.push('/recovery/exercise')} 
+              onClick={() => router.push(`${pathname}/recovery/exercise`)} 
             />
           );
         }
@@ -40,7 +42,7 @@ export default function DashboardRenderer({ config }: { config: State | null }) 
             <NutritionPreviewCard 
               key={module.id} 
               data={module} 
-              onClick={() => router.push('/recovery/nutrition')}
+              onClick={() => router.push(`${pathname}/recovery/nutrition`)}
             />
           );
         }
