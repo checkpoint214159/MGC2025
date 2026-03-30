@@ -394,7 +394,8 @@ export const ModelName = {
   Progress: 'Progress',
   External: 'External',
   Thread: 'Thread',
-  Message: 'Message'
+  Message: 'Message',
+  GraphConfig: 'GraphConfig'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -410,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "user" | "adminPatientRelation" | "baseline" | "biometrics" | "state" | "module" | "progress" | "external" | "thread" | "message"
+    modelProps: "account" | "user" | "adminPatientRelation" | "baseline" | "biometrics" | "state" | "module" | "progress" | "external" | "thread" | "message" | "graphConfig"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1228,6 +1229,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    GraphConfig: {
+      payload: Prisma.$GraphConfigPayload<ExtArgs>
+      fields: Prisma.GraphConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GraphConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GraphConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.GraphConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GraphConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphConfigPayload>
+        }
+        findMany: {
+          args: Prisma.GraphConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphConfigPayload>[]
+        }
+        create: {
+          args: Prisma.GraphConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphConfigPayload>
+        }
+        createMany: {
+          args: Prisma.GraphConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GraphConfigCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphConfigPayload>[]
+        }
+        delete: {
+          args: Prisma.GraphConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphConfigPayload>
+        }
+        update: {
+          args: Prisma.GraphConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.GraphConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GraphConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GraphConfigUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphConfigPayload>[]
+        }
+        upsert: {
+          args: Prisma.GraphConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GraphConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.GraphConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGraphConfig>
+        }
+        groupBy: {
+          args: Prisma.GraphConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GraphConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GraphConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GraphConfigCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1393,6 +1468,19 @@ export const MessageScalarFieldEnum = {
 } as const
 
 export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+export const GraphConfigScalarFieldEnum = {
+  graphName: 'graphName',
+  contextWindowDays: 'contextWindowDays',
+  smartFiltering: 'smartFiltering',
+  maxContextTokens: 'maxContextTokens',
+  includeTrajectory: 'includeTrajectory',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GraphConfigScalarFieldEnum = (typeof GraphConfigScalarFieldEnum)[keyof typeof GraphConfigScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1659,6 +1747,7 @@ export type GlobalOmitConfig = {
   external?: Prisma.ExternalOmit
   thread?: Prisma.ThreadOmit
   message?: Prisma.MessageOmit
+  graphConfig?: Prisma.GraphConfigOmit
 }
 
 /* Types for Logging */

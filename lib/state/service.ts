@@ -13,6 +13,7 @@ import { generateObject } from 'ai';
 import { getModel } from '../llm/model';
 import { LLMGenerateState } from './services/full';
 import { getModuleFromState } from '../utils';
+import { stateGenerationGraph } from './graph/graph';
 
 const schema = StateSchema
 
@@ -36,71 +37,41 @@ export async function getActiveState(userId: string, date: Date): Promise<State 
   }
 }
 
-export async function generateNewState(userId: string, date: Date) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    include: { 
-      threads: {
-        include: { messages: true }
-      }
-    }
+/**
+ * generateNewState: Orchestrates daily state generation via LangGraph
+ *
+ * 💡 Refactoring note: This function was previously a monolithic sequence of:
+ *   1. Fetch user + yesterday's state
+ *   2. Compile external context
+ *   3. Call Promise.all to generate all modules in parallel
+ *   4. Save to DB in a transaction
+ *
+ * Now all orchestration is handled by stateGenerationGraph (LangGraph).
+ * This function is a thin wrapper that invokes the graph and returns the result.
+ *
+ * The graph takes care of:
+ *   - load_context: steps 1-2 above
+ *   - dispatch + parallel generate_module: step 3 above
+ *   - save_state: step 4 above
+ */
+export async function generateNewState(userId: string, date: Date): Promise<State> {
+  console.log("generating new state via LangGraph");
+
+  // Invoke the graph with initial inputs.
+  // No thread_id or checkpointer config needed — state generation is one-shot.
+  const result = await stateGenerationGraph.invoke({
+    userId,
+    date,
   });
 
-  if (!user) {
-    throw new Error("User not found"); 
+  if (!result.savedState) {
+    throw new Error(
+      "State generation graph completed without producing a savedState. Graph may have failed silently."
+    );
   }
 
-  const yesterday = new Date(date);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayActive = await getActiveState(userId, yesterday);
-  console.log('generating new state')
-  const causalStateId = yesterdayActive?.id?? null;
-  
-  const {threads, profile} = user
-  const safeProfile = profile ?? "No profile data provided"
-  const result = await compileExternalAction(threads, safeProfile)
-  
-  if (!result.success || !result.data) {
-    throw new Error(result.error || "Failed to compile external context");
-  }
-
-  const x = result.data
-  const generatedPlan = await LLMGenerateState(yesterdayActive, x, userId);
-  console.log('generatedPlan?', generatedPlan)
-  const state = await prisma.$transaction(async (tx) => {
-
-    await tx.state.updateMany({
-      where: { userId, dateCreated: date, isActive: true },
-      data: { isActive: false }
-    });
-
-    return await tx.state.create({
-      data: {
-        userId,
-        dateCreated: date,
-        isActive: true,
-        causalStateId: causalStateId,
-        causalXId: x.id,
-        modules: {
-          create: Object.entries(generatedPlan).map(([type, blueprint]: [string, any]) => ({
-            type,
-            summary: blueprint.summary,
-            plan: blueprint.plan,
-            checklists: blueprint.checklists || [],
-            progress: {
-              create: {
-                trackables: createInitialProgress(blueprint.plan),
-                checklistState: blueprint.checklists ? createInitialChecklistState(blueprint.checklists) : {}
-              }
-            }
-          }))
-        }
-      },
-      include: { modules: { include: { progress: true } } }
-    });
-  });
-
-  return StateSchema.parse(state)
+  console.log("state generation complete via LangGraph");
+  return result.savedState;
 }
 
 

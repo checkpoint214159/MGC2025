@@ -24,7 +24,7 @@ export default function UserDashboard() {
             return ensureAction(response)
         },
         enabled: status === "authenticated" && !!session?.user?.id,
-        staleTime: 1 // Cache data for 5 minutes
+        staleTime: 60 * 5 * 1000 // Cache data for 5 minutes
     });
 
     // Render loading state

@@ -61,7 +61,8 @@ export const ModelName = {
   Progress: 'Progress',
   External: 'External',
   Thread: 'Thread',
-  Message: 'Message'
+  Message: 'Message',
+  GraphConfig: 'GraphConfig'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -206,6 +207,19 @@ export const MessageScalarFieldEnum = {
 } as const
 
 export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+export const GraphConfigScalarFieldEnum = {
+  graphName: 'graphName',
+  contextWindowDays: 'contextWindowDays',
+  smartFiltering: 'smartFiltering',
+  maxContextTokens: 'maxContextTokens',
+  includeTrajectory: 'includeTrajectory',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GraphConfigScalarFieldEnum = (typeof GraphConfigScalarFieldEnum)[keyof typeof GraphConfigScalarFieldEnum]
 
 
 export const SortOrder = {

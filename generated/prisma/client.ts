@@ -94,3 +94,8 @@ export type Thread = Prisma.ThreadModel
  * 
  */
 export type Message = Prisma.MessageModel
+/**
+ * Model GraphConfig
+ * 
+ */
+export type GraphConfig = Prisma.GraphConfigModel

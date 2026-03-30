@@ -157,8 +157,10 @@ export async function fetchStateAction(date: Date, admin_force: boolean = false)
   // to 'ask to generate state' is not supported. That should be handled by server.
 
   return await authenticatedAction(async (userId): Promise<State> => {
+    console.log("[fetchStateAction] 🚀 Starting - userId:", userId, "date:", date, "admin_force:", admin_force);
     let state = await getActiveState(userId, date);
     if (!state || admin_force) {
+      console.log("[fetchStateAction] ⚠️ No state found, calling generateNewState");
       // Get necessary context for generation
       const user = await prisma.user.findUnique({ 
         where: { id: userId }, 
@@ -167,6 +169,9 @@ export async function fetchStateAction(date: Date, admin_force: boolean = false)
       if (!user) throw new Error("User record missing");
 
       state = await generateNewState(userId, date);
+      console.log("[fetchStateAction] ✅ State generated successfully");
+    } else {
+      console.log("[fetchStateAction] ✅ State already exists, returning");
     }
     return state;
   });

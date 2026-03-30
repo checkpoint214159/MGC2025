@@ -181,3 +181,13 @@ model Message {
   thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
+
+model GraphConfig {
+  graphName           String   @id @unique // e.g., "state-generation"
+  contextWindowDays   Int      @default(1)     // 1=yesterday, N=last N days, -1=all
+  smartFiltering      Boolean  @default(false) // Filter states for relevance
+  maxContextTokens    Int      @default(8000)  // Token limit for LLM context
+  includeTrajectory   Boolean  @default(false) // Summary instead of full history
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
