@@ -88,9 +88,9 @@ These notes are written for any OpenAI/CoPilot/agent that lands in this repo. Th
 | Auth & sessions | `auth.ts`, `types/next-auth.d.ts` |
 | Server actions | `lib/actions.ts` |
 | LLM schemas | `lib/llm/schemas/*`, `lib/user/baseline.ts` |
-| State generation | `lib/state/service.ts`, `lib/state/services/full.ts` |
-| RAG logic | `lib/rag.ts`, `app/api/chat/route.ts`, `app/api/ingest/route.ts` |
-| Onboarding UI | `app/(onboarding)/info/*` |
+| State generation | `lib/state/service.ts`, `lib/state/graph/graph.ts` |
+| RAG logic | `lib/rag/service.ts`, `lib/rag/client.ts`, `app/api/chat/route.ts` |
+| Onboarding UI | `app/(app)/patient/info/*` |
 | Admin system | `lib/auth-utils.ts`, `components/guards/AdminGuard.tsx`, `app/(app)/admin/*` |
 | Route guards | `components/guards/` (AuthGuard, OnboardingGuard, AdminGuard) |
 | Recovery components | `components/recovery/` (UserDashboard, DashboardRenderer, widgets) |
@@ -100,6 +100,53 @@ These notes are written for any OpenAI/CoPilot/agent that lands in this repo. Th
 | Provider wrappers | `components/providers/` (Providers) |
 | UI primitives | `components/ui/` (Button, Card, Input, etc.) |
 | Utilities | `lib/utils.ts`, `lib/date-utils.ts` |
+| MCP server | `mcp_server/src/index.ts`, `mcp_server/src/tools/` |
+
+---
+
+## MCP Server (`mcp_server/`)
+
+An MCP (Model Context Protocol) server exposes the app's core capabilities as AI-callable tools.
+It runs as a separate stdio process invoked by Claude Code via `.mcp.json` at the project root.
+
+**Architecture:**
+- Entry point: `mcp_server/src/index.ts`
+- Tool modules: `mcp_server/src/tools/` (patient, planning, rag, context)
+- Shared clients: `mcp_server/src/lib/client.ts` (re-exports `prisma` and Pinecone from parent)
+- Package config: `mcp_server/package.json` (owns `@modelcontextprotocol/sdk`)
+
+**Running the MCP server:**
+```bash
+# Development (run from project root)
+npx tsx mcp_server/src/index.ts
+# or via the package script
+cd mcp_server && npm run dev
+```
+
+**Available tools:**
+| Tool | Description |
+|------|-------------|
+| `get_patient_profile` | Patient demographics, biometrics, baseline, onboarding status |
+| `get_patient_state` | Active recovery state + module progress for a given date |
+| `generate_daily_state` | Trigger LangGraph pipeline to generate today's recovery plan |
+| `update_module_progress` | Mark trackable items as done in a module |
+| `get_patient_states_history` | List historical active states (trajectory review) |
+| `search_guidelines` | Semantic search over Pinecone-indexed hospital guidelines |
+| `get_onboarding_thread` | Retrieve onboarding conversation transcript |
+| `get_compiled_external` | Retrieve frozen External snapshot used in state generation |
+| `list_patient_threads` | List all threads for a patient with message counts |
+
+**Key design constraints:**
+- The MCP server does NOT use Next.js — no `"use server"`, no `auth()`, no `next/headers`
+- `lib/date-utils.ts` uses a dynamic import for `next/headers` so it is safe to import outside Next.js
+- `lib/state/service.ts` has no dependency on `lib/actions.ts` — graph nodes use services directly
+- Path alias `@/` in MCP server source resolves to the project root (via `mcp_server/tsconfig.json` `baseUrl: ".."`)
+- The MCP server inherits `DATABASE_URL` via dotenv in `lib/prisma.ts` (loads `.env.local`)
+
+**Adding a new tool:**
+1. Add the tool definition (name, description, inputSchema, handler) to the relevant file in `mcp_server/src/tools/`
+2. Export it in the file's array (e.g., `patientTools`, `planningTools`)
+3. Restart the MCP server — tools are auto-registered via `allTools` in `src/index.ts`
 
 ---
 ## Admin System (Doctor/Patient Tiers)
