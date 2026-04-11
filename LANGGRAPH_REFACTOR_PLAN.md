@@ -867,7 +867,7 @@ export const StateGenerationAnnotation = Annotation.Root({
   }),
 });
 
-export type StateGenerationState = typeof StateGenerationAnnotation.State;
+export type StateGenerationLangGraphState = typeof StateGenerationAnnotation.State;
 ```
 
 ### 2.3 Nodes — Mapping from Current Functions
@@ -886,11 +886,11 @@ export type StateGenerationState = typeof StateGenerationAnnotation.State;
 
 import { prisma } from "@/lib/prisma";
 import { getActiveState } from "@/lib/state/service"; // existing function, unchanged
-import { StateGenerationState } from "../state";
+import { StateGenerationLangGraphState } from "../state";
 
 // Node: load_context
 // Maps to: the first two awaits in generateNewState() in lib/state/service.ts
-export async function loadContextNode(state: StateGenerationState) {
+export async function loadContextNode(state: StateGenerationLangGraphState) {
   const yesterday = new Date(state.date);
   yesterday.setDate(yesterday.getDate() - 1);
 
@@ -934,11 +934,11 @@ export async function loadContextNode(state: StateGenerationState) {
 import { prisma } from "@/lib/prisma";
 import { compileExternal } from "@/lib/external/service"; // existing function, unchanged
 import { ExternalSchema } from "@/lib/external/schemas/external";
-import { StateGenerationState } from "../state";
+import { StateGenerationLangGraphState } from "../state";
 
 // Node: compile_external
 // Maps to: compileExternalAction() call in generateNewState() in lib/state/service.ts
-export async function compileExternalNode(state: StateGenerationState) {
+export async function compileExternalNode(state: StateGenerationLangGraphState) {
   const user = await prisma.user.findUnique({
     where: { id: state.userId },
     include: { threads: { include: { messages: true } } },
@@ -963,12 +963,12 @@ export async function compileExternalNode(state: StateGenerationState) {
 
 ```typescript
 import { Send } from "@langchain/langgraph";
-import { StateGenerationState } from "../state";
+import { StateGenerationLangGraphState } from "../state";
 
 // This determines which modules to generate.
 // In the future, you could select different modules based on surgery type,
 // day of recovery, or patient progress.
-function getModuleKeysForState(state: StateGenerationState): string[] {
+function getModuleKeysForState(state: StateGenerationLangGraphState): string[] {
   // Could be dynamic: e.g., add 'wound_care' on days 1-3, 'physiotherapy' later
   return ["exercise", "nutrition"];
 }
@@ -977,7 +977,7 @@ function getModuleKeysForState(state: StateGenerationState): string[] {
 // Instead of returning a node name string, it returns an ARRAY of Send objects.
 // LangGraph launches one invocation of "generate_module" per Send — in parallel.
 // Each Send carries its own input payload (not the full graph state).
-export function dispatchModules(state: StateGenerationState): Send[] {
+export function dispatchModules(state: StateGenerationLangGraphState): Send[] {
   const moduleKeys = getModuleKeysForState(state);
 
   return moduleKeys.map(
@@ -1007,7 +1007,7 @@ export function dispatchModules(state: StateGenerationState): Send[] {
 "use server";
 
 import { generateModule } from "@/lib/state/services/modules"; // existing function, unchanged
-import { StateGenerationState } from "../state";
+import { StateGenerationLangGraphState } from "../state";
 
 // The "mini-state" type for each parallel Send invocation
 interface ModuleInput {
@@ -1022,7 +1022,7 @@ interface ModuleInput {
 // This node is called ONCE PER MODULE, in parallel, by the Send fan-out.
 // Each call writes { generatedModules: { [moduleKey]: blueprint } } to state.
 // The reducer on generatedModules merges all modules together.
-export async function generateModuleNode(input: ModuleInput): Promise<Partial<StateGenerationState>> {
+export async function generateModuleNode(input: ModuleInput): Promise<Partial<StateGenerationLangGraphState>> {
   const result = await generateModule(
     input.moduleKey,
     input.profile,
@@ -1053,12 +1053,12 @@ export async function generateModuleNode(input: ModuleInput): Promise<Partial<St
 import { prisma } from "@/lib/prisma";
 import { StateSchema } from "@/lib/state/schemas/state";
 import { createInitialProgress, createInitialChecklistState } from "@/lib/state/converters";
-import { StateGenerationState } from "../state";
+import { StateGenerationLangGraphState } from "../state";
 
 // Node: save_state
 // Maps to: the prisma.$transaction block at the end of generateNewState()
 // Called after ALL generate_module invocations have completed (fan-in).
-export async function saveStateNode(state: StateGenerationState) {
+export async function saveStateNode(state: StateGenerationLangGraphState) {
   const savedState = await prisma.$transaction(async (tx) => {
     // Deactivate any existing state for today
     await tx.state.updateMany({

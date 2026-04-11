@@ -51,12 +51,13 @@ export const StateGenerationAnnotation = Annotation.Root({
     reducer: (_, incoming) => incoming,
   }),
 
-  // --- Per-module outputs (accumulated via Map-Reduce) ---
+  // --- per-module outputs are accumulated via Map-Reduce ---
   // 💡 LangGraph is designed for this use case: each parallel generate_module
   // invocation writes { generatedModules: { [key]: blueprint } }.
   // The merge reducer combines all modules:
   //   exercise → { generatedModules: { exercise: {...} } }
   //   nutrition → { generatedModules: { nutrition: {...} } }
+  // etc etc...
   //   Final → { generatedModules: { exercise: {...}, nutrition: {...} } }
   generatedModules: Annotation<Record<string, any>>({
     default: () => ({}),
@@ -67,8 +68,8 @@ export const StateGenerationAnnotation = Annotation.Root({
   // Written by save_state node
   savedState: Annotation<State | null>({
     default: () => null,
-    reducer: (_, incoming) => incoming,
+    reducer: (_, incoming: State) => incoming,
   }),
 });
 
-export type StateGenerationState = typeof StateGenerationAnnotation.State;
+export type StateGenerationLangGraphState = typeof StateGenerationAnnotation.State;

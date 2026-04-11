@@ -1,5 +1,5 @@
 import { Send } from "@langchain/langgraph";
-import { StateGenerationState } from "../state";
+import { StateGenerationLangGraphState } from "@/lib/state/graph/annotation";
 
 /**
  * Helper: determine which modules should be generated for this state.
@@ -11,7 +11,7 @@ import { StateGenerationState } from "../state";
  *   if (state.date day === 0) return ['wound_care', 'exercise', 'nutrition']
  *   if (state.date day > 5) return ['exercise', 'nutrition', 'physiotherapy']
  */
-function getModuleKeysForState(_state: StateGenerationState): string[] {
+function getModuleKeysForState(_state: StateGenerationLangGraphState): string[] {
   return ["exercise", "nutrition"];
 }
 
@@ -31,7 +31,7 @@ function getModuleKeysForState(_state: StateGenerationState): string[] {
  * After all parallel tasks complete, the graph moves to the next node (fan-in).
  */
 export function dispatchModules(
-  state: StateGenerationState
+  state: StateGenerationLangGraphState
 ): Send[] {
   const moduleKeys = getModuleKeysForState(state);
 

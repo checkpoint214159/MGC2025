@@ -21,6 +21,7 @@ import { MetadataFilter } from "@/lib/rag/schemas/rag";
 import { selectAndBuildQuery } from "@/lib/rag/rag_query";
 import { generateQueryBaseline, generateBaseline } from "@/lib/onboarding/baselines"
 import { generateUserProfile } from "@/lib/onboarding/profile"
+import { getOnboardingState, startOnboarding, resumeOnboarding } from "@/lib/onboarding/service"
 
 
 // i love functors
@@ -111,6 +112,26 @@ export async function generateUserProfileAction({thread, biometrics, baseline}: 
 export async function getOnBoardingAction() {
   return authenticatedAction(async (userId) => {
     return await getExistingOnboardingData(userId);
+  });
+}
+
+// ---- Onboarding graph actions ----
+
+export async function getOnboardingStateAction() {
+  return authenticatedAction(async (userId) => {
+    return await getOnboardingState(userId);
+  });
+}
+
+export async function startOnboardingAction() {
+  return authenticatedAction(async (userId) => {
+    return await startOnboarding(userId);
+  });
+}
+
+export async function resumeOnboardingAction(input: any) {
+  return authenticatedAction(async (userId) => {
+    return await resumeOnboarding(userId, input);
   });
 }
 

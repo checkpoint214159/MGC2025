@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getActiveState } from "@/lib/state/service";
 import { getStateGenerationConfig } from "@/lib/state/graph/config";
-import { StateGenerationState } from "@/lib/state/graph/state";
+import { StateGenerationLangGraphState } from "@/lib/state/graph/annotation";
 
 /**
  * Node: load_context
@@ -23,8 +23,8 @@ import { StateGenerationState } from "@/lib/state/graph/state";
  * - smartFiltering: if true, only include states with significant changes
  */
 export async function loadContextNode(
-  state: StateGenerationState
-): Promise<Partial<StateGenerationState>> {
+  state: StateGenerationLangGraphState
+): Promise<Partial<StateGenerationLangGraphState>> {
   // 📋 Load runtime configuration
   console.log("[loadContextNode] ⏱️ Starting node for userId:", state.userId, "date:", state.date);
   const config = await getStateGenerationConfig();

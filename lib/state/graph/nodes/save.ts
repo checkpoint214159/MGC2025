@@ -4,7 +4,7 @@ import {
   createInitialProgress,
   createInitialChecklistState,
 } from "@/lib/state/converters";
-import { StateGenerationState } from "../state";
+import { StateGenerationLangGraphState } from "@/lib/state/graph/annotation";
 
 /**
  * Node: save_state
@@ -22,8 +22,8 @@ import { StateGenerationState } from "../state";
  * By the time this node runs, state.generatedModules[key] is populated for every key.
  */
 export async function saveStateNode(
-  state: StateGenerationState
-): Promise<Partial<StateGenerationState>> {
+  state: StateGenerationLangGraphState
+): Promise<Partial<StateGenerationLangGraphState>> {
   if (!state.external) {
     throw new Error("External context missing — graph state corrupted");
   }

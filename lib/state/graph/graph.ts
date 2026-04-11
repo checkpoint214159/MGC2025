@@ -1,5 +1,5 @@
 import { StateGraph } from "@langchain/langgraph";
-import { StateGenerationAnnotation } from "./state";
+import { StateGenerationAnnotation } from "./annotation";
 import { loadContextNode } from "./nodes/context";
 import { compileExternalNode } from "./nodes/external";
 import { dispatchModules } from "./nodes/dispatch";

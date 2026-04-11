@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { compileExternal } from "@/lib/external/service";
 import { ExternalSchema } from "@/lib/external/schemas/external";
-import { StateGenerationState } from "../state";
+import { StateGenerationLangGraphState } from "@/lib/state/graph/annotation";
 
 /**
  * Node: compile_external
@@ -19,8 +19,8 @@ import { StateGenerationState } from "../state";
  * before the module generation fan-out.
  */
 export async function compileExternalNode(
-  state: StateGenerationState
-): Promise<Partial<StateGenerationState>> {
+  state: StateGenerationLangGraphState
+): Promise<Partial<StateGenerationLangGraphState>> {
   const user = await prisma.user.findUnique({
     where: { id: state.userId },
     include: { threads: { include: { messages: true } } },

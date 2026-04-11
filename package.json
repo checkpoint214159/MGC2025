@@ -10,6 +10,9 @@
         "seed": "npx tsx scripts/seed-patients.ts",
         "seed:help": "npx tsx scripts/seed-patients.ts --help"
     },
+    "overrides": {
+        "debug": "^4.3.4"
+    },
     "dependencies": {
         "@ai-sdk/deepseek": "^1.0.31",
         "@ai-sdk/react": "^2.0.109",
@@ -17,6 +20,7 @@
         "@langchain/community": "^1.1.2",
         "@langchain/core": "^1.1.11",
         "@langchain/langgraph": "^1.2.6",
+        "@langchain/langgraph-checkpoint-postgres": "^1.0.1",
         "@langchain/openai": "^1.2.1",
         "@langchain/pinecone": "^1.0.1",
         "@langchain/textsplitters": "^1.0.1",
@@ -48,7 +52,7 @@
         "pdf-parse": "^2.4.5",
         "pg": "^8.16.3",
         "pinecone": "^0.1.0",
-        "prisma": "^7.2.0",
+        "prisma": "^6.19.3",
         "react": "19.2.1",
         "react-dom": "19.2.1",
         "shadcn": "^3.6.2",

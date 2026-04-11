@@ -1,5 +1,5 @@
 import { ensureAction } from "@/lib/utils";
-import { updateBiometricsAction } from "@/lib/actions";
+import { updateBiometricsAction, startOnboardingAction } from "@/lib/actions";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Biometrics, BiometricsSchema } from "@/lib/user/schema";
@@ -100,15 +100,17 @@ export function SubmitBiometricsPage() {
 
     async function submitBio(bio: Biometrics) {
         const userId = session?.user?.id!
-        console.log('userId?', userId)
         const updatedBioResult = await updateBiometricsAction(bio)
-        const updatedBio = ensureAction(updatedBioResult)
-        setBiometrics(BiometricsSchema.parse(updatedBio))
-        await queryClient.invalidateQueries({ 
-            queryKey: ['onboarding', userId] 
+        ensureAction(updatedBioResult)
+        setBiometrics(BiometricsSchema.parse(updatedBioResult.data))
+
+        // Kick off the onboarding graph — runs until the first interrupt
+        // (collect_baseline_responses), then returns. Page query re-fetch
+        // will pick up the new phase.
+        await startOnboardingAction()
+        await queryClient.invalidateQueries({
+            queryKey: ['onboarding-state', userId]
         });
-        await update({session})
-        router.refresh()
     }
 
     return <BiometricsForm onComplete = {submitBio} />
