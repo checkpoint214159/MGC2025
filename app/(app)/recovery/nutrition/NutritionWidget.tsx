@@ -1,27 +1,18 @@
-"use client"
+"use client";
 
 import { useState, useMemo } from "react";
+import { Check } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { NutritionPlan } from "@/lib/state/schemas/nutrition";
+
+type Metric = { goal: number; value: number; unit?: string };
+type MetricRecord = Record<string, Metric>;
 import { updateProgressAction } from "@/lib/actions";
 import { NUTRITION_THEMES } from "@/lib/state/ui";
-import { Progress } from "@/components/ui/progress";
-import { Slider } from "@/components/ui/slider";
+import { useCaregiver } from "@/context/CaregiverContext";
+import { Card, Chip, Button, ProgressBar } from "@/components/ui/primitives";
 import { Input } from "@/components/ui/input";
-import { motion, AnimatePresence } from "framer-motion";
-import { Check, Save, Loader2 } from "lucide-react"; // Icons for feedback
-
-  const getProgressBarColor = (progress: number) => {
-    if (progress < 50) return "#ef4444"; // red-500
-    if (progress < 80) return "#f59e0b"; // amber-500
-    return "#22c55e"; // green-500
-  };
-
-interface NutrientRowProps {
-  label: string;
-  metric: any;
-  value: number;
-  onUpdate: (val: number) => void;
-}
+import { Slider } from "@/components/ui/slider";
 
 interface Props {
   plan: NutritionPlan;
@@ -29,137 +20,144 @@ interface Props {
   moduleId: string;
 }
 
-function NutrientRow({ label, metric, value, onUpdate }: NutrientRowProps) {
-  const progressPercent = Math.min((value / metric.goal) * 100, 100);
-  console.log('progressPercent', progressPercent)
-  console.log('color?', getProgressBarColor(progressPercent))
-  
-  return (
-    <div className="space-y-3 pb-6 border-b border-slate-50 last:border-0">
-      <div className="flex justify-between items-end">
-        <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</p>
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-black text-slate-900">{value}</span>
-            <span className="text-slate-400 text-xs font-medium">/ {metric.goal} {metric.unit}</span>
-          </div>
-        </div>
-        
-        <Input 
-          type="number"
-          value={value}
-          onChange={(e) => onUpdate(Number(e.target.value))}
-          className="w-20 h-8 text-right font-bold bg-slate-50 border-none focus-visible:ring-1"
-        />
-      </div>
-
-      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-        <Progress 
-          value={progressPercent} 
-          className="h-2"
-          indicatorColor={getProgressBarColor(progressPercent)} 
-        />
-      </div>
-
-      <Slider
-        value={[value]}
-        max={metric.goal * 1.5}
-        step={label.toLowerCase() === 'calories' ? 10 : 1}
-        onValueChange={(vals) => onUpdate(vals[0])}
-        className="py-2"
-      />
-    </div>
-  );
-}
-
-export default function NutritionGroupRenderer({ plan, trackable, moduleId }: Props) {
+export default function NutritionWidget({ plan, trackable, moduleId }: Props) {
   const { meta, data } = plan;
-  const type = (meta.type as keyof typeof NUTRITION_THEMES) || 'default';
+  const type = (meta.type as keyof typeof NUTRITION_THEMES) || "default";
   const theme = NUTRITION_THEMES[type];
+  const { isCaregiver } = useCaregiver();
 
-  const [localValues, setLocalValues] = useState<Record<string, number>>(() => 
-    Object.fromEntries(Object.entries(trackable.data).map(([k, v]: [string, any]) => [k, v.value || 0]))
+  const trkData = trackable.data as MetricRecord;
+  const planData = data as MetricRecord;
+
+  const [localValues, setLocalValues] = useState<Record<string, number>>(() =>
+    Object.fromEntries(Object.entries(trkData).map(([k, v]) => [k, v.value || 0]))
   );
-  
-  const [status, setStatus] = useState<'idle' | 'saving' | 'success'>('idle');
+  const [status, setStatus] = useState<"idle" | "saving" | "success">("idle");
 
-  const hasChanges = useMemo(() => 
-    Object.entries(localValues).some(([k, v]) => v !== (trackable.data as any)[k]?.value),
-    [localValues, trackable.data]
+  const hasChanges = useMemo(
+    () => Object.entries(localValues).some(([k, v]) => v !== trkData[k]?.value),
+    [localValues, trkData]
   );
 
-  const handleUpdate = (key: string, newValue: number) => {
-    setLocalValues(prev => ({ ...prev, [key]: newValue }));
-    if (status === 'success') setStatus('idle');
-  };
+  function handleUpdate(key: string, val: number) {
+    setLocalValues((p) => ({ ...p, [key]: val }));
+    if (status === "success") setStatus("idle");
+  }
 
   async function onSave() {
-    setStatus('saving');
-    const updatedTrackable = Object.fromEntries(
-      Object.entries(trackable.data).map(([k, v]: [string, any]) => [
-        k, { ...v, value: localValues[k] }
-      ])
+    setStatus("saving");
+    const updated = Object.fromEntries(
+      Object.entries(trkData).map(([k, v]) => [k, { ...v, value: localValues[k] }])
     );
-    
     try {
-      await updateProgressAction(moduleId, [{ id: trackable.id, data: updatedTrackable }]);
-      setStatus('success');
-      setTimeout(() => setStatus('idle'), 3000);
-    } catch (e) {
-      setStatus('idle');
+      await updateProgressAction(moduleId, [{ id: trackable.id, data: updated }]);
+      setStatus("success");
+      setTimeout(() => setStatus("idle"), 2500);
+    } catch {
+      setStatus("idle");
     }
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-      {/* Interactive Header */}
-      <div className={`p-4 flex items-center justify-between ${theme.bg} border-b border-slate-100`}>
-        <div className="flex items-center gap-2">
-          <span className="text-xl">{theme.icon}</span>
-          <h3 className="font-bold text-slate-900 capitalize">{meta.type || type}</h3>
+    <Card className="space-y-5">
+      <div className="flex items-start justify-between">
+        <div className="space-y-1.5">
+          <h3 className="text-[17px] font-semibold text-ink capitalize">{meta.type || type}</h3>
+          <Chip className={theme.chipClass}>{theme.label}</Chip>
         </div>
-
-        <motion.button
-          disabled={!hasChanges || status === 'saving'}
-          onClick={onSave}
-          initial={false}
-          animate={{
-            backgroundColor: status === 'success' ? "#22c55e" : hasChanges ? "#0f172a" : "#f1f5f9",
-            color: status === 'success' || hasChanges ? "#ffffff" : "#94a3b8",
-            scale: status === 'saving' ? 0.98 : 1
-          }}
-          className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-shadow hover:shadow-md disabled:shadow-none"
-        >
-          <AnimatePresence mode="wait">
-            {status === 'saving' ? (
-              <motion.div key="saving" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <Loader2 className="w-3 h-3 animate-spin" />
-              </motion.div>
-            ) : status === 'success' ? (
-              <motion.div key="success" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                <Check className="w-3 h-3" />
-              </motion.div>
-            ) : (
-              <motion.div key="save" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <Save className="w-3 h-3" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-          {status === 'success' ? "Saved" : status === 'saving' ? "Saving..." : "Update"}
-        </motion.button>
+        <AnimatePresence mode="wait">
+          {status === "success" ? (
+            <motion.span
+              key="ok"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              className="inline-flex items-center gap-1.5 text-[13px] text-progress font-medium"
+            >
+              <Check size={14} strokeWidth={2.5} /> Saved
+            </motion.span>
+          ) : null}
+        </AnimatePresence>
       </div>
 
-      <div className="p-5 space-y-6">
-        {Object.entries(data).map(([key, metric]) => (
-          <NutrientRow 
+      <div className="space-y-5">
+        {Object.entries(planData).map(([key, metric]) => (
+          <NutrientRow
             key={key}
             label={key}
             metric={metric}
             value={localValues[key]}
-            onUpdate={(val) => handleUpdate(key, val)}
+            onUpdate={(v) => handleUpdate(key, v)}
+            readOnly={isCaregiver}
           />
         ))}
       </div>
+
+      {isCaregiver ? (
+        <p className="border-t border-border pt-3 text-[12px] text-ink-subtle">
+          Caregiver view — read-only.
+        </p>
+      ) : (
+        <div className="flex justify-end pt-2 border-t border-border">
+          <Button
+            variant={hasChanges ? "primary" : "secondary"}
+            disabled={!hasChanges}
+            loading={status === "saving"}
+            onClick={onSave}
+            size="md"
+          >
+            {hasChanges ? "Save progress" : "Saved"}
+          </Button>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function NutrientRow({
+  label,
+  metric,
+  value,
+  onUpdate,
+  readOnly,
+}: {
+  label: string;
+  metric: Metric;
+  value: number;
+  onUpdate: (v: number) => void;
+  readOnly?: boolean;
+}) {
+  return (
+    <div className="space-y-3 pb-5 border-b border-border last:border-0 last:pb-0">
+      <div className="flex items-end justify-between gap-3">
+        <div className="space-y-0.5">
+          <p className="text-[13px] font-medium text-ink-muted capitalize">{label}</p>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-[22px] font-semibold text-ink tabular-nums">{value}</span>
+            <span className="text-[13px] text-ink-subtle">
+              / {metric.goal} {metric.unit}
+            </span>
+          </div>
+        </div>
+        <Input
+          type="number"
+          value={value}
+          onChange={(e) => onUpdate(Number(e.target.value))}
+          disabled={readOnly}
+          className="w-20 h-9 text-right tabular-nums"
+        />
+      </div>
+
+      <ProgressBar value={value} max={metric.goal} tone="progress" size="md" />
+
+      <Slider
+        value={[value]}
+        max={Math.max(metric.goal * 1.5, 1)}
+        step={label.toLowerCase() === "calories" ? 10 : 1}
+        onValueChange={(vals) => onUpdate(vals[0])}
+        disabled={readOnly}
+        className="py-1"
+      />
     </div>
   );
 }

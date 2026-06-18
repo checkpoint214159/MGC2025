@@ -1,12 +1,13 @@
-"use client"
+"use client";
 
 import { useState, useMemo } from "react";
-import { ExercisePlan, ExerciseMetrics } from "@/lib/state/schemas/exercise"
-import { updateProgressAction } from "@/lib/actions"
-import { Progress } from "@/components/ui/progress"
-import { motion, AnimatePresence } from "framer-motion";
-import { INTENSITY_THEMES, type Intensity } from "@/lib/state/ui";
-
+import { Minus, Plus, AlertTriangle } from "lucide-react";
+import { motion } from "framer-motion";
+import { ExercisePlan, ExerciseMetrics } from "@/lib/state/schemas/exercise";
+import { updateProgressAction } from "@/lib/actions";
+import { INTENSITY_THEMES } from "@/lib/state/ui";
+import { useCaregiver } from "@/context/CaregiverContext";
+import { Button, Chip, ProgressBar, Card } from "@/components/ui/primitives";
 
 interface RendererProps {
   plan: ExercisePlan;
@@ -15,154 +16,143 @@ interface RendererProps {
   isPreview?: boolean;
 }
 
-
-export default function RecoveryExerciseRenderer({ 
-  plan, 
+export default function RecoveryExerciseRenderer({
+  plan,
   trackable,
   moduleId,
-  isPreview = false 
+  isPreview = false,
 }: RendererProps) {
-  const { id, meta } = plan
-  const { name, intensity, precaution } = meta
-  console.log('plan???', plan)
-  const trackableId = trackable.id
-  const [localValues, setLocalValues] = useState<Record<string, number>>(() => {
-    return Object.fromEntries(
-      Object.entries(trackable.data).map(([key, metric]: [string, ExerciseMetrics]) => [key, metric.value])
-    );
-  });
+  const { meta } = plan;
+  const { name, intensity, precaution } = meta;
+  const theme = INTENSITY_THEMES[intensity as keyof typeof INTENSITY_THEMES] ?? INTENSITY_THEMES.blue;
+  const { isCaregiver } = useCaregiver();
+
+  const trackableId = trackable.id;
+  const [localValues, setLocalValues] = useState<Record<string, number>>(() =>
+    Object.fromEntries(
+      Object.entries(trackable.data).map(([k, m]: [string, ExerciseMetrics]) => [k, m.value])
+    )
+  );
   const [isSaving, setIsSaving] = useState(false);
 
-  const hasChanges = useMemo(() => {
-    return Object.entries(localValues).some(([key, val]) => {
-      const original = (trackable.data as any)[key]?.value || 0;
-      return val !== original;
-    });
-  }, [localValues, trackable.data]);
+  const hasChanges = useMemo(
+    () =>
+      Object.entries(localValues).some(([k, v]) => {
+        const trkData = trackable.data as Record<string, ExerciseMetrics>;
+        return v !== (trkData[k]?.value || 0);
+      }),
+    [localValues, trackable.data]
+  );
 
   async function handleSave() {
-    // save our localValues to a new trackable
     setIsSaving(true);
-
-    const updatedTrackable = Object.fromEntries(
-      Object.entries(trackable.data).map(([key, metric]: [string, ExerciseMetrics]) => [
-        key,
-        { ...metric, value: localValues[key] }  // replace with localValues
+    const updated = Object.fromEntries(
+      Object.entries(trackable.data).map(([k, m]: [string, ExerciseMetrics]) => [
+        k,
+        { ...m, value: localValues[k] },
       ])
     );
-
-    const result = await updateProgressAction(moduleId, [
-      { 
-        id: trackableId, 
-        data: updatedTrackable
-      }
-    ]);
-    
+    const result = await updateProgressAction(moduleId, [{ id: trackableId, data: updated }]);
     if (!result.success) {
-        console.log('error', result.error)
-        alert(`Failed to save progress, with error: ${result.error}`);
+      console.error("Save failed:", result.error);
     }
     setIsSaving(false);
   }
 
-  const intensityMap: Record<string, string> = {
-    blue: "bg-blue-100 text-blue-700 border-blue-200",
-    orange: "bg-orange-100 text-orange-700 border-orange-200",
-    red: "bg-red-100 text-red-700 border-red-200",
-  };
-  const theme = INTENSITY_THEMES[intensity] || INTENSITY_THEMES.blue;
-
-  const getProgressBarColor = (progress: number) => {
-    if (progress < 50) return "#ef4444"; // red-500
-    if (progress < 80) return "#f59e0b"; // amber-500
-    return "#22c55e"; // green-500
-  };
-
   return (
-    <motion.div
-      className={`bg-white p-6 rounded-2xl shadow-sm border ${theme.container} space-y-6`}
-    >
-      {/* Group Header */}
-      <div className="flex justify-between items-start gap-4">
-      <div className="space-y-1">
-        <h3 className="font-bold text-xl text-slate-900 capitalize leading-tight">
-          {name}
-        </h3>
-        
-        {/* Conditional Precaution Rendering */}
+    <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+      <Card className="space-y-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-1.5">
+            <h3 className="text-[17px] font-semibold text-ink capitalize leading-tight">{name}</h3>
+            <Chip
+              tone={intensity === "red" ? "critical" : intensity === "orange" ? "attention" : "accent"}
+              size="sm"
+            >
+              {theme.label}
+            </Chip>
+          </div>
+        </div>
+
         {!isPreview && theme.showPrecaution && precaution && (
-          <div className={`flex items-start gap-2 p-2.5 rounded-lg border border-transparent ${theme.precautionBg} ${theme.precautionText} text-[11px] leading-relaxed animate-in fade-in slide-in-from-top-1`}>
-            <span className="shrink-0">{theme.icon}</span>
-            <p>{precaution}</p>
+          <div className="flex items-start gap-2.5 rounded-md bg-attention-soft/70 px-3 py-2.5 text-[13px] text-attention-ink">
+            <AlertTriangle size={16} strokeWidth={1.75} className="shrink-0 mt-0.5" />
+            <p className="leading-snug">{precaution}</p>
           </div>
         )}
-      </div>
 
-    </div>
-
-      {/* List of Exercises in this Widget */}
-      <div className="space-y-6">
-        {Object.entries(plan.data).map(([key, metric]: [string, ExerciseMetrics]) => {
-          const currentLocal = localValues[key] || 0;
-          const progressPercent = Math.min((currentLocal / metric.goal) * 100, 100);
-
-          return (
-            <div key={key} className="space-y-3">
-              <div className="flex justify-between items-end">
-                <div className="space-y-1">
-                  <p className="text-sm font-semibold text-slate-700 capitalize">{key}</p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-black text-slate-900">{currentLocal}</span>
-                    <span className="text-slate-400 text-xs">/ {metric.goal} {metric.unit}</span>
+        <div className="space-y-5">
+          {Object.entries(plan.data).map(([key, metric]: [string, ExerciseMetrics]) => {
+            const current = localValues[key] || 0;
+            return (
+              <div key={key} className="space-y-2">
+                <div className="flex items-end justify-between">
+                  <div className="space-y-0.5">
+                    <p className="text-[13px] font-medium text-ink-muted capitalize">{key}</p>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-[24px] font-semibold text-ink tabular-nums">{current}</span>
+                      <span className="text-[13px] text-ink-subtle">
+                        / {metric.goal} {metric.unit}
+                      </span>
+                    </div>
                   </div>
+
+                  {!isPreview && !isCaregiver && (
+                    <div className="flex items-center gap-1 rounded-md bg-surface-sunken border border-border p-1">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setLocalValues((p) => ({ ...p, [key]: Math.max(0, p[key] - 1) }))
+                        }
+                        className="size-9 rounded grid place-items-center hover:bg-surface text-ink-muted hover:text-ink transition-colors"
+                        aria-label={`Decrease ${key}`}
+                      >
+                        <Minus size={16} strokeWidth={2} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setLocalValues((p) => ({ ...p, [key]: p[key] + 1 }))}
+                        className="size-9 rounded grid place-items-center hover:bg-surface text-ink-muted hover:text-ink transition-colors"
+                        aria-label={`Increase ${key}`}
+                      >
+                        <Plus size={16} strokeWidth={2} />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                {/* Micro-controls for this specific exercise */}
                 {!isPreview && (
-                  <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-lg border border-slate-100">
-                    <button 
-                      onClick={() => setLocalValues(prev => ({ ...prev, [key]: Math.max(0, prev[key] - 1) }))}
-                      className="w-8 h-8 rounded-md bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100 active:scale-90 transition-all text-slate-600"
-                    >-</button>
-                    <button 
-                      onClick={() => setLocalValues(prev => ({ ...prev, [key]: prev[key] + 1 }))}
-                      className="w-8 h-8 rounded-md bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-100 active:scale-90 transition-all text-slate-600"
-                    >+</button>
-                  </div>
+                  <ProgressBar
+                    value={current}
+                    max={metric.goal}
+                    tone="progress"
+                    size="md"
+                  />
                 )}
               </div>
-
-              {/* Individual Progress Bar */}
-              {!isPreview && (
-                <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                  <Progress 
-                    value={progressPercent} 
-                    className="h-2"
-                    indicatorColor={getProgressBarColor(progressPercent)} // Custom prop for dynamic color
-                  />
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Global Save for this Widget */}
-      {!isPreview && (
-        <div className="pt-4 border-t border-slate-100 flex justify-end">
-          <button
-            disabled={!hasChanges || isSaving}
-            onClick={handleSave}
-            className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2
-              ${hasChanges 
-                ? 'bg-slate-900 text-white shadow-lg hover:bg-slate-800' 
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
-          >
-            {isSaving && <div className="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full" />}
-            {hasChanges ? 'Update' : 'Synced'}
-          </button>
+            );
+          })}
         </div>
-      )}
+
+        {!isPreview && !isCaregiver && (
+          <div className="flex justify-end pt-2 border-t border-border">
+            <Button
+              variant={hasChanges ? "primary" : "secondary"}
+              disabled={!hasChanges}
+              loading={isSaving}
+              onClick={handleSave}
+              size="md"
+            >
+              {hasChanges ? "Save progress" : "Saved"}
+            </Button>
+          </div>
+        )}
+        {!isPreview && isCaregiver && (
+          <p className="border-t border-border pt-3 text-[12px] text-ink-subtle">
+            Caregiver view — read-only.
+          </p>
+        )}
+      </Card>
     </motion.div>
   );
 }
