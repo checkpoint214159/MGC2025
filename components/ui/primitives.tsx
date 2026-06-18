@@ -261,7 +261,7 @@ export function NudgeInline({ nudge, onDismiss }: { nudge: Nudge; onDismiss?: ()
           type="button"
           onClick={onDismiss}
           aria-label="Dismiss"
-          className="grid size-8 shrink-0 place-items-center rounded-md text-ink-subtle hover:bg-surface hover:text-ink"
+          className="grid size-11 shrink-0 place-items-center rounded-md text-ink-subtle hover:bg-surface hover:text-ink"
         >
           <X size={16} strokeWidth={1.75} />
         </button>

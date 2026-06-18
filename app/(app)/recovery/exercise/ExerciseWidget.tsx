@@ -148,7 +148,7 @@ export default function RecoveryExerciseRenderer({
           </div>
         )}
         {!isPreview && isCaregiver && (
-          <p className="border-t border-border pt-3 text-[12px] text-ink-subtle">
+          <p className="border-t border-border pt-3 text-[13px] text-ink-muted">
             Caregiver view — read-only.
           </p>
         )}

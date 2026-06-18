@@ -54,7 +54,7 @@ export function ReEngagementCheckIn({
           type="button"
           onClick={onDismiss}
           aria-label="Dismiss check-in"
-          className="grid size-8 shrink-0 place-items-center rounded-md text-ink-subtle hover:bg-surface hover:text-ink"
+          className="grid size-11 shrink-0 place-items-center rounded-md text-ink-subtle hover:bg-surface hover:text-ink"
         >
           <X size={18} strokeWidth={1.75} />
         </button>
