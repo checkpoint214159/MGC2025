@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useCallback, useContext, useSyncExternalStore, ReactNode } from "react";
 
 type CaregiverState = {
   isCaregiver: boolean;
@@ -11,46 +11,66 @@ type CaregiverState = {
 
 const CaregiverCtx = createContext<CaregiverState | null>(null);
 const KEY = "caregiverMode";
+const EVENT = "caregiver-change";
+
+function subscribe(cb: () => void) {
+  window.addEventListener("storage", cb);
+  window.addEventListener(EVENT, cb);
+  return () => {
+    window.removeEventListener("storage", cb);
+    window.removeEventListener(EVENT, cb);
+  };
+}
+
+// Snapshot is the raw string (a stable primitive), so useSyncExternalStore
+// doesn't loop; the object is derived from it during render.
+function getSnapshot(): string | null {
+  try {
+    return localStorage.getItem(KEY);
+  } catch {
+    return null;
+  }
+}
+
+function getServerSnapshot(): string | null {
+  return null;
+}
+
+function parse(raw: string | null): { patientName: string } | null {
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as { patientName: string };
+  } catch {
+    return null;
+  }
+}
 
 export function CaregiverProvider({ children }: { children: ReactNode }) {
-  const [isCaregiver, setIsCaregiver] = useState(false);
-  const [patientName, setPatientName] = useState("");
+  const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const stored = parse(raw);
 
-  useEffect(() => {
+  const enter = useCallback((patientName: string) => {
     try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as { patientName: string };
-        setIsCaregiver(true);
-        setPatientName(parsed.patientName);
-      }
+      localStorage.setItem(KEY, JSON.stringify({ patientName }));
     } catch {
       /* ignore */
     }
+    window.dispatchEvent(new Event(EVENT));
   }, []);
 
-  const enter = (name: string) => {
-    setIsCaregiver(true);
-    setPatientName(name);
-    try {
-      localStorage.setItem(KEY, JSON.stringify({ patientName: name }));
-    } catch {
-      /* ignore */
-    }
-  };
-
-  const exit = () => {
-    setIsCaregiver(false);
-    setPatientName("");
+  const exit = useCallback(() => {
     try {
       localStorage.removeItem(KEY);
     } catch {
       /* ignore */
     }
-  };
+    window.dispatchEvent(new Event(EVENT));
+  }, []);
 
   return (
-    <CaregiverCtx.Provider value={{ isCaregiver, patientName, enter, exit }}>
+    <CaregiverCtx.Provider
+      value={{ isCaregiver: stored !== null, patientName: stored?.patientName ?? "", enter, exit }}
+    >
       {children}
     </CaregiverCtx.Provider>
   );
