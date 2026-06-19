@@ -1,39 +1,33 @@
-// import { Pinecone } from "@pinecone-database/pinecone";
-// import { OpenAIEmbeddings } from "@langchain/openai";
-// import { PineconeStore } from "@langchain/pinecone";
+import { Pinecone } from "@pinecone-database/pinecone";
 
-// // Connect to the specific index
-// function getPineconeClient() {
-//     const apiKey = process.env.PINECONE_API_KEY;
-//     if (!apiKey) {
-//         throw new Error("PINECONE_API_KEY is not set");
-//     }
-//     return new Pinecone({ apiKey });
-// }
+/**
+ * Retrieves the top hospital-guideline chunks relevant to a query from Pinecone,
+ * using the same integrated-inference embedding the plan pipeline uses. Returns an
+ * empty string when Pinecone is not configured so callers can degrade gracefully.
+ */
+export async function getContext(query: string, surgeryType?: string): Promise<string> {
+  const apiKey = process.env.PINECONE_API_KEY;
+  const indexName = process.env.PINECONE_INDEX;
+  if (!apiKey || !indexName) return "";
 
-// // Retrieve relevant chunks based on query and metadata filter
-// export async function getContext(query: string, surgeryType?: string) {
-//     const indexName = process.env.PINECONE_INDEX;
-//     if (!indexName) {
-//         throw new Error("PINECONE_INDEX is not set");
-//     }
+  const pinecone = new Pinecone({ apiKey });
+  const index = pinecone.Index(indexName);
 
-//     const pinecone = getPineconeClient();
-//     const index = pinecone.Index(indexName);
+  const embedding = await pinecone.inference.embed("nvidia-llama-text-embed-v2", [query], {
+    inputType: "query",
+  });
+  const vector = (embedding as unknown as Array<{ values?: number[] }>)[0]?.values;
+  if (!vector) return "";
 
-//     const vectorStore = await PineconeStore.fromExistingIndex(
-//         new OpenAIEmbeddings({
-//             modelName: "text-embedding-3-small", // Dimensions: 1536
-//         }),
-//         { pineconeIndex: index }
-//     );
+  const result = await index.query({
+    vector,
+    topK: 3,
+    includeMetadata: true,
+    ...(surgeryType ? { filter: { surgeryType: { $eq: surgeryType } } } : {}),
+  });
 
-//     // Perform similarity search with optional metadata filtering
-//     // We want finding relevant advice to be strictly filtered by surgery type if possible
-//     // so we don't give ACL advice to a Shoulder patient.
-//     const filter = surgeryType ? { surgeryType: { $eq: surgeryType } } : undefined;
-
-//     const results = await vectorStore.similaritySearch(query, 3, filter);
-
-//     return results.map((doc) => doc.pageContent).join("\n\n");
-// }
+  return (result.matches ?? [])
+    .map((match) => (match.metadata as { text?: string } | undefined)?.text ?? "")
+    .filter(Boolean)
+    .join("\n\n");
+}
