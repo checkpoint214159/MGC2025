@@ -77,6 +77,12 @@ export function PreviewGallery() {
           Dev preview — mock data, no backend. Dev-only route (404s in production).
         </div>
         <h1 className="text-[28px] font-semibold text-ink">Engagement revamp — component preview</h1>
+        <a
+          href="/preview/mgc"
+          className="inline-flex items-center gap-1.5 text-[14px] font-medium text-accent-ink hover:underline"
+        >
+          → MGC mockup: patient dashboard (S4) with the recovery arc
+        </a>
       </header>
 
       <Section label="Today hero — patient mode">
