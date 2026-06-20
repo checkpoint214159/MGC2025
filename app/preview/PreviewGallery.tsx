@@ -6,6 +6,7 @@
  */
 
 import { TodayHero } from "@/components/recovery/TodayHero";
+import { RecoveryArc } from "@/components/recovery/RecoveryArc";
 import { ReEngagementCheckIn } from "@/components/recovery/ReEngagementCheckIn";
 import {
   StreakRing,
@@ -99,6 +100,14 @@ export function PreviewGallery() {
           streak={streak}
           isCaregiver
         />
+      </Section>
+
+      <Section label="Recovery arc — signature motif across phases (day 3 / 12 / 18)">
+        <Card className="space-y-6">
+          <RecoveryArc day={3} />
+          <RecoveryArc day={12} />
+          <RecoveryArc day={18} />
+        </Card>
       </Section>
 
       <Section label="Streak ring — count progression (one bad day forgiven; solid at cap)">

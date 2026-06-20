@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { BadgeCheck, Check, ChevronRight, Sparkles } from "lucide-react";
 import { Card, Chip, StreakRing } from "@/components/ui/primitives";
+import { RecoveryArc } from "./RecoveryArc";
 import { caregiverCopy, type Priority, type Streak } from "@/lib/engagement";
 import { cn } from "@/lib/utils";
 
@@ -22,33 +23,48 @@ export function TodayHero({ name, recoveryDay, phaseLabel, priorities, reviewedB
 
   return (
     <Card variant="hero" className="mb-6">
-      {/* Header row */}
-      <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <Chip tone="accent" size="md">
-              <span className="size-1.5 rounded-full bg-accent" />
-              {recoveryDay !== null ? `Day ${recoveryDay}` : "Getting started"}
-            </Chip>
-            <Chip tone="neutral" size="md">{phaseLabel}</Chip>
-          </div>
-          <h1 className="text-[28px] md:text-[32px] font-semibold text-ink leading-tight">
-            {isCaregiver ? `${copy.heading}.` : `${greeting()}, ${name}.`}
-          </h1>
-          {reviewedBy && (
-            <p className="flex items-center gap-1.5 text-[14px] text-ink-muted">
-              <BadgeCheck size={15} strokeWidth={2} className="shrink-0 text-progress" />
-              <span>
-                Reviewed by <span className="font-medium text-ink">{reviewedBy.name}</span>, {reviewedBy.title}
-              </span>
-            </p>
+      {/* Day anchor + streak — the day is the hero */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-4 md:gap-5">
+          {recoveryDay !== null ? (
+            <div className="leading-none">
+              <div className="text-[12px] font-medium uppercase tracking-wide text-ink-subtle">Day</div>
+              <div className="text-[52px] md:text-[60px] font-bold leading-[0.85] tabular-nums text-ink">
+                {recoveryDay}
+              </div>
+            </div>
+          ) : (
+            <div className="text-[28px] font-semibold text-ink">Getting started</div>
           )}
+          <div className="space-y-1.5 pt-0.5">
+            <Chip tone="accent" size="md">{phaseLabel}</Chip>
+            <h1 className="text-[17px] font-medium text-ink">
+              {isCaregiver ? copy.heading : `${greeting()}, ${name}`}
+            </h1>
+            {reviewedBy && (
+              <p className="flex items-center gap-1.5 text-[14px] text-ink-muted">
+                <BadgeCheck size={15} strokeWidth={2} className="shrink-0 text-progress" />
+                <span>
+                  Reviewed by <span className="font-medium text-ink">{reviewedBy.name}</span>, {reviewedBy.title}
+                </span>
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="rounded-md bg-surface-sunken px-4 py-3">
+        <div className="shrink-0">
           <StreakRing count={streak.count} atCap={streak.atCap} />
         </div>
       </div>
+
+      {/* Recovery arc — the signature motif */}
+      {recoveryDay !== null && (
+        <div className="mt-6">
+          <RecoveryArc day={recoveryDay} />
+        </div>
+      )}
+
+      <div className="my-6 h-px bg-border" />
 
       {/* Priorities */}
       <div className="space-y-1">
