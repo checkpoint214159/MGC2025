@@ -1,41 +1,38 @@
+// Semantic theme map for module sub-types.
+// Colors are CSS tokens (defined in app/globals.css), not raw values.
+
 export const INTENSITY_THEMES = {
   blue: {
-    container: "border-blue-100",
-    badge: "bg-blue-50 text-blue-600 border-blue-200",
-    icon: "✨",
-    precautionBg: "bg-blue-50/50",
-    precautionText: "text-blue-700",
+    chipClass: "bg-accent-soft text-accent-ink",
+    barColor: "var(--accent)",
+    label: "Encouraged",
+    icon: "•",
     showPrecaution: false,
-    barColor: "#3b82f6", // blue-500
   },
   orange: {
-    container: "border-orange-100",
-    badge: "bg-orange-50 text-orange-700 border-orange-200",
-    icon: "⚠️",
-    precautionBg: "bg-orange-50/50",
-    precautionText: "text-orange-800",
+    chipClass: "bg-attention-soft text-attention-ink",
+    barColor: "var(--attention)",
+    label: "Cautious",
+    icon: "!",
     showPrecaution: true,
-    barColor: "#f59e0b", // amber-500
   },
   red: {
-    container: "border-red-100",
-    badge: "bg-red-50 text-red-700 border-red-200",
-    icon: "🛑",
-    precautionBg: "bg-red-50",
-    precautionText: "text-red-900 font-medium",
+    chipClass: "bg-critical-soft text-critical-ink",
+    barColor: "var(--critical)",
+    label: "Pause if pain",
+    icon: "!!",
     showPrecaution: true,
-    barColor: "#ef4444", // red-500
   },
 } as const;
 
 export type Intensity = keyof typeof INTENSITY_THEMES;
 
-
+// Kept as data tags for nutrition sub-categories. No emoji.
 export const NUTRITION_THEMES = {
-  macros: { icon: "🥩", color: "text-orange-600", bg: "bg-orange-50" },
-  minerals: { icon: "🧂", color: "text-blue-600", bg: "bg-blue-50" },
-  vitamins: { icon: "💊", color: "text-purple-600", bg: "bg-purple-50" },
-  hydration: { icon: "💧", color: "text-cyan-600", bg: "bg-cyan-50" },
-  default: { icon: "🍽️", color: "text-slate-600", bg: "bg-slate-50" }
+  macros: { label: "Macros", chipClass: "bg-accent-soft text-accent-ink" },
+  minerals: { label: "Minerals", chipClass: "bg-progress-soft text-progress-ink" },
+  vitamins: { label: "Vitamins", chipClass: "bg-attention-soft text-attention-ink" },
+  hydration: { label: "Hydration", chipClass: "bg-accent-soft text-accent-ink" },
+  fats: { label: "Fats", chipClass: "bg-surface-sunken text-ink-muted" },
+  default: { label: "Other", chipClass: "bg-surface-sunken text-ink-muted" },
 } as const;
-

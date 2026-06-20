@@ -1,55 +1,31 @@
-import { useRouter } from "next/navigation"; // Use router for client-side navigation
+"use client";
+
 import { State } from "@/lib/state/schemas/state";
 import ExercisePreviewCard from "@/components/ui/ExercisePreviewCard";
 import NutritionPreviewCard from "@/components/ui/NutritionPreviewCard";
-import SymptomPreviewCard from "../ui/SymptomsPreviewCard";
-import SleepPreviewCard from "../ui/SleepPreviewCard";
+import { ExerciseModule } from "@/lib/state/schemas/exercise";
+import { NutritionModule } from "@/lib/state/schemas/nutrition";
 
 export default function DashboardRenderer({ config }: { config: State | null }) {
-  const router = useRouter();
-
-  if (!config) {
+  if (!config || config.modules.length === 0) {
     return (
-      <div className="p-6 border-2 border-dashed border-slate-200 rounded-xl text-center">
-        <p className="text-slate-500 italic">No recovery plan found. Please generate one to begin.</p>
+      <div className="rounded-lg border border-dashed border-border bg-surface-sunken/40 p-6">
+        <p className="text-[14px] text-ink-muted">Your plan hasn&apos;t been generated yet.</p>
       </div>
     );
   }
-  
-  return (
-    /* Responsive Grid Logic:
-       - grid-cols-1: Mobile (default)
-       - md:grid-cols-2: Tablets/Laptops
-       - lg:grid-cols-3: Desktop Monitors
-       - items-start: Prevents cards from stretching to match the height of the tallest card
-    */
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-      {config.modules.map((module) => {
-        if (module.type === 'exercise') {
-          return (
-            <ExercisePreviewCard 
-              key={module.id} 
-              data={module} 
-              onClick={() => router.push('/recovery/exercise')} 
-            />
-          );
-        }
 
-        if (module.type === 'nutrition') {
-          return (
-            <NutritionPreviewCard 
-              key={module.id} 
-              data={module} 
-              onClick={() => router.push('/recovery/nutrition')}
-            />
-          );
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {config.modules.map((m) => {
+        if (m.type === "exercise") {
+          return <ExercisePreviewCard key={m.id} data={m as ExerciseModule} />;
+        }
+        if (m.type === "nutrition") {
+          return <NutritionPreviewCard key={m.id} data={m as NutritionModule} />;
         }
         return null;
       })}
-
-      {/* Hardcoded visual modules */}
-      <SymptomPreviewCard data={{}} onClick={() => {}} />
-      <SleepPreviewCard data={{}} onClick={() => {}} />
     </div>
   );
 }
