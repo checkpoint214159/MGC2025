@@ -2,123 +2,108 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
+import { Button } from "@/components/ui/primitives";
+import { AuthShell, Field, authInputClass } from "../AuthShell";
 
 export default function SignUpPage() {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [email, setEmail] = useState("");
-    const [error, setError] = useState("");
-    const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-    const handleSignUp = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError("");
-
-        const response = await fetch("/api/auth/signup", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ 
-                    email, 
-                    password,
-                    username,
-                }),
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-            console.log("Sign up successful:", data);
-            router.push("/login");
-        } else {
-            const errorMessage = data.message || "Sign up failed.";
-            setError(errorMessage);
-        }
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, username }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        router.push("/login");
+      } else {
+        setError(data.message || "Sign up failed. Please try again.");
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const goLogin = () => {
-      router.push("/login")
-    }
+  return (
+    <AuthShell
+      title="Create your account"
+      subtitle="A calm companion for your recovery at home."
+      error={error}
+      footer={
+        <>
+          Already have an account?{" "}
+          <Link href="/login" className="font-medium text-accent-ink hover:underline">
+            Sign in
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSignUp} className="mt-6 space-y-4">
+        <Field label="Name" htmlFor="username">
+          <input
+            id="username"
+            type="text"
+            autoComplete="name"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            className={authInputClass}
+          />
+        </Field>
 
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-2xl">
-                <h2 className="text-3xl font-bold text-center text-blue-600">
-                    Sign Up
-                </h2>
+        <Field label="Email" htmlFor="email">
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className={authInputClass}
+          />
+        </Field>
 
-                {error && (
-                    <p className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-center">
-                        {error}
-                    </p>
-                )}
+        <Field label="Password" htmlFor="password">
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className={`${authInputClass} pr-11`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-1 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded text-ink-subtle hover:text-ink"
+            >
+              {showPassword ? <EyeOff size={18} strokeWidth={1.75} /> : <Eye size={18} strokeWidth={1.75} />}
+            </button>
+          </div>
+        </Field>
 
-                <form onSubmit={handleSignUp} className="space-y-4">
-                    <div>
-                        <label
-                            htmlFor="username"
-                            className="block text-sm font-medium text-gray-700"
-                        >
-                            Username
-                        </label>
-                        <input
-                            id="username"
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label
-                            htmlFor="password"
-                            className="block text-sm font-medium text-gray-700"
-                        >
-                            Password
-                        </label>
-                        <input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label
-                            htmlFor="email"
-                            className="block text-sm font-medium text-gray-700"
-                        >
-                            Email
-                        </label>
-                        <input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                        Sign Up
-                    </button>
-                </form>
-
-                <button
-                    onClick={goLogin}
-                    className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                    Login?
-                </button>
-            </div>
-        </div>
-    );
+        <Button type="submit" variant="primary" size="lg" loading={loading} className="w-full">
+          Create account
+        </Button>
+      </form>
+    </AuthShell>
+  );
 }

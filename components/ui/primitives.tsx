@@ -119,7 +119,7 @@ export function Stat({
 }) {
   return (
     <div className={cn("flex flex-col gap-0.5", className)}>
-      <span className="text-[12px] font-medium text-ink-subtle uppercase tracking-wide">{label}</span>
+      <span className="text-[12px] font-medium text-ink-muted uppercase tracking-wide">{label}</span>
       <span className="text-[20px] font-semibold text-ink leading-tight tabular-nums">{value}</span>
       {hint && <span className="text-[13px] text-ink-muted">{hint}</span>}
     </div>
@@ -158,7 +158,7 @@ export function ProgressBar({
           <span className="text-[13px] text-ink-muted">{label}</span>
           <span className="text-[13px] text-ink tabular-nums">
             {Math.round(value)}
-            <span className="text-ink-subtle"> / {Math.round(max)}</span>
+            <span className="text-ink-muted"> / {Math.round(max)}</span>
           </span>
         </div>
       )}

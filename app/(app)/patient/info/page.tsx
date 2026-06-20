@@ -25,6 +25,7 @@ import { BaselinePage } from "./BaselinePage";
 import { QuestionPage } from "./QuestionPage";
 import ForceOnboardingAction from "@/components/development/ForceOnboarding";
 import { getQueryBaseline } from "@/lib/user/service";
+import { Button } from "@/components/ui/primitives";
 
 export default function OnboardingFlow() {
   const { data: session, status, update } = useSession();
@@ -100,31 +101,27 @@ export default function OnboardingFlow() {
   console.log('baselines?', onboardingData?.baseline)
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen bg-[#f8fafc] p-6 overflow-hidden pt-20">
+    <div className="flex flex-col items-center justify-start min-h-screen p-6 overflow-hidden pt-20">
     {renderStep()}
-    
+
     {process.env.NODE_ENV === 'development' && (
-      <div className="mt-20 p-6 bg-red-50 border-2 border-red-200 rounded-2xl">
-        <h3 className="text-red-800 font-bold mb-4 uppercase tracking-wider text-xs">
-          Admin / Dev Tools
+      <div className="mt-20 rounded-lg border border-attention/30 bg-attention-soft/40 p-5">
+        <h3 className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-attention-ink">
+          Dev tools
         </h3>
-          <div className="flex flex-wrap gap-4">
-            <button
+          <div className="flex flex-wrap gap-2">
+            <Button variant="secondary" size="sm"
               onClick={async() => {await deleteBiometricsAction(); await handleReset()}}>
-              Delete Biometrics
-            </button>
-            <button
+              Delete biometrics
+            </Button>
+            <Button variant="secondary" size="sm"
               onClick={async () => {await deleteBaselinesAction(); await handleReset()}}>
-              Delete Baselines
-            </button>
-            <button
+              Delete baselines
+            </Button>
+            <Button variant="secondary" size="sm"
               onClick={async () => {await deleteOnboardingThreadAction(); await handleReset()}}>
-              Delete Thread
-            </button>
-            {/* <button
-              onClick={async () => {await deleteOnboardingDataAction(); await handleReset()}}>
-              Delete All Onboarding
-            </button> */}
+              Delete thread
+            </Button>
             <ForceOnboardingAction />
         </div>
       </div>
@@ -134,19 +131,3 @@ export default function OnboardingFlow() {
 }
 
 
-function LoadingScreen({ message }: { message: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-      <h2 className="text-xl font-semibold">{message}</h2>
-    </div>
-  );
-}
-
-function LoadingOverlay() {
-  return (
-    <div className="fixed inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-center justify-center">
-       <div className="animate-bounce text-blue-600 font-bold">AI is thinking...</div>
-    </div>
-  );
-}

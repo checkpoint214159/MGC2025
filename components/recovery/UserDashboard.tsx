@@ -98,7 +98,7 @@ export function UserDashboard() {
         <div className="flex items-baseline justify-between mb-3">
           <h2 className="text-[15px] font-semibold text-ink">Full plan for today</h2>
           {isToday && (
-            <span className="text-[12px] text-ink-subtle">
+            <span className="text-[12px] text-ink-muted">
               Updated {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}
             </span>
           )}

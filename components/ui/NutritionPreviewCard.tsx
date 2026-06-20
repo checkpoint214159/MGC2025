@@ -1,57 +1,81 @@
-import { Utensils, Zap, ArrowRight, Flame, Droplets } from "lucide-react";
-import { DashboardCard, CardSlider, CardStat } from "./DashboardUtils";
+"use client";
+
+import { Salad, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { Card, ProgressBar } from "@/components/ui/primitives";
 import { NutritionModule } from "@/lib/state/schemas/nutrition";
 
+export default function NutritionPreviewCard({
+  data,
+  onClick,
+}: {
+  data: NutritionModule;
+  onClick?: () => void;
+}) {
+  type Macro = { goal?: number; value?: number } | undefined;
+  type Macros = Partial<Record<"calories" | "protein" | "carbs" | "fats", Macro>>;
 
-export default function NutritionPreviewCard({ data, onClick }: { data: NutritionModule, onClick: () => void }) {
+  const macrosPlan = data.plan?.find((p) => p.meta?.type === "macros");
+  const macrosProgress = data.progress?.trackables.find((t) => t.id === macrosPlan?.id);
+  const planData = (macrosPlan?.data ?? {}) as Macros;
+  const progData = (macrosProgress?.data ?? {}) as Macros;
 
-  const previewMacros = ['calories', 'fats', 'protein', 'carbs']
-
-  console.log('plan?', data)
-  let macroPlans: Record<string, number> = {}
-  data.plan.map(p => {
-    for (const [k, v] of Object.entries(p.data)) {
-      if (previewMacros.includes(k)) {
-        macroPlans[k] = v.goal
-      } 
-    }
-  })
-
-  let previewMacroVals: Record<string, number> = {} 
-  
-  data.progress?.trackables.map(t  => {
-    for (const [k, v] of Object.entries(t.data)) {
-      if (previewMacros.includes(k)) {
-        previewMacroVals[k] = v.value
-      } 
-    }
-  })
-  console.log('previewMacroVals?', previewMacroVals)
-  console.log('macroPlans?', macroPlans)
+  const cal = { goal: planData.calories?.goal ?? 0, value: progData.calories?.value ?? 0 };
+  const protein = { goal: planData.protein?.goal ?? 0, value: progData.protein?.value ?? 0 };
+  const carbs = { goal: planData.carbs?.goal ?? 0, value: progData.carbs?.value ?? 0 };
+  const fats = { goal: planData.fats?.goal ?? 0, value: progData.fats?.value ?? 0 };
 
   return (
-    <DashboardCard
-    title="Nutrition"
-    icon={Utensils}
-    iconColorClass="bg-orange-100 text-orange-600"
-    accentColorClass="border-l-orange-500"
-    onClick={onClick}
-  >
-    {/* Big Main Slider */}
-    <CardSlider label="Total Calories" current={previewMacroVals.calories} target={macroPlans.calories} colorClass="bg-orange-500" size="lg" />
+    <Link href="/recovery/nutrition" onClick={onClick} className="block focus:outline-none">
+      <Card interactive className="h-full">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="size-9 rounded-md bg-progress-soft text-progress-ink grid place-items-center">
+              <Salad size={18} strokeWidth={1.75} />
+            </div>
+            <div className="leading-tight">
+              <h3 className="text-[17px] font-semibold text-ink">Nutrition</h3>
+              <p className="text-[13px] text-ink-muted">Fueling tissue repair</p>
+            </div>
+          </div>
+          <ChevronRight size={18} className="text-ink-subtle" strokeWidth={1.75} />
+        </div>
 
-    {/* Multiple Small Sliders in a row */}
-    <div className="grid grid-cols-3 gap-4 mt-2">
-      <CardSlider label="Protein" current={previewMacroVals.protein} target={macroPlans.protein} colorClass="bg-blue-500" size="sm" />
-      <CardSlider label="Carbs" current={previewMacroVals.carbs} target={macroPlans.carbs} colorClass="bg-green-500" size="sm" />
-      <CardSlider label="Fats" current={previewMacroVals.fats} target={macroPlans.fats} colorClass="bg-yellow-500" size="sm" />
+        <ProgressBar
+          showLabel
+          label="Calories"
+          value={cal.value}
+          max={Math.max(cal.goal, 1)}
+          tone="progress"
+          size="lg"
+        />
+
+        <div className="grid grid-cols-3 gap-3 mt-4">
+          <MicroMacro label="Protein" value={protein.value} goal={protein.goal} />
+          <MicroMacro label="Carbs" value={carbs.value} goal={carbs.goal} />
+          <MicroMacro label="Fats" value={fats.value} goal={fats.goal} />
+        </div>
+      </Card>
+    </Link>
+  );
+}
+
+function MicroMacro({ label, value, goal }: { label: string; value: number; goal: number }) {
+  const pct = goal > 0 ? Math.min((value / goal) * 100, 100) : 0;
+  return (
+    <div>
+      <div className="flex items-baseline justify-between mb-1">
+        <span className="text-[12px] font-medium text-ink-muted">{label}</span>
+        <span className="text-[12px] text-ink tabular-nums">
+          {Math.round(value)}<span className="text-ink-muted">g</span>
+        </span>
+      </div>
+      <div className="h-1 w-full bg-surface-sunken rounded-full overflow-hidden">
+        <div
+          className="h-full bg-accent rounded-full transition-[width] duration-500 ease-[var(--ease-out-quart)]"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
     </div>
-
-    {/* Random Icon Placement inside the body */}
-    {/* <div className="flex items-center gap-2 pt-2">
-      <CardStat label="Hydration" value="2.1L" icon={Droplets} />
-      <CardStat label="Fiber" value="25g" />
-    </div> */}
-  </DashboardCard>
   );
 }

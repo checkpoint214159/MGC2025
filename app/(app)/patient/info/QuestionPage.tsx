@@ -10,7 +10,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { DynamicQuestionCard, ThinkingCard } from "./QuestionCard"
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 
 interface QuestionPageProps {
@@ -24,8 +24,8 @@ export function QuestionPage({biometrics, baseline, thread}: QuestionPageProps) 
     const [isAiLoading, setIsAiLoading] = useState(false);
     const { data: session, update } = useSession();
     const router = useRouter();
+    const reduce = useReducedMotion();
     const [activeThread, setActiveThread] = useState<Thread | null>(thread);
-    console.log('activeThread?', activeThread)
 
     // question-initing effect
     useEffect(() => {
@@ -50,7 +50,7 @@ export function QuestionPage({biometrics, baseline, thread}: QuestionPageProps) 
         if (!biometrics || !session?.user?.id) return;
         setIsAiLoading(true)
 
-        let currentThread = await makeThread(activeThread);
+        const currentThread = await makeThread(activeThread);
         let nextQn: BaseQuestion
         let updated: Thread
 
@@ -70,7 +70,7 @@ export function QuestionPage({biometrics, baseline, thread}: QuestionPageProps) 
             updated = ensureAction(result)
             nextQn = await getNextLLMQuestion(biometrics, updated, baseline) 
         }
-        const numQuestions = (currentThread?.messages ?? [])
+        const numQuestions = (updated?.messages ?? [])
             .filter(m => m.role === 'assistant').length
         console.log('numQuestions', numQuestions)
 
@@ -109,17 +109,19 @@ export function QuestionPage({biometrics, baseline, thread}: QuestionPageProps) 
     const visibleHistory = history.slice(-2);
 
     return (
-        <div className="flex flex-col items-center justify-start min-h-screen bg-[#f8fafc] p-6 overflow-hidden pt-20">
+        <div className="flex flex-col items-center justify-start min-h-screen p-6 overflow-hidden pt-20">
             <div className="w-full max-w-xl flex flex-col gap-6">
-            {/* progress pips */}
-            <div className="flex gap-2 justify-center px-10 mb-4">
-                {history.map((_, i) => (
-                <motion.div 
-                    key={i} 
-                    layoutId={`pip-${i}`}
-                    className="h-1.5 flex-1 rounded-full bg-blue-600" 
-                />
-                ))}
+            {/* progress */}
+            <div className="space-y-2 mb-2">
+                <p className="text-center text-[13px] text-ink-muted">A few quick questions to personalise your plan</p>
+                <div className="flex gap-1.5 justify-center">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                        key={i}
+                        className={`h-1.5 w-10 rounded-full transition-colors duration-300 ${i < history.length ? "bg-accent" : "bg-surface-sunken"}`}
+                    />
+                    ))}
+                </div>
             </div>
 
         {/* THE SCROLL STACK */}
@@ -130,16 +132,10 @@ export function QuestionPage({biometrics, baseline, thread}: QuestionPageProps) 
 
               return (
                 <motion.div
-                  key={q.questionText} // Use text as key for animation
-                  initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                  animate={{ 
-                    opacity: fade ? 0.4 : 1, 
-                    y: 0, 
-                    scale: fade ? 0.95 : 1,
-                    // When it's past, we shift it up slightly
-                    marginTop: fade ? "-20px" : "0px" 
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  key={q.questionText}
+                  initial={reduce ? false : { opacity: 0, y: 24 }}
+                  animate={{ opacity: fade ? 0.7 : 1, y: 0 }}
+                  transition={reduce ? { duration: 0 } : { duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <DynamicQuestionCard 
                     question={q} 
@@ -154,8 +150,9 @@ export function QuestionPage({biometrics, baseline, thread}: QuestionPageProps) 
             {/* AI THINKING CARD */}
         {isAiLoading && (
             <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={reduce ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reduce ? 0 : 0.24 }}
             className="w-full"
             >
             <ThinkingCard />

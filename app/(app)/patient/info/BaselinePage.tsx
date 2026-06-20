@@ -1,81 +1,66 @@
 "use client";
 
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Biometrics } from "@/lib/user/schema";
-import { BaselineSchema, QueryBaseline, QueryBaselineSchema, QueryICFEntry } from "@/lib/user/baseline"; // Our Zod schema
+import { BaselineSchema, QueryBaseline, QueryBaselineSchema, QueryICFEntry } from "@/lib/user/baseline";
 import { Slider } from "@/components/ui/slider";
-import { Card } from "@/components/ui/Card";
-import { generateBaselineAction, generateQueryBaselineAction, getQueryBaselineAction, setBaselineAction, setQueryBaselineAction } from "@/lib/actions";
-import { Button } from "@/components/ui/Button";
+import { Card, Button } from "@/components/ui/primitives";
+import { generateBaselineAction, generateQueryBaselineAction, setBaselineAction, setQueryBaselineAction } from "@/lib/actions";
 import { AlertCircle, Loader2, RefreshCcw } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import { z } from "zod"
-
 
 interface BaselinePageProps {
   biometrics: Biometrics;
   queryBaseline: QueryBaseline | null;
 }
 
-
-
 export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
-  // local state management
   const queryClient = useQueryClient();
-  const { data: session, status, update } = useSession();
+  const { data: session, update } = useSession();
+  const reduce = useReducedMotion();
   // "success" is derived from queryBaseline being present, so we only track
-  // generation loading vs error here (no more orphaned "success" flag).
+  // generation loading vs error here.
   const [genState, setGenState] = useState<"loading" | "error">("loading");
   const startedRef = useRef(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const flatMetrics: QueryICFEntry[] = useMemo(() => {
     if (!queryBaseline?.axes) return [];
-
     return [
-    ...Object.values(queryBaseline.axes.biomechanical?.entries || {}),
-    ...Object.values(queryBaseline.axes.functional?.entries || []),
-    ...Object.values(queryBaseline.axes.systemic?.entries || []),
+      ...Object.values(queryBaseline.axes.biomechanical?.entries || {}),
+      ...Object.values(queryBaseline.axes.functional?.entries || []),
+      ...Object.values(queryBaseline.axes.systemic?.entries || []),
     ];
   }, [queryBaseline]);
-    // whenever flatmetrics change, populate responses accordingly
+
+  const [responses, setResponses] = useState<Record<string, number>>({});
   useEffect(() => {
     if (flatMetrics.length > 0 && Object.keys(responses).length === 0) {
-      const initial = Object.fromEntries(flatMetrics.map(v => [v.code, v.range / 2]));
-      setResponses(initial);
+      setResponses(Object.fromEntries(flatMetrics.map((v) => [v.code, v.range / 2])));
     }
   }, [flatMetrics]);
 
-  const [responses, setResponses] = useState<Record<string, number>>({});
-
   // Generate the query baseline once on first entry. Bounded by a timeout and a
-  // recoverable error state, so a slow or failed model call no longer hangs the
-  // spinner forever (previously the throw was swallowed and status stuck on loading).
+  // recoverable error state so a slow/failed model call no longer hangs forever.
   const runGeneration = useCallback(async () => {
     try {
       const llmOutcome = await Promise.race([
         generateQueryBaselineAction(biometrics),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("Generation timed out")), 90_000)
-        ),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Generation timed out")), 90_000)),
       ]);
       if (!llmOutcome.success) throw new Error("LLM Generation failed");
-
       const validatedData = QueryBaselineSchema.parse(llmOutcome.data);
       await setQueryBaselineAction(validatedData);
       await queryClient.invalidateQueries({ queryKey: ["onboarding", session?.user?.id] });
       await update({ session });
-      // On success the parent re-passes a non-null queryBaseline, which renders
-      // the question flow below; no extra local state needed.
     } catch (error) {
       console.error("Query baseline generation failed:", error);
       setGenState("error");
     }
   }, [biometrics, queryClient, session, update]);
 
-  // first-entry generate query (runs once; retry is explicit)
   useEffect(() => {
     if (queryBaseline || startedRef.current) return;
     startedRef.current = true;
@@ -88,136 +73,111 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
     void runGeneration();
   };
 
-  const createBaselines = async (biometrics: Biometrics, responses: Record<string, number>, queryBaseline: QueryBaseline) => {
-    return await generateBaselineAction(biometrics, responses, queryBaseline)
-  }
+  const createBaselines = async (bio: Biometrics, res: Record<string, number>, qb: QueryBaseline) =>
+    generateBaselineAction(bio, res, qb);
 
+  const currentMetric = flatMetrics[currentIndex];
+  const progress = ((currentIndex + 1) / flatMetrics.length) * 100;
 
-    const currentMetric = flatMetrics[currentIndex];
-    const progress = ((currentIndex + 1) / flatMetrics.length) * 100;
+  const handleNext = async () => {
+    if (!queryBaseline) {
+      console.error("handleNext called with null queryBaseline");
+      return;
+    }
+    if (currentIndex < flatMetrics.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    } else {
+      const result = await createBaselines(biometrics, responses, queryBaseline);
+      const baselines = BaselineSchema.parse(result.data);
+      await setBaselineAction(baselines);
+      await update();
+    }
+  };
 
-    const handleNext = async () => {
-        if (!queryBaseline) {
-          alert("Error! handleNext was somehow called with null queryBaseline!")
-        } else {
-          if (currentIndex < flatMetrics.length - 1) {
-              setCurrentIndex(prev => prev + 1);
-          } else {
-              const result = await createBaselines(biometrics, responses, queryBaseline);
-              const baselines = BaselineSchema.parse(result.data)
-              console.log('baselines', baselines)
-              await setBaselineAction(baselines)
-              await update();
-          }
-        }
-    };
-
-
-  // Helper to get labels based on the specific ICF unit
   const getUnitLabels = (unit: string) => {
     if (unit.toLowerCase().includes("scale")) return ["Severe", "Optimal"];
     if (unit.toLowerCase().includes("ml") || unit.toLowerCase().includes("meters")) return ["Low", "High"];
     return ["Limited", "Full"];
   };
 
-  // 1. Loading State (only while there is no baseline yet)
+  // 1. Loading (only while there is no baseline yet)
   if (!queryBaseline && genState === "loading") {
     return (
-      <div className="max-w-xl w-full mx-auto p-12 flex flex-col items-center justify-center gap-4 text-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        <div className="space-y-2">
-          <h3 className="font-semibold text-slate-900">Generating Clinical Path</h3>
-          <p className="text-sm text-slate-500">Mapping WHO-ICF metrics for {biometrics.treatment}...</p>
+      <div className="mx-auto flex w-full max-w-xl flex-col items-center justify-center gap-4 p-12 text-center">
+        <Loader2 className="size-8 animate-spin text-accent" />
+        <div className="space-y-1">
+          <h3 className="text-[19px] font-semibold text-ink">Preparing your check-in</h3>
+          <p className="text-[14px] text-ink-muted">Tailoring a few questions to {biometrics.treatment}…</p>
         </div>
       </div>
     );
   }
 
-  // 2. Error State (recoverable — wired to retry)
+  // 2. Error (recoverable)
   if (!queryBaseline && genState === "error") {
     return (
-      <Card className="max-w-xl w-full mx-auto m-6 p-8 border-red-100 bg-red-50/30 text-center space-y-4">
-        <AlertCircle className="h-10 w-10 text-red-500 mx-auto" />
-        <div className="space-y-2">
-          <h3 className="font-bold text-red-900">Generation Failed</h3>
-          <p className="text-sm text-red-700">We couldn&apos;t map the WHO-ICF baseline for this procedure. This can happen if the model is slow or overloaded.</p>
+      <Card className="mx-auto m-6 max-w-xl space-y-4 border-critical/20 bg-critical-soft/40 p-8 text-center">
+        <AlertCircle className="mx-auto size-9 text-critical" />
+        <div className="space-y-1">
+          <h3 className="text-[19px] font-semibold text-ink">We couldn&apos;t prepare your check-in</h3>
+          <p className="text-[14px] text-ink-muted">This can happen if the service is slow or overloaded.</p>
         </div>
-        <Button onClick={handleRetry} className="bg-blue-600 hover:bg-blue-700">
-          <RefreshCcw className="h-4 w-4 mr-2" /> Try again
+        <Button variant="primary" onClick={handleRetry}>
+          <RefreshCcw size={16} strokeWidth={1.75} /> Try again
         </Button>
       </Card>
     );
   }
 
-  // 3. Empty Data State (LLM returned nothing)
+  // 3. Empty data
   if (queryBaseline && flatMetrics.length === 0) {
     return (
-      <Card className="max-w-xl w-full mx-auto m-6 p-8 text-center">
-        <p className="text-slate-500">No specific metrics found for this procedure. Please contact your clinical lead.</p>
+      <Card className="mx-auto m-6 max-w-xl p-8 text-center">
+        <p className="text-[14px] text-ink-muted">No specific metrics found for this procedure. Please contact your clinical lead.</p>
       </Card>
     );
   }
 
-  // 4. Main UI (Guaranteed to have currentMetric)
+  // 4. Main UI
   return (
-    <div className="max-w-xl w-full mx-auto p-6 flex flex-col gap-8">
-      {/* Header & Progress */}
-      <div className="space-y-4 text-center">
-        <div className="flex justify-between items-end">
-          <div className="text-left">
-            <h2 className="text-2xl font-bold text-slate-900">Pre-Op Baseline</h2>
-            <p className="text-slate-500 text-sm italic">Step {currentIndex + 1} of {flatMetrics.length}</p>
-          </div>
-          <div className="text-right text-[10px] font-mono text-slate-400">
-            FRAMEWORK: WHO-ICF
-          </div>
+    <div className="mx-auto flex w-full max-w-xl flex-col gap-8 p-6">
+      <header className="space-y-4">
+        <div>
+          <h1 className="text-[26px] font-semibold text-ink">Your starting point</h1>
+          <p className="text-[14px] text-ink-muted">Step {currentIndex + 1} of {flatMetrics.length}</p>
         </div>
-
-        <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-sunken">
           <motion.div
-            initial={{ width: 0 }}
+            initial={reduce ? false : { width: 0 }}
             animate={{ width: `${progress}%` }}
-            className="h-full bg-blue-600"
+            transition={{ duration: reduce ? 0 : 0.24, ease: [0.25, 1, 0.5, 1] }}
+            className="h-full bg-accent"
           />
         </div>
-      </div>
+      </header>
 
       <AnimatePresence mode="wait">
         <motion.div
           key={currentMetric.code}
-          initial={{ opacity: 0, x: 10 }}
+          initial={reduce ? false : { opacity: 0, x: 8 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -10 }}
-          transition={{ duration: 0.2 }}
+          exit={reduce ? { opacity: 0 } : { opacity: 0, x: -8 }}
+          transition={{ duration: reduce ? 0 : 0.2 }}
         >
-          <Card className="p-8 space-y-8 shadow-xl border-slate-200">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                {/* <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white ${
-                  currentMetric.axisType === 'A' ? 'bg-orange-500' :
-                  currentMetric.axisType === 'B' ? 'bg-blue-500' : 'bg-emerald-500'
-                }`}>
-                  AXISType {currentMetric.axisType}
-                </span> */}
-                <span className="text-[10px] font-mono text-slate-400">
-                  {currentMetric.domain}
-                </span>
-              </div>
-
-              <h3 className="text-xl font-semibold text-slate-800 leading-snug">
+          <Card className="space-y-8 p-7 md:p-8">
+            <div className="space-y-3">
+              <span className="text-[12px] font-medium text-ink-subtle">{currentMetric.domain}</span>
+              <h2 className="text-[22px] font-semibold leading-snug text-ink">
                 {currentMetric.question?.questionText || `Rate your ${currentMetric.indicator}`}
-              </h3>
-
-              <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-                <p className="text-xs text-slate-600 italic">
-                   {currentMetric.justification}
-                </p>
+              </h2>
+              <div className="rounded-md bg-surface-sunken p-3">
+                <p className="text-[13px] text-ink-muted">{currentMetric.justification}</p>
               </div>
             </div>
 
-            <div className="py-6 space-y-6">
-              <div className="flex justify-center">
-                <span className="text-5xl font-light text-blue-600">
+            <div className="space-y-6 py-2">
+              <div className="text-center">
+                <span className="text-[32px] font-semibold tabular-nums text-accent-ink">
                   {responses[currentMetric.code] ?? Math.round(currentMetric.range / 2)}
                 </span>
               </div>
@@ -227,23 +187,25 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
                 max={currentMetric.range}
                 step={1}
                 value={[responses[currentMetric.code] || Math.round(currentMetric.range / 2)]}
-                onValueChange={([val]) => setResponses(prev => ({ ...prev, [currentMetric.code]: val }))}
+                onValueChange={([val]) => setResponses((prev) => ({ ...prev, [currentMetric.code]: val }))}
+                aria-label={currentMetric.question?.questionText || `Rate your ${currentMetric.indicator}`}
+                className="py-1"
               />
 
-              <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
+              <div className="flex justify-between text-[12px] font-medium text-ink-subtle">
                 <span>{getUnitLabels(currentMetric.unit)[0]}</span>
                 <span>{getUnitLabels(currentMetric.unit)[1]}</span>
               </div>
             </div>
 
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-3 border-t border-border pt-5">
               {currentIndex > 0 && (
-                <Button variant="ghost" onClick={() => setCurrentIndex(prev => prev - 1)}>
+                <Button variant="secondary" onClick={() => setCurrentIndex((prev) => prev - 1)}>
                   Back
                 </Button>
               )}
-              <Button onClick={handleNext} className="flex-1 bg-blue-600 hover:bg-blue-700 py-6 text-lg">
-                {currentIndex === flatMetrics.length - 1 ? "Complete Baseline" : "Next Metric"}
+              <Button variant="primary" size="lg" className="flex-1" onClick={handleNext}>
+                {currentIndex === flatMetrics.length - 1 ? "Complete" : "Next"}
               </Button>
             </div>
           </Card>
