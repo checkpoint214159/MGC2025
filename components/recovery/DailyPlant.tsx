@@ -3,74 +3,61 @@
 import { ReactNode, useState } from "react";
 
 /**
- * A calm "growing plant" reflecting % of today's tasks done, in clear stages from
- * seed to flower. The bloom is randomised (picked once on mount, client-side, so the
- * SSR markup never differs). Reduced-motion safe — only the progress bar transitions.
+ * A calm "growing coneflower" reflecting % of today's tasks done, in clear stages from
+ * seed to bloom. Echinacea: lance leaves, a golden-spiral spiky cone, drooping rose-pink
+ * petals. Each bloom is subtly randomised (petal count + pink hue), picked once on mount
+ * client-side so SSR markup never differs. Reduced-motion safe.
  */
 const VW = 120;
 const VH = 150;
 const soilY = 116;
 const X = 60;
 
-const leaf = (cx: number, cy: number, rot: number, rx = 13, ry = 5.5): ReactNode => (
-  <ellipse cx={cx} cy={cy} rx={rx} ry={ry} transform={`rotate(${rot} ${cx} ${cy})`} fill="var(--progress-soft)" stroke="var(--progress)" strokeWidth={1.5} />
+// pointed lance leaf (echinacea), translated + rotated into place
+const leaf = (cx: number, cy: number, rot: number, len = 16, w = 5): ReactNode => (
+  <path
+    d={`M ${-len / 2} 0 Q 0 ${-w / 2} ${len / 2} 0 Q 0 ${w / 2} ${-len / 2} 0 Z`}
+    transform={`translate(${cx} ${cy}) rotate(${rot})`}
+    fill="var(--progress-soft)"
+    stroke="var(--progress)"
+    strokeWidth={1.3}
+  />
 );
 
-// Randomised flower variants — each draws petals + a center around (cx, cy).
-const FLOWERS: Array<(cx: number, cy: number) => ReactNode> = [
-  (cx, cy) => ( // daisy — amber
+function coneflower(cx: number, cy: number, petals: number, hue: number): ReactNode {
+  const petalFill = `oklch(0.68 0.14 ${hue})`;
+  const petalStroke = `oklch(0.58 0.15 ${hue})`;
+  return (
     <g>
-      {Array.from({ length: 11 }).map((_, i) => {
-        const deg = (360 / 11) * i;
+      {/* drooping rose-pink ray petals */}
+      {Array.from({ length: petals }).map((_, i) => {
+        const deg = (360 / petals) * i - 90;
         const a = (deg * Math.PI) / 180;
-        const px = cx + Math.cos(a) * 9;
-        const py = cy + Math.sin(a) * 9;
-        return <ellipse key={i} cx={px} cy={py} rx={5} ry={2.3} transform={`rotate(${deg} ${px} ${py})`} fill="var(--surface)" stroke="var(--attention)" strokeWidth={1} />;
+        const px = cx + Math.cos(a) * 13;
+        const py = cy + Math.sin(a) * 13 + 2; // slight downward bias = droop
+        return (
+          <path
+            key={i}
+            d="M -8 0 Q 0 -2.4 8 0 Q 0 2.4 -8 0 Z"
+            transform={`translate(${px} ${py}) rotate(${deg})`}
+            fill={petalFill}
+            stroke={petalStroke}
+            strokeWidth={0.8}
+          />
+        );
       })}
-      <circle cx={cx} cy={cy} r={4.5} fill="var(--attention)" />
-    </g>
-  ),
-  (cx, cy) => ( // 5-petal blossom — petrol
-    <g>
-      {Array.from({ length: 5 }).map((_, i) => {
-        const a = ((i * 72 - 90) * Math.PI) / 180;
-        return <circle key={i} cx={cx + Math.cos(a) * 7} cy={cy + Math.sin(a) * 7} r={5} fill="var(--accent-soft)" stroke="var(--accent)" strokeWidth={1} />;
+      {/* raised copper cone */}
+      <ellipse cx={cx} cy={cy - 1} rx={7.5} ry={6.5} fill="oklch(0.5 0.1 58)" stroke="oklch(0.42 0.1 54)" strokeWidth={1} />
+      {/* golden-spiral spiky texture */}
+      {Array.from({ length: 16 }).map((_, i) => {
+        const t = i / 16;
+        const ang = i * 137.5 * (Math.PI / 180);
+        const rad = 5.5 * Math.sqrt(t);
+        return <circle key={`s${i}`} cx={cx + Math.cos(ang) * rad} cy={cy - 1 + Math.sin(ang) * rad * 0.85} r={0.85} fill="oklch(0.74 0.15 70)" />;
       })}
-      <circle cx={cx} cy={cy} r={3.5} fill="var(--accent)" />
     </g>
-  ),
-  (cx, cy) => ( // rose cluster — warm
-    <g>
-      <circle cx={cx} cy={cy} r={9} fill="var(--critical-soft)" stroke="var(--critical)" strokeWidth={1} />
-      <circle cx={cx - 2.5} cy={cy - 1} r={4.5} fill="none" stroke="var(--critical)" strokeWidth={1} opacity={0.6} />
-      <circle cx={cx + 1.5} cy={cy + 1.5} r={2.5} fill="var(--critical)" opacity={0.5} />
-    </g>
-  ),
-  (cx, cy) => ( // sunflower — amber
-    <g>
-      {Array.from({ length: 13 }).map((_, i) => {
-        const deg = (360 / 13) * i;
-        const a = (deg * Math.PI) / 180;
-        const px = cx + Math.cos(a) * 9;
-        const py = cy + Math.sin(a) * 9;
-        return <ellipse key={i} cx={px} cy={py} rx={4.5} ry={2} transform={`rotate(${deg} ${px} ${py})`} fill="var(--attention-soft)" stroke="var(--attention)" strokeWidth={0.8} />;
-      })}
-      <circle cx={cx} cy={cy} r={5.5} fill="var(--attention-ink)" />
-    </g>
-  ),
-  (cx, cy) => ( // 6-petal duotone
-    <g>
-      {Array.from({ length: 6 }).map((_, i) => {
-        const a = (i * 60 * Math.PI) / 180;
-        const px = cx + Math.cos(a) * 7;
-        const py = cy + Math.sin(a) * 7;
-        const even = i % 2 === 0;
-        return <ellipse key={i} cx={px} cy={py} rx={5.5} ry={3} transform={`rotate(${i * 60} ${px} ${py})`} fill={even ? "var(--accent-soft)" : "var(--attention-soft)"} stroke={even ? "var(--accent)" : "var(--attention)"} strokeWidth={0.8} />;
-      })}
-      <circle cx={cx} cy={cy} r={3.5} fill="var(--accent)" />
-    </g>
-  ),
-];
+  );
+}
 
 const STAGE_LABEL = ["seed", "sprout", "seedling", "growing", "leafing out", "budding", "in bloom"];
 const STEM_TOP = [110, 100, 88, 74, 62, 56, 54];
@@ -89,10 +76,10 @@ export function DailyPlant({ done, total }: { done: number; total: number }) {
   const pct = total > 0 ? Math.min(Math.max((done / total) * 100, 0), 100) : 0;
   const stage = stageOf(pct);
   const top = STEM_TOP[stage];
-  const [flowerIdx] = useState(() => Math.floor(Math.random() * FLOWERS.length));
+  const [bloom] = useState(() => ({ petals: 12 + Math.floor(Math.random() * 4), hue: 344 + Math.floor(Math.random() * 14) }));
 
   const msg =
-    stage === 6 ? "In full bloom — every task done today." :
+    stage === 6 ? "In full bloom — a coneflower for the whole day." :
     stage >= 4 ? "Growing nicely. Keep going." :
     stage >= 1 ? "A good start. One at a time." :
     "Plant today's seed — tap a card to begin.";
@@ -107,22 +94,22 @@ export function DailyPlant({ done, total }: { done: number; total: number }) {
         {/* seed */}
         {stage === 0 && <ellipse cx={X} cy={soilY - 3} rx={5} ry={3.5} transform={`rotate(-20 ${X} ${soilY - 3})`} fill="var(--ink-subtle)" />}
 
-        {/* stem + leaves */}
+        {/* stem + lance leaves */}
         {stage >= 1 && (
           <>
             <path d={`M ${X} ${soilY - 6} Q ${X - 4} ${(soilY + top) / 2} ${X} ${top}`} fill="none" stroke="var(--progress)" strokeWidth={2.5} strokeLinecap="round" />
             {stage === 1 && (
               <>
-                {leaf(X - 5, top + 2, -45, 6, 3)}
-                {leaf(X + 5, top + 2, 45, 6, 3)}
+                {leaf(X - 5, top + 2, -45, 8, 3)}
+                {leaf(X + 5, top + 2, 45, 8, 3)}
               </>
             )}
-            {stage >= 2 && leaf(48, 100, -36)}
-            {stage >= 2 && leaf(72, 92, 36)}
-            {stage >= 3 && leaf(48, 78, -30)}
-            {stage >= 3 && leaf(72, 72, 30)}
-            {stage >= 4 && leaf(50, 60, -26, 11, 4.5)}
-            {stage >= 4 && leaf(70, 56, 26, 11, 4.5)}
+            {stage >= 2 && leaf(46, 100, -38, 18, 5)}
+            {stage >= 2 && leaf(74, 92, 38, 18, 5)}
+            {stage >= 3 && leaf(47, 78, -32, 17, 5)}
+            {stage >= 3 && leaf(73, 72, 32, 17, 5)}
+            {stage >= 4 && leaf(49, 60, -28, 14, 4)}
+            {stage >= 4 && leaf(71, 56, 28, 14, 4)}
           </>
         )}
 
@@ -131,8 +118,8 @@ export function DailyPlant({ done, total }: { done: number; total: number }) {
           <path d={`M ${X} ${top} Q ${X - 6} ${top - 9} ${X} ${top - 15} Q ${X + 6} ${top - 9} ${X} ${top}`} fill="var(--progress-soft)" stroke="var(--progress)" strokeWidth={1.5} />
         )}
 
-        {/* flower (randomised) */}
-        {stage === 6 && FLOWERS[flowerIdx](X, top - 7)}
+        {/* coneflower bloom (randomised) */}
+        {stage === 6 && coneflower(X, top - 8, bloom.petals, bloom.hue)}
       </svg>
 
       <div className="flex-1">
