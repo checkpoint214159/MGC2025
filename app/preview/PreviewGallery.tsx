@@ -7,6 +7,7 @@
 
 import { TodayHero } from "@/components/recovery/TodayHero";
 import { RecoveryArc } from "@/components/recovery/RecoveryArc";
+import { PlantArt, STAGE_LABEL } from "@/components/recovery/DailyPlant";
 import { ReEngagementCheckIn } from "@/components/recovery/ReEngagementCheckIn";
 import { CareTeamCard } from "@/components/recovery/CareTeamCard";
 import {
@@ -84,6 +85,18 @@ export function PreviewGallery() {
           → MGC mockup: patient dashboard (S4) with the recovery arc
         </a>
       </header>
+
+      <Section label="Coneflower — all 7 growth stages (seed → bloom)">
+        <Card className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {Array.from({ length: 7 }).map((_, n) => (
+            <div key={n} className="flex flex-col items-center gap-1 rounded-md border border-border bg-surface p-2 text-center">
+              <PlantArt stage={n} petals={13} hue={350} className="h-32 w-auto" />
+              <div className="text-[13px] font-medium text-ink">{n} of 6</div>
+              <div className="text-[12px] capitalize text-ink-muted">{STAGE_LABEL[n]}</div>
+            </div>
+          ))}
+        </Card>
+      </Section>
 
       <Section label="Today hero — patient mode">
         <TodayHero
