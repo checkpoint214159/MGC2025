@@ -1,0 +1,12 @@
+{
+  // Throwaway spike: run a LangGraph graph inside a Durable Object.
+  "name": "langgraph-do-spike",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-04-05",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    "bindings": [{ "name": "ONBOARDING", "class_name": "OnboardingDO" }]
+  },
+  // SQLite-backed DOs (required on the free plan).
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["OnboardingDO"] }]
+}

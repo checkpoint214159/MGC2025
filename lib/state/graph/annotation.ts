@@ -68,7 +68,7 @@ export const StateGenerationAnnotation = Annotation.Root({
   // Written by save_state node
   savedState: Annotation<State | null>({
     default: () => null,
-    reducer: (_, incoming: State) => incoming,
+    reducer: (_, incoming) => incoming,
   }),
 });
 

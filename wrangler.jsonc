@@ -1,0 +1,26 @@
+{
+  // Cloudflare Workers config for the OpenNext build of this Next.js app.
+  // Docs: https://opennext.js.org/cloudflare
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mgc2025",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-04-05",
+  // nodejs_compat is REQUIRED by OpenNext so Node APIs (Buffer, etc.) work in the Worker.
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".open-next/assets"
+  },
+  "observability": {
+    "enabled": true
+  }
+
+  // --- Added in later phases (left here as a reference, keep commented until then) ---
+  //
+  // Phase 2 — Database via Hyperdrive (points at the existing Postgres):
+  // "hyperdrive": [
+  //   { "binding": "HYPERDRIVE", "id": "<hyperdrive-config-id>", "localConnectionString": "postgres://..." }
+  // ],
+  //
+  // Phase 1+ — incremental cache (optional): OpenNext can use R2/KV. Defaults need no binding.
+}

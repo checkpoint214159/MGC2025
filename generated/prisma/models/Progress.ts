@@ -150,7 +150,7 @@ export type ProgressGroupByOutputType = {
   _max: ProgressMaxAggregateOutputType | null
 }
 
-type GetProgressGroupByPayload<T extends ProgressGroupByArgs> = Prisma.PrismaPromise<
+export type GetProgressGroupByPayload<T extends ProgressGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ProgressGroupByOutputType, T['by']> &
       {
@@ -1060,6 +1060,11 @@ export type ProgressFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Skip the first `n` Progresses.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Progresses.
+   */
   distinct?: Prisma.ProgressScalarFieldEnum | Prisma.ProgressScalarFieldEnum[]
 }
 

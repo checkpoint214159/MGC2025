@@ -151,7 +151,7 @@ export type AdminPatientRelationGroupByOutputType = {
   _max: AdminPatientRelationMaxAggregateOutputType | null
 }
 
-type GetAdminPatientRelationGroupByPayload<T extends AdminPatientRelationGroupByArgs> = Prisma.PrismaPromise<
+export type GetAdminPatientRelationGroupByPayload<T extends AdminPatientRelationGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<AdminPatientRelationGroupByOutputType, T['by']> &
       {
@@ -1180,6 +1180,11 @@ export type AdminPatientRelationFindManyArgs<ExtArgs extends runtime.Types.Exten
    * Skip the first `n` AdminPatientRelations.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of AdminPatientRelations.
+   */
   distinct?: Prisma.AdminPatientRelationScalarFieldEnum | Prisma.AdminPatientRelationScalarFieldEnum[]
 }
 

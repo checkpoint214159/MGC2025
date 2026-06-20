@@ -140,7 +140,7 @@ export type BaselineGroupByOutputType = {
   _max: BaselineMaxAggregateOutputType | null
 }
 
-type GetBaselineGroupByPayload<T extends BaselineGroupByArgs> = Prisma.PrismaPromise<
+export type GetBaselineGroupByPayload<T extends BaselineGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<BaselineGroupByOutputType, T['by']> &
       {
@@ -1002,6 +1002,11 @@ export type BaselineFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Skip the first `n` Baselines.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Baselines.
+   */
   distinct?: Prisma.BaselineScalarFieldEnum | Prisma.BaselineScalarFieldEnum[]
 }
 

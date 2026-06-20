@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 import path from "path";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { neonConfig } from "@neondatabase/serverless";
 import { PrismaClient } from "@/generated/prisma/client";
 
 // Keep env loading behavior deterministic across Next runtime and one-off scripts.
@@ -23,7 +24,18 @@ if (process.env.PRISMA_DEBUG_CONNECTION === "1") {
 	}
 }
 
-const adapter = new PrismaPg({ connectionString });
+// Neon's wire protocol runs over WebSockets. Cloudflare Workers (workerd)
+// provide a global WebSocket automatically; Node does not, so we attach the
+// `ws` polyfill there. The guard keeps `ws` out of the Workers runtime path.
+const onWorkerd =
+	typeof navigator !== "undefined" &&
+	navigator.userAgent === "Cloudflare-Workers";
+if (!onWorkerd) {
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	neonConfig.webSocketConstructor = require("ws");
+}
+
+const adapter = new PrismaNeon({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 export { prisma };

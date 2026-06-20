@@ -199,7 +199,7 @@ export type BiometricsGroupByOutputType = {
   _max: BiometricsMaxAggregateOutputType | null
 }
 
-type GetBiometricsGroupByPayload<T extends BiometricsGroupByArgs> = Prisma.PrismaPromise<
+export type GetBiometricsGroupByPayload<T extends BiometricsGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<BiometricsGroupByOutputType, T['by']> &
       {
@@ -1156,6 +1156,11 @@ export type BiometricsFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` Biometrics.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Biometrics.
+   */
   distinct?: Prisma.BiometricsScalarFieldEnum | Prisma.BiometricsScalarFieldEnum[]
 }
 

@@ -1,0 +1,23 @@
+# Local secrets for `wrangler dev` / OpenNext preview (NOT read by `next dev` — that uses .env.local).
+# Copy to `.dev.vars` (git-ignored) and fill in. Mirrors the keys in .env.local.
+
+DATABASE_URL=postgres://user:pass@host:5432/dbname
+AUTH_SECRET=
+
+# LLM provider — OpenRouter (replaces the Vercel AI Gateway).
+# Get a key at https://openrouter.ai/keys
+OPENROUTER_API_KEY=
+
+OPENAI_API_KEY=
+PINECONE_API_KEY=
+PINECONE_INDEX=
+ADMIN_EMAILS=
+
+# LLM model slugs (OpenRouter naming — verify at https://openrouter.ai/models)
+AI_MODEL=anthropic/claude-sonnet-4
+# CHAT_MODEL=deepseek/deepseek-chat
+# LLM_MAX_OUTPUT_TOKENS=16384   # caps per-call output reservation (OpenRouter)
+# RAG tuning (see lib/rag/service.ts)
+# RAG_SEARCH_TYPE=hybrid
+# RAG_TOP_K=10
+# RAG_NAMESPACE=__default__

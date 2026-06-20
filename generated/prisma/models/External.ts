@@ -154,7 +154,7 @@ export type ExternalGroupByOutputType = {
   _max: ExternalMaxAggregateOutputType | null
 }
 
-type GetExternalGroupByPayload<T extends ExternalGroupByArgs> = Prisma.PrismaPromise<
+export type GetExternalGroupByPayload<T extends ExternalGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ExternalGroupByOutputType, T['by']> &
       {
@@ -1231,6 +1231,11 @@ export type ExternalFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Skip the first `n` Externals.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Externals.
+   */
   distinct?: Prisma.ExternalScalarFieldEnum | Prisma.ExternalScalarFieldEnum[]
 }
 

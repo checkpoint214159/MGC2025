@@ -165,7 +165,7 @@ export type ThreadGroupByOutputType = {
   _max: ThreadMaxAggregateOutputType | null
 }
 
-type GetThreadGroupByPayload<T extends ThreadGroupByArgs> = Prisma.PrismaPromise<
+export type GetThreadGroupByPayload<T extends ThreadGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ThreadGroupByOutputType, T['by']> &
       {
@@ -1274,6 +1274,11 @@ export type ThreadFindManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Skip the first `n` Threads.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Threads.
+   */
   distinct?: Prisma.ThreadScalarFieldEnum | Prisma.ThreadScalarFieldEnum[]
 }
 

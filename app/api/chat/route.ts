@@ -1,5 +1,6 @@
 import { streamText, convertToModelMessages } from "ai";
 import { getContext } from "@/lib/rag/service";
+import { getModel } from "@/lib/llm/model";
 
 export const maxDuration = 30;
 
@@ -52,7 +53,8 @@ INSTRUCTIONS:
 
         // 3. Generate Response
         const result = await streamText({
-            model: "deepseek/deepseek-v3.2", // Keeping existing model
+            // OpenRouter model for chat; override via CHAT_MODEL env.
+            model: getModel(process.env.CHAT_MODEL || "deepseek/deepseek-chat"),
             messages: messagesWithSystem,
         });
 

@@ -210,7 +210,7 @@ export type GraphConfigGroupByOutputType = {
   _max: GraphConfigMaxAggregateOutputType | null
 }
 
-type GetGraphConfigGroupByPayload<T extends GraphConfigGroupByArgs> = Prisma.PrismaPromise<
+export type GetGraphConfigGroupByPayload<T extends GraphConfigGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<GraphConfigGroupByOutputType, T['by']> &
       {
@@ -1060,6 +1060,11 @@ export type GraphConfigFindManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Skip the first `n` GraphConfigs.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of GraphConfigs.
+   */
   distinct?: Prisma.GraphConfigScalarFieldEnum | Prisma.GraphConfigScalarFieldEnum[]
 }
 
