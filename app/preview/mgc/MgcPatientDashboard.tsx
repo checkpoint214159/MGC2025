@@ -51,12 +51,7 @@ function PriorityCard({
 
 export function MgcPatientDashboard() {
   return (
-    <div className="min-h-screen bg-bg">
       <div className="mx-auto max-w-3xl space-y-6 px-5 py-10 md:px-8">
-        <div className="inline-flex items-center gap-2 rounded-md bg-attention-soft px-3 py-1.5 text-[12px] text-attention-ink">
-          MGC mockup — S4 Patient Dashboard · mock data, no backend
-        </div>
-
         <header className="flex items-start gap-4">
           <div className="leading-none">
             <div className="text-[12px] font-medium uppercase tracking-wide text-ink-subtle">Day</div>
@@ -124,6 +119,5 @@ export function MgcPatientDashboard() {
           />
         </section>
       </div>
-    </div>
   );
 }
