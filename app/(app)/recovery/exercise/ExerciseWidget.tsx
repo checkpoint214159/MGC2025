@@ -104,7 +104,7 @@ export default function RecoveryExerciseRenderer({
                         onClick={() =>
                           setLocalValues((p) => ({ ...p, [key]: Math.max(0, p[key] - 1) }))
                         }
-                        className="size-9 rounded grid place-items-center hover:bg-surface text-ink-muted hover:text-ink transition-colors"
+                        className="size-11 rounded-md grid place-items-center hover:bg-surface text-ink-muted hover:text-ink transition-colors"
                         aria-label={`Decrease ${key}`}
                       >
                         <Minus size={16} strokeWidth={2} />
@@ -112,7 +112,7 @@ export default function RecoveryExerciseRenderer({
                       <button
                         type="button"
                         onClick={() => setLocalValues((p) => ({ ...p, [key]: p[key] + 1 }))}
-                        className="size-9 rounded grid place-items-center hover:bg-surface text-ink-muted hover:text-ink transition-colors"
+                        className="size-11 rounded-md grid place-items-center hover:bg-surface text-ink-muted hover:text-ink transition-colors"
                         aria-label={`Increase ${key}`}
                       >
                         <Plus size={16} strokeWidth={2} />

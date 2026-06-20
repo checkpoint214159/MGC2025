@@ -166,7 +166,6 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
         >
           <Card className="space-y-8 p-7 md:p-8">
             <div className="space-y-3">
-              <span className="text-[12px] font-medium text-ink-subtle">{currentMetric.domain}</span>
               <h2 className="text-[22px] font-semibold leading-snug text-ink">
                 {currentMetric.question?.questionText || `Rate your ${currentMetric.indicator}`}
               </h2>

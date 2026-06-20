@@ -70,8 +70,8 @@ export function DynamicQuestionCard({
         <div className="mx-auto mb-4 grid size-10 place-items-center rounded-full bg-accent-soft">
           <span className="size-5 animate-spin rounded-full border-2 border-accent border-t-transparent" />
         </div>
-        <h3 className="text-[19px] font-semibold text-ink">Assessment complete</h3>
-        <p className="mt-1 text-[14px] text-ink-muted">Preparing your recovery plan…</p>
+        <h3 className="text-[19px] font-semibold text-ink">That&apos;s everything — thank you</h3>
+        <p className="mt-1 text-[14px] text-ink-muted">Putting together your plan…</p>
       </div>
     );
   }
@@ -83,10 +83,7 @@ export function DynamicQuestionCard({
           loading ? "pointer-events-none" : ""
         }`}
       >
-        <span className="inline-flex items-center rounded-full bg-surface-sunken px-2.5 py-1 text-[12px] font-medium text-ink-muted">
-          {question.metadata.intent}
-        </span>
-        <h2 className="mt-4 text-[22px] font-semibold leading-snug text-ink">{question.questionText}</h2>
+        <h2 className="text-[22px] font-semibold leading-snug text-ink">{question.questionText}</h2>
         {!fade && (
           <div className="mt-6">
             <DynamicInputs question={question} onAnswer={onAnswer} loading={loading} />

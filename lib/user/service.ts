@@ -86,6 +86,7 @@ export async function generateQueryBaseline(userId: string, biometrics: Biometri
 
   ### QUESTION PROTOCOL
   - For each entry, craft a 'questionText' that is patient-facing but clinically precise.
+  - PLAIN LANGUAGE: write every 'questionText' so an older patient with no medical training and no energy can understand it on first read. One short, warm sentence. No clinical jargon, no abbreviations, no framework names (never say "ICF", "WHO", "metric", "indicator", "domain"). Ask about everyday experience ("How far can you walk before resting?"), not clinical constructs.
   - Assign a logical 'range' (usually 0-10) and 'unit' (e.g., '1-10 scale', 'meters').
   - Pre-operative baselines represent the patient's "normal" state.
   `;

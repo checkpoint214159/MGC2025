@@ -144,7 +144,7 @@ function NutrientRow({
           value={value}
           onChange={(e) => onUpdate(Number(e.target.value))}
           disabled={readOnly}
-          className="w-20 h-9 text-right tabular-nums"
+          className="w-24 h-11 text-right tabular-nums"
         />
       </div>
 

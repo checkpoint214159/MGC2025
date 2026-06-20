@@ -8,6 +8,7 @@
 import { TodayHero } from "@/components/recovery/TodayHero";
 import { RecoveryArc } from "@/components/recovery/RecoveryArc";
 import { ReEngagementCheckIn } from "@/components/recovery/ReEngagementCheckIn";
+import { CareTeamCard } from "@/components/recovery/CareTeamCard";
 import {
   StreakRing,
   NudgeInline,
@@ -126,6 +127,10 @@ export function PreviewGallery() {
 
       <Section label="Day 10–14 re-engagement check-in (dismissible, one-time)">
         <ReEngagementCheckIn day={12} onDismiss={() => {}} />
+      </Section>
+
+      <Section label="Care-team safety path (calm by default; red-flags in a disclosure)">
+        <CareTeamCard />
       </Section>
 
       <Section label="Empty state">

@@ -10,6 +10,7 @@ import { useLocalStorageFlag } from "@/lib/hooks/useLocalStorageFlag";
 import DashboardRenderer from "@/components/recovery/DashboardRenderer";
 import { TodayHero } from "@/components/recovery/TodayHero";
 import { ReEngagementCheckIn } from "@/components/recovery/ReEngagementCheckIn";
+import { CareTeamCard } from "@/components/recovery/CareTeamCard";
 import { NudgeInline, CaregiverBanner } from "@/components/ui/primitives";
 import { DevDateSwitcher } from "@/components/development/DevDateSwitcher";
 import ForceGenerateButton from "@/components/development/ForceStateGeneration";
@@ -105,6 +106,10 @@ export function UserDashboard() {
         </div>
         <DashboardRenderer config={state} />
       </section>
+
+      <div className="mt-6">
+        <CareTeamCard />
+      </div>
 
       {process.env.NODE_ENV === "development" && (
         <div className="mt-12 rounded-lg border border-attention/40 bg-attention-soft/30 p-5">

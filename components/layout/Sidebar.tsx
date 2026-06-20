@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Home, Activity, Salad, MessageCircle, LogOut, ChevronLeft, ChevronRight, User, Users } from "lucide-react";
 import { useCaregiver } from "@/context/CaregiverContext";
+import { useTextScale, TEXT_SCALES } from "@/context/TextScaleContext";
 import { FLAGS } from "@/lib/config/flags";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { isCaregiver, enter, exit } = useCaregiver();
+  const { scale, setScale } = useTextScale();
 
   const name = session?.user?.name?.split(" ")[0] || "Patient";
 
@@ -86,6 +88,30 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div className="px-3 pb-4 pt-2 border-t border-border space-y-0.5">
+        {!collapsed && (
+          <div className="px-1 pb-2">
+            <div className="mb-1.5 text-[12px] font-medium text-ink-subtle">Text size</div>
+            <div className="flex gap-1">
+              {TEXT_SCALES.map((s, i) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setScale(s)}
+                  aria-pressed={scale === s}
+                  aria-label={`Text size ${["normal", "large", "largest"][i]}`}
+                  className={cn(
+                    "flex h-11 flex-1 items-center justify-center rounded-md border font-semibold transition-colors",
+                    scale === s
+                      ? "border-accent bg-accent-soft text-accent-ink"
+                      : "border-border text-ink-muted hover:bg-surface-sunken hover:text-ink"
+                  )}
+                >
+                  <span style={{ fontSize: [13, 15, 18][i] }}>A</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <Link
           href="/patient/info"
           className="flex items-center gap-3 rounded-md px-3 h-11 text-[14px] font-medium text-ink-muted hover:bg-surface-sunken hover:text-ink"
