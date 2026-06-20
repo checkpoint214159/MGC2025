@@ -7,7 +7,7 @@ import { prisma } from "./prisma";
  * Ensures the authenticated user has the specified role.
  * Throws an error if the user is not authenticated or doesn't match the role.
  */
-export async function requireRole(requiredRole: 'patient' | 'admin'): Promise<string> {
+export async function requireRole(requiredRole: 'patient' | 'admin' | 'physiotherapist' | 'dietician'): Promise<string> {
   const session = await auth();
   const userId = session?.user?.id;
   const userRole = session?.user?.role;

@@ -8,7 +8,7 @@ declare module "next-auth" {
     user: {
       id: string;
       doneOnboarding: boolean;
-      role: 'patient' | 'admin';
+      role: 'patient' | 'admin' | 'physiotherapist' | 'dietician';
       adminManagedPatientIds?: string[];
     } & DefaultSession["user"]
     hasTodayState?: boolean | null,
@@ -22,7 +22,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     id: string
-    role: 'patient' | 'admin'
+    role: 'patient' | 'admin' | 'physiotherapist' | 'dietician'
     adminManagedPatientIds?: string[]
     doneOnboarding?: boolean
     hasTodayState?: boolean | null

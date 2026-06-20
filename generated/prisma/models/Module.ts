@@ -29,6 +29,9 @@ export type ModuleMinAggregateOutputType = {
   type: string | null
   stateId: string | null
   summary: string | null
+  ownerRole: $Enums.UserRole | null
+  verifiedAt: Date | null
+  verifiedById: string | null
 }
 
 export type ModuleMaxAggregateOutputType = {
@@ -36,6 +39,9 @@ export type ModuleMaxAggregateOutputType = {
   type: string | null
   stateId: string | null
   summary: string | null
+  ownerRole: $Enums.UserRole | null
+  verifiedAt: Date | null
+  verifiedById: string | null
 }
 
 export type ModuleCountAggregateOutputType = {
@@ -45,6 +51,9 @@ export type ModuleCountAggregateOutputType = {
   summary: number
   plan: number
   checklists: number
+  ownerRole: number
+  verifiedAt: number
+  verifiedById: number
   _all: number
 }
 
@@ -54,6 +63,9 @@ export type ModuleMinAggregateInputType = {
   type?: true
   stateId?: true
   summary?: true
+  ownerRole?: true
+  verifiedAt?: true
+  verifiedById?: true
 }
 
 export type ModuleMaxAggregateInputType = {
@@ -61,6 +73,9 @@ export type ModuleMaxAggregateInputType = {
   type?: true
   stateId?: true
   summary?: true
+  ownerRole?: true
+  verifiedAt?: true
+  verifiedById?: true
 }
 
 export type ModuleCountAggregateInputType = {
@@ -70,6 +85,9 @@ export type ModuleCountAggregateInputType = {
   summary?: true
   plan?: true
   checklists?: true
+  ownerRole?: true
+  verifiedAt?: true
+  verifiedById?: true
   _all?: true
 }
 
@@ -152,6 +170,9 @@ export type ModuleGroupByOutputType = {
   summary: string | null
   plan: runtime.JsonValue
   checklists: runtime.JsonValue | null
+  ownerRole: $Enums.UserRole | null
+  verifiedAt: Date | null
+  verifiedById: string | null
   _count: ModuleCountAggregateOutputType | null
   _min: ModuleMinAggregateOutputType | null
   _max: ModuleMaxAggregateOutputType | null
@@ -182,8 +203,12 @@ export type ModuleWhereInput = {
   summary?: Prisma.StringNullableFilter<"Module"> | string | null
   plan?: Prisma.JsonFilter<"Module">
   checklists?: Prisma.JsonNullableFilter<"Module">
+  ownerRole?: Prisma.EnumUserRoleNullableFilter<"Module"> | $Enums.UserRole | null
+  verifiedAt?: Prisma.DateTimeNullableFilter<"Module"> | Date | string | null
+  verifiedById?: Prisma.StringNullableFilter<"Module"> | string | null
   state?: Prisma.XOR<Prisma.StateScalarRelationFilter, Prisma.StateWhereInput>
   progress?: Prisma.XOR<Prisma.ProgressNullableScalarRelationFilter, Prisma.ProgressWhereInput> | null
+  comments?: Prisma.ModuleCommentListRelationFilter
 }
 
 export type ModuleOrderByWithRelationInput = {
@@ -193,8 +218,12 @@ export type ModuleOrderByWithRelationInput = {
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
   plan?: Prisma.SortOrder
   checklists?: Prisma.SortOrderInput | Prisma.SortOrder
+  ownerRole?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedById?: Prisma.SortOrderInput | Prisma.SortOrder
   state?: Prisma.StateOrderByWithRelationInput
   progress?: Prisma.ProgressOrderByWithRelationInput
+  comments?: Prisma.ModuleCommentOrderByRelationAggregateInput
 }
 
 export type ModuleWhereUniqueInput = Prisma.AtLeast<{
@@ -207,8 +236,12 @@ export type ModuleWhereUniqueInput = Prisma.AtLeast<{
   summary?: Prisma.StringNullableFilter<"Module"> | string | null
   plan?: Prisma.JsonFilter<"Module">
   checklists?: Prisma.JsonNullableFilter<"Module">
+  ownerRole?: Prisma.EnumUserRoleNullableFilter<"Module"> | $Enums.UserRole | null
+  verifiedAt?: Prisma.DateTimeNullableFilter<"Module"> | Date | string | null
+  verifiedById?: Prisma.StringNullableFilter<"Module"> | string | null
   state?: Prisma.XOR<Prisma.StateScalarRelationFilter, Prisma.StateWhereInput>
   progress?: Prisma.XOR<Prisma.ProgressNullableScalarRelationFilter, Prisma.ProgressWhereInput> | null
+  comments?: Prisma.ModuleCommentListRelationFilter
 }, "id">
 
 export type ModuleOrderByWithAggregationInput = {
@@ -218,6 +251,9 @@ export type ModuleOrderByWithAggregationInput = {
   summary?: Prisma.SortOrderInput | Prisma.SortOrder
   plan?: Prisma.SortOrder
   checklists?: Prisma.SortOrderInput | Prisma.SortOrder
+  ownerRole?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  verifiedById?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ModuleCountOrderByAggregateInput
   _max?: Prisma.ModuleMaxOrderByAggregateInput
   _min?: Prisma.ModuleMinOrderByAggregateInput
@@ -233,6 +269,9 @@ export type ModuleScalarWhereWithAggregatesInput = {
   summary?: Prisma.StringNullableWithAggregatesFilter<"Module"> | string | null
   plan?: Prisma.JsonWithAggregatesFilter<"Module">
   checklists?: Prisma.JsonNullableWithAggregatesFilter<"Module">
+  ownerRole?: Prisma.EnumUserRoleNullableWithAggregatesFilter<"Module"> | $Enums.UserRole | null
+  verifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Module"> | Date | string | null
+  verifiedById?: Prisma.StringNullableWithAggregatesFilter<"Module"> | string | null
 }
 
 export type ModuleCreateInput = {
@@ -241,8 +280,12 @@ export type ModuleCreateInput = {
   summary?: string | null
   plan: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: $Enums.UserRole | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
   state: Prisma.StateCreateNestedOneWithoutModulesInput
   progress?: Prisma.ProgressCreateNestedOneWithoutModuleInput
+  comments?: Prisma.ModuleCommentCreateNestedManyWithoutModuleInput
 }
 
 export type ModuleUncheckedCreateInput = {
@@ -252,7 +295,11 @@ export type ModuleUncheckedCreateInput = {
   summary?: string | null
   plan: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: $Enums.UserRole | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
   progress?: Prisma.ProgressUncheckedCreateNestedOneWithoutModuleInput
+  comments?: Prisma.ModuleCommentUncheckedCreateNestedManyWithoutModuleInput
 }
 
 export type ModuleUpdateInput = {
@@ -261,8 +308,12 @@ export type ModuleUpdateInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: Prisma.NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.StateUpdateOneRequiredWithoutModulesNestedInput
   progress?: Prisma.ProgressUpdateOneWithoutModuleNestedInput
+  comments?: Prisma.ModuleCommentUpdateManyWithoutModuleNestedInput
 }
 
 export type ModuleUncheckedUpdateInput = {
@@ -272,7 +323,11 @@ export type ModuleUncheckedUpdateInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: Prisma.NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   progress?: Prisma.ProgressUncheckedUpdateOneWithoutModuleNestedInput
+  comments?: Prisma.ModuleCommentUncheckedUpdateManyWithoutModuleNestedInput
 }
 
 export type ModuleCreateManyInput = {
@@ -282,6 +337,9 @@ export type ModuleCreateManyInput = {
   summary?: string | null
   plan: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: $Enums.UserRole | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
 }
 
 export type ModuleUpdateManyMutationInput = {
@@ -290,6 +348,9 @@ export type ModuleUpdateManyMutationInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: Prisma.NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ModuleUncheckedUpdateManyInput = {
@@ -299,6 +360,9 @@ export type ModuleUncheckedUpdateManyInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: Prisma.NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ModuleListRelationFilter = {
@@ -318,6 +382,9 @@ export type ModuleCountOrderByAggregateInput = {
   summary?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   checklists?: Prisma.SortOrder
+  ownerRole?: Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrder
+  verifiedById?: Prisma.SortOrder
 }
 
 export type ModuleMaxOrderByAggregateInput = {
@@ -325,6 +392,9 @@ export type ModuleMaxOrderByAggregateInput = {
   type?: Prisma.SortOrder
   stateId?: Prisma.SortOrder
   summary?: Prisma.SortOrder
+  ownerRole?: Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrder
+  verifiedById?: Prisma.SortOrder
 }
 
 export type ModuleMinOrderByAggregateInput = {
@@ -332,6 +402,9 @@ export type ModuleMinOrderByAggregateInput = {
   type?: Prisma.SortOrder
   stateId?: Prisma.SortOrder
   summary?: Prisma.SortOrder
+  ownerRole?: Prisma.SortOrder
+  verifiedAt?: Prisma.SortOrder
+  verifiedById?: Prisma.SortOrder
 }
 
 export type ModuleScalarRelationFilter = {
@@ -381,6 +454,14 @@ export type ModuleUncheckedUpdateManyWithoutStateNestedInput = {
   deleteMany?: Prisma.ModuleScalarWhereInput | Prisma.ModuleScalarWhereInput[]
 }
 
+export type NullableEnumUserRoleFieldUpdateOperationsInput = {
+  set?: $Enums.UserRole | null
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type ModuleCreateNestedOneWithoutProgressInput = {
   create?: Prisma.XOR<Prisma.ModuleCreateWithoutProgressInput, Prisma.ModuleUncheckedCreateWithoutProgressInput>
   connectOrCreate?: Prisma.ModuleCreateOrConnectWithoutProgressInput
@@ -395,13 +476,31 @@ export type ModuleUpdateOneRequiredWithoutProgressNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ModuleUpdateToOneWithWhereWithoutProgressInput, Prisma.ModuleUpdateWithoutProgressInput>, Prisma.ModuleUncheckedUpdateWithoutProgressInput>
 }
 
+export type ModuleCreateNestedOneWithoutCommentsInput = {
+  create?: Prisma.XOR<Prisma.ModuleCreateWithoutCommentsInput, Prisma.ModuleUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.ModuleCreateOrConnectWithoutCommentsInput
+  connect?: Prisma.ModuleWhereUniqueInput
+}
+
+export type ModuleUpdateOneRequiredWithoutCommentsNestedInput = {
+  create?: Prisma.XOR<Prisma.ModuleCreateWithoutCommentsInput, Prisma.ModuleUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.ModuleCreateOrConnectWithoutCommentsInput
+  upsert?: Prisma.ModuleUpsertWithoutCommentsInput
+  connect?: Prisma.ModuleWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ModuleUpdateToOneWithWhereWithoutCommentsInput, Prisma.ModuleUpdateWithoutCommentsInput>, Prisma.ModuleUncheckedUpdateWithoutCommentsInput>
+}
+
 export type ModuleCreateWithoutStateInput = {
   id?: string
   type: string
   summary?: string | null
   plan: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: $Enums.UserRole | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
   progress?: Prisma.ProgressCreateNestedOneWithoutModuleInput
+  comments?: Prisma.ModuleCommentCreateNestedManyWithoutModuleInput
 }
 
 export type ModuleUncheckedCreateWithoutStateInput = {
@@ -410,7 +509,11 @@ export type ModuleUncheckedCreateWithoutStateInput = {
   summary?: string | null
   plan: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: $Enums.UserRole | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
   progress?: Prisma.ProgressUncheckedCreateNestedOneWithoutModuleInput
+  comments?: Prisma.ModuleCommentUncheckedCreateNestedManyWithoutModuleInput
 }
 
 export type ModuleCreateOrConnectWithoutStateInput = {
@@ -449,6 +552,9 @@ export type ModuleScalarWhereInput = {
   summary?: Prisma.StringNullableFilter<"Module"> | string | null
   plan?: Prisma.JsonFilter<"Module">
   checklists?: Prisma.JsonNullableFilter<"Module">
+  ownerRole?: Prisma.EnumUserRoleNullableFilter<"Module"> | $Enums.UserRole | null
+  verifiedAt?: Prisma.DateTimeNullableFilter<"Module"> | Date | string | null
+  verifiedById?: Prisma.StringNullableFilter<"Module"> | string | null
 }
 
 export type ModuleCreateWithoutProgressInput = {
@@ -457,7 +563,11 @@ export type ModuleCreateWithoutProgressInput = {
   summary?: string | null
   plan: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: $Enums.UserRole | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
   state: Prisma.StateCreateNestedOneWithoutModulesInput
+  comments?: Prisma.ModuleCommentCreateNestedManyWithoutModuleInput
 }
 
 export type ModuleUncheckedCreateWithoutProgressInput = {
@@ -467,6 +577,10 @@ export type ModuleUncheckedCreateWithoutProgressInput = {
   summary?: string | null
   plan: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: $Enums.UserRole | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
+  comments?: Prisma.ModuleCommentUncheckedCreateNestedManyWithoutModuleInput
 }
 
 export type ModuleCreateOrConnectWithoutProgressInput = {
@@ -491,7 +605,11 @@ export type ModuleUpdateWithoutProgressInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: Prisma.NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   state?: Prisma.StateUpdateOneRequiredWithoutModulesNestedInput
+  comments?: Prisma.ModuleCommentUpdateManyWithoutModuleNestedInput
 }
 
 export type ModuleUncheckedUpdateWithoutProgressInput = {
@@ -501,6 +619,78 @@ export type ModuleUncheckedUpdateWithoutProgressInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: Prisma.NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  comments?: Prisma.ModuleCommentUncheckedUpdateManyWithoutModuleNestedInput
+}
+
+export type ModuleCreateWithoutCommentsInput = {
+  id?: string
+  type: string
+  summary?: string | null
+  plan: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: $Enums.UserRole | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
+  state: Prisma.StateCreateNestedOneWithoutModulesInput
+  progress?: Prisma.ProgressCreateNestedOneWithoutModuleInput
+}
+
+export type ModuleUncheckedCreateWithoutCommentsInput = {
+  id?: string
+  type: string
+  stateId: string
+  summary?: string | null
+  plan: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: $Enums.UserRole | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
+  progress?: Prisma.ProgressUncheckedCreateNestedOneWithoutModuleInput
+}
+
+export type ModuleCreateOrConnectWithoutCommentsInput = {
+  where: Prisma.ModuleWhereUniqueInput
+  create: Prisma.XOR<Prisma.ModuleCreateWithoutCommentsInput, Prisma.ModuleUncheckedCreateWithoutCommentsInput>
+}
+
+export type ModuleUpsertWithoutCommentsInput = {
+  update: Prisma.XOR<Prisma.ModuleUpdateWithoutCommentsInput, Prisma.ModuleUncheckedUpdateWithoutCommentsInput>
+  create: Prisma.XOR<Prisma.ModuleCreateWithoutCommentsInput, Prisma.ModuleUncheckedCreateWithoutCommentsInput>
+  where?: Prisma.ModuleWhereInput
+}
+
+export type ModuleUpdateToOneWithWhereWithoutCommentsInput = {
+  where?: Prisma.ModuleWhereInput
+  data: Prisma.XOR<Prisma.ModuleUpdateWithoutCommentsInput, Prisma.ModuleUncheckedUpdateWithoutCommentsInput>
+}
+
+export type ModuleUpdateWithoutCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: Prisma.NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.StateUpdateOneRequiredWithoutModulesNestedInput
+  progress?: Prisma.ProgressUpdateOneWithoutModuleNestedInput
+}
+
+export type ModuleUncheckedUpdateWithoutCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  stateId?: Prisma.StringFieldUpdateOperationsInput | string
+  summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plan?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: Prisma.NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  progress?: Prisma.ProgressUncheckedUpdateOneWithoutModuleNestedInput
 }
 
 export type ModuleCreateManyStateInput = {
@@ -509,6 +699,9 @@ export type ModuleCreateManyStateInput = {
   summary?: string | null
   plan: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: $Enums.UserRole | null
+  verifiedAt?: Date | string | null
+  verifiedById?: string | null
 }
 
 export type ModuleUpdateWithoutStateInput = {
@@ -517,7 +710,11 @@ export type ModuleUpdateWithoutStateInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: Prisma.NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   progress?: Prisma.ProgressUpdateOneWithoutModuleNestedInput
+  comments?: Prisma.ModuleCommentUpdateManyWithoutModuleNestedInput
 }
 
 export type ModuleUncheckedUpdateWithoutStateInput = {
@@ -526,7 +723,11 @@ export type ModuleUncheckedUpdateWithoutStateInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: Prisma.NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   progress?: Prisma.ProgressUncheckedUpdateOneWithoutModuleNestedInput
+  comments?: Prisma.ModuleCommentUncheckedUpdateManyWithoutModuleNestedInput
 }
 
 export type ModuleUncheckedUpdateManyWithoutStateInput = {
@@ -535,8 +736,40 @@ export type ModuleUncheckedUpdateManyWithoutStateInput = {
   summary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plan?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   checklists?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  ownerRole?: Prisma.NullableEnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
+
+/**
+ * Count Type ModuleCountOutputType
+ */
+
+export type ModuleCountOutputType = {
+  comments: number
+}
+
+export type ModuleCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  comments?: boolean | ModuleCountOutputTypeCountCommentsArgs
+}
+
+/**
+ * ModuleCountOutputType without action
+ */
+export type ModuleCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ModuleCountOutputType
+   */
+  select?: Prisma.ModuleCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ModuleCountOutputType without action
+ */
+export type ModuleCountOutputTypeCountCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ModuleCommentWhereInput
+}
 
 
 export type ModuleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -546,8 +779,13 @@ export type ModuleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   summary?: boolean
   plan?: boolean
   checklists?: boolean
+  ownerRole?: boolean
+  verifiedAt?: boolean
+  verifiedById?: boolean
   state?: boolean | Prisma.StateDefaultArgs<ExtArgs>
   progress?: boolean | Prisma.Module$progressArgs<ExtArgs>
+  comments?: boolean | Prisma.Module$commentsArgs<ExtArgs>
+  _count?: boolean | Prisma.ModuleCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["module"]>
 
 export type ModuleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -557,6 +795,9 @@ export type ModuleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   summary?: boolean
   plan?: boolean
   checklists?: boolean
+  ownerRole?: boolean
+  verifiedAt?: boolean
+  verifiedById?: boolean
   state?: boolean | Prisma.StateDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["module"]>
 
@@ -567,6 +808,9 @@ export type ModuleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   summary?: boolean
   plan?: boolean
   checklists?: boolean
+  ownerRole?: boolean
+  verifiedAt?: boolean
+  verifiedById?: boolean
   state?: boolean | Prisma.StateDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["module"]>
 
@@ -577,12 +821,17 @@ export type ModuleSelectScalar = {
   summary?: boolean
   plan?: boolean
   checklists?: boolean
+  ownerRole?: boolean
+  verifiedAt?: boolean
+  verifiedById?: boolean
 }
 
-export type ModuleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "stateId" | "summary" | "plan" | "checklists", ExtArgs["result"]["module"]>
+export type ModuleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "stateId" | "summary" | "plan" | "checklists" | "ownerRole" | "verifiedAt" | "verifiedById", ExtArgs["result"]["module"]>
 export type ModuleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   state?: boolean | Prisma.StateDefaultArgs<ExtArgs>
   progress?: boolean | Prisma.Module$progressArgs<ExtArgs>
+  comments?: boolean | Prisma.Module$commentsArgs<ExtArgs>
+  _count?: boolean | Prisma.ModuleCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ModuleIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   state?: boolean | Prisma.StateDefaultArgs<ExtArgs>
@@ -596,6 +845,7 @@ export type $ModulePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   objects: {
     state: Prisma.$StatePayload<ExtArgs>
     progress: Prisma.$ProgressPayload<ExtArgs> | null
+    comments: Prisma.$ModuleCommentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -604,6 +854,9 @@ export type $ModulePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     summary: string | null
     plan: runtime.JsonValue
     checklists: runtime.JsonValue | null
+    ownerRole: $Enums.UserRole | null
+    verifiedAt: Date | null
+    verifiedById: string | null
   }, ExtArgs["result"]["module"]>
   composites: {}
 }
@@ -1000,6 +1253,7 @@ export interface Prisma__ModuleClient<T, Null = never, ExtArgs extends runtime.T
   readonly [Symbol.toStringTag]: "PrismaPromise"
   state<T extends Prisma.StateDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StateDefaultArgs<ExtArgs>>): Prisma.Prisma__StateClient<runtime.Types.Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   progress<T extends Prisma.Module$progressArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Module$progressArgs<ExtArgs>>): Prisma.Prisma__ProgressClient<runtime.Types.Result.GetResult<Prisma.$ProgressPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  comments<T extends Prisma.Module$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Module$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModuleCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1035,6 +1289,9 @@ export interface ModuleFieldRefs {
   readonly summary: Prisma.FieldRef<"Module", 'String'>
   readonly plan: Prisma.FieldRef<"Module", 'Json'>
   readonly checklists: Prisma.FieldRef<"Module", 'Json'>
+  readonly ownerRole: Prisma.FieldRef<"Module", 'UserRole'>
+  readonly verifiedAt: Prisma.FieldRef<"Module", 'DateTime'>
+  readonly verifiedById: Prisma.FieldRef<"Module", 'String'>
 }
     
 
@@ -1447,6 +1704,30 @@ export type Module$progressArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.ProgressInclude<ExtArgs> | null
   where?: Prisma.ProgressWhereInput
+}
+
+/**
+ * Module.comments
+ */
+export type Module$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ModuleComment
+   */
+  select?: Prisma.ModuleCommentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ModuleComment
+   */
+  omit?: Prisma.ModuleCommentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ModuleCommentInclude<ExtArgs> | null
+  where?: Prisma.ModuleCommentWhereInput
+  orderBy?: Prisma.ModuleCommentOrderByWithRelationInput | Prisma.ModuleCommentOrderByWithRelationInput[]
+  cursor?: Prisma.ModuleCommentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ModuleCommentScalarFieldEnum | Prisma.ModuleCommentScalarFieldEnum[]
 }
 
 /**

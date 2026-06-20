@@ -61,7 +61,9 @@ export const ModelName = {
   Progress: 'Progress',
   External: 'External',
   Thread: 'Thread',
-  Message: 'Message'
+  Message: 'Message',
+  ModuleComment: 'ModuleComment',
+  Flag: 'Flag'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -140,8 +142,13 @@ export const StateScalarFieldEnum = {
   dateCreated: 'dateCreated',
   createdAt: 'createdAt',
   isActive: 'isActive',
+  recoveryDays: 'recoveryDays',
+  status: 'status',
+  confidence: 'confidence',
+  isAnchor: 'isAnchor',
   causalStateId: 'causalStateId',
   nextStateId: 'nextStateId',
+  anchorStateId: 'anchorStateId',
   causalXId: 'causalXId'
 } as const
 
@@ -154,7 +161,10 @@ export const ModuleScalarFieldEnum = {
   stateId: 'stateId',
   summary: 'summary',
   plan: 'plan',
-  checklists: 'checklists'
+  checklists: 'checklists',
+  ownerRole: 'ownerRole',
+  verifiedAt: 'verifiedAt',
+  verifiedById: 'verifiedById'
 } as const
 
 export type ModuleScalarFieldEnum = (typeof ModuleScalarFieldEnum)[keyof typeof ModuleScalarFieldEnum]
@@ -206,6 +216,34 @@ export const MessageScalarFieldEnum = {
 } as const
 
 export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+export const ModuleCommentScalarFieldEnum = {
+  id: 'id',
+  moduleId: 'moduleId',
+  authorId: 'authorId',
+  role: 'role',
+  body: 'body',
+  createdAt: 'createdAt'
+} as const
+
+export type ModuleCommentScalarFieldEnum = (typeof ModuleCommentScalarFieldEnum)[keyof typeof ModuleCommentScalarFieldEnum]
+
+
+export const FlagScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  type: 'type',
+  severity: 'severity',
+  status: 'status',
+  detail: 'detail',
+  note: 'note',
+  createdAt: 'createdAt',
+  resolvedAt: 'resolvedAt',
+  resolvedById: 'resolvedById'
+} as const
+
+export type FlagScalarFieldEnum = (typeof FlagScalarFieldEnum)[keyof typeof FlagScalarFieldEnum]
 
 
 export const SortOrder = {

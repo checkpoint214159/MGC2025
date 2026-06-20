@@ -20,8 +20,20 @@ export type StateModel = runtime.Types.Result.DefaultSelection<Prisma.$StatePayl
 
 export type AggregateState = {
   _count: StateCountAggregateOutputType | null
+  _avg: StateAvgAggregateOutputType | null
+  _sum: StateSumAggregateOutputType | null
   _min: StateMinAggregateOutputType | null
   _max: StateMaxAggregateOutputType | null
+}
+
+export type StateAvgAggregateOutputType = {
+  recoveryDays: number | null
+  confidence: number | null
+}
+
+export type StateSumAggregateOutputType = {
+  recoveryDays: number | null
+  confidence: number | null
 }
 
 export type StateMinAggregateOutputType = {
@@ -30,8 +42,13 @@ export type StateMinAggregateOutputType = {
   dateCreated: Date | null
   createdAt: Date | null
   isActive: boolean | null
+  recoveryDays: number | null
+  status: $Enums.PlanStatus | null
+  confidence: number | null
+  isAnchor: boolean | null
   causalStateId: string | null
   nextStateId: string | null
+  anchorStateId: string | null
   causalXId: string | null
 }
 
@@ -41,8 +58,13 @@ export type StateMaxAggregateOutputType = {
   dateCreated: Date | null
   createdAt: Date | null
   isActive: boolean | null
+  recoveryDays: number | null
+  status: $Enums.PlanStatus | null
+  confidence: number | null
+  isAnchor: boolean | null
   causalStateId: string | null
   nextStateId: string | null
+  anchorStateId: string | null
   causalXId: string | null
 }
 
@@ -52,12 +74,27 @@ export type StateCountAggregateOutputType = {
   dateCreated: number
   createdAt: number
   isActive: number
+  recoveryDays: number
+  status: number
+  confidence: number
+  isAnchor: number
   causalStateId: number
   nextStateId: number
+  anchorStateId: number
   causalXId: number
   _all: number
 }
 
+
+export type StateAvgAggregateInputType = {
+  recoveryDays?: true
+  confidence?: true
+}
+
+export type StateSumAggregateInputType = {
+  recoveryDays?: true
+  confidence?: true
+}
 
 export type StateMinAggregateInputType = {
   id?: true
@@ -65,8 +102,13 @@ export type StateMinAggregateInputType = {
   dateCreated?: true
   createdAt?: true
   isActive?: true
+  recoveryDays?: true
+  status?: true
+  confidence?: true
+  isAnchor?: true
   causalStateId?: true
   nextStateId?: true
+  anchorStateId?: true
   causalXId?: true
 }
 
@@ -76,8 +118,13 @@ export type StateMaxAggregateInputType = {
   dateCreated?: true
   createdAt?: true
   isActive?: true
+  recoveryDays?: true
+  status?: true
+  confidence?: true
+  isAnchor?: true
   causalStateId?: true
   nextStateId?: true
+  anchorStateId?: true
   causalXId?: true
 }
 
@@ -87,8 +134,13 @@ export type StateCountAggregateInputType = {
   dateCreated?: true
   createdAt?: true
   isActive?: true
+  recoveryDays?: true
+  status?: true
+  confidence?: true
+  isAnchor?: true
   causalStateId?: true
   nextStateId?: true
+  anchorStateId?: true
   causalXId?: true
   _all?: true
 }
@@ -131,6 +183,18 @@ export type StateAggregateArgs<ExtArgs extends runtime.Types.Extensions.Internal
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: StateAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: StateSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: StateMinAggregateInputType
@@ -161,6 +225,8 @@ export type StateGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   _count?: StateCountAggregateInputType | true
+  _avg?: StateAvgAggregateInputType
+  _sum?: StateSumAggregateInputType
   _min?: StateMinAggregateInputType
   _max?: StateMaxAggregateInputType
 }
@@ -171,10 +237,17 @@ export type StateGroupByOutputType = {
   dateCreated: Date
   createdAt: Date
   isActive: boolean
+  recoveryDays: number | null
+  status: $Enums.PlanStatus
+  confidence: number | null
+  isAnchor: boolean
   causalStateId: string | null
   nextStateId: string | null
+  anchorStateId: string | null
   causalXId: string | null
   _count: StateCountAggregateOutputType | null
+  _avg: StateAvgAggregateOutputType | null
+  _sum: StateSumAggregateOutputType | null
   _min: StateMinAggregateOutputType | null
   _max: StateMaxAggregateOutputType | null
 }
@@ -203,12 +276,19 @@ export type StateWhereInput = {
   dateCreated?: Prisma.DateTimeFilter<"State"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"State"> | Date | string
   isActive?: Prisma.BoolFilter<"State"> | boolean
+  recoveryDays?: Prisma.IntNullableFilter<"State"> | number | null
+  status?: Prisma.EnumPlanStatusFilter<"State"> | $Enums.PlanStatus
+  confidence?: Prisma.FloatNullableFilter<"State"> | number | null
+  isAnchor?: Prisma.BoolFilter<"State"> | boolean
   causalStateId?: Prisma.StringNullableFilter<"State"> | string | null
   nextStateId?: Prisma.StringNullableFilter<"State"> | string | null
+  anchorStateId?: Prisma.StringNullableFilter<"State"> | string | null
   causalXId?: Prisma.StringNullableFilter<"State"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   causalState?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
   nextState?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
+  anchorState?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
+  trackingStates?: Prisma.StateListRelationFilter
   causalX?: Prisma.XOR<Prisma.ExternalNullableScalarRelationFilter, Prisma.ExternalWhereInput> | null
   modules?: Prisma.ModuleListRelationFilter
 }
@@ -219,12 +299,19 @@ export type StateOrderByWithRelationInput = {
   dateCreated?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  recoveryDays?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
+  confidence?: Prisma.SortOrderInput | Prisma.SortOrder
+  isAnchor?: Prisma.SortOrder
   causalStateId?: Prisma.SortOrderInput | Prisma.SortOrder
   nextStateId?: Prisma.SortOrderInput | Prisma.SortOrder
+  anchorStateId?: Prisma.SortOrderInput | Prisma.SortOrder
   causalXId?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   causalState?: Prisma.StateOrderByWithRelationInput
   nextState?: Prisma.StateOrderByWithRelationInput
+  anchorState?: Prisma.StateOrderByWithRelationInput
+  trackingStates?: Prisma.StateOrderByRelationAggregateInput
   causalX?: Prisma.ExternalOrderByWithRelationInput
   modules?: Prisma.ModuleOrderByRelationAggregateInput
 }
@@ -241,9 +328,16 @@ export type StateWhereUniqueInput = Prisma.AtLeast<{
   dateCreated?: Prisma.DateTimeFilter<"State"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"State"> | Date | string
   isActive?: Prisma.BoolFilter<"State"> | boolean
+  recoveryDays?: Prisma.IntNullableFilter<"State"> | number | null
+  status?: Prisma.EnumPlanStatusFilter<"State"> | $Enums.PlanStatus
+  confidence?: Prisma.FloatNullableFilter<"State"> | number | null
+  isAnchor?: Prisma.BoolFilter<"State"> | boolean
+  anchorStateId?: Prisma.StringNullableFilter<"State"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   causalState?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
   nextState?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
+  anchorState?: Prisma.XOR<Prisma.StateNullableScalarRelationFilter, Prisma.StateWhereInput> | null
+  trackingStates?: Prisma.StateListRelationFilter
   causalX?: Prisma.XOR<Prisma.ExternalNullableScalarRelationFilter, Prisma.ExternalWhereInput> | null
   modules?: Prisma.ModuleListRelationFilter
 }, "id" | "causalStateId" | "nextStateId" | "causalXId">
@@ -254,12 +348,19 @@ export type StateOrderByWithAggregationInput = {
   dateCreated?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  recoveryDays?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
+  confidence?: Prisma.SortOrderInput | Prisma.SortOrder
+  isAnchor?: Prisma.SortOrder
   causalStateId?: Prisma.SortOrderInput | Prisma.SortOrder
   nextStateId?: Prisma.SortOrderInput | Prisma.SortOrder
+  anchorStateId?: Prisma.SortOrderInput | Prisma.SortOrder
   causalXId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.StateCountOrderByAggregateInput
+  _avg?: Prisma.StateAvgOrderByAggregateInput
   _max?: Prisma.StateMaxOrderByAggregateInput
   _min?: Prisma.StateMinOrderByAggregateInput
+  _sum?: Prisma.StateSumOrderByAggregateInput
 }
 
 export type StateScalarWhereWithAggregatesInput = {
@@ -271,8 +372,13 @@ export type StateScalarWhereWithAggregatesInput = {
   dateCreated?: Prisma.DateTimeWithAggregatesFilter<"State"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"State"> | Date | string
   isActive?: Prisma.BoolWithAggregatesFilter<"State"> | boolean
+  recoveryDays?: Prisma.IntNullableWithAggregatesFilter<"State"> | number | null
+  status?: Prisma.EnumPlanStatusWithAggregatesFilter<"State"> | $Enums.PlanStatus
+  confidence?: Prisma.FloatNullableWithAggregatesFilter<"State"> | number | null
+  isAnchor?: Prisma.BoolWithAggregatesFilter<"State"> | boolean
   causalStateId?: Prisma.StringNullableWithAggregatesFilter<"State"> | string | null
   nextStateId?: Prisma.StringNullableWithAggregatesFilter<"State"> | string | null
+  anchorStateId?: Prisma.StringNullableWithAggregatesFilter<"State"> | string | null
   causalXId?: Prisma.StringNullableWithAggregatesFilter<"State"> | string | null
 }
 
@@ -281,10 +387,16 @@ export type StateCreateInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   nextStateId?: string | null
   user: Prisma.UserCreateNestedOneWithoutStatesInput
   causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
   nextState?: Prisma.StateCreateNestedOneWithoutCausalStateInput
+  anchorState?: Prisma.StateCreateNestedOneWithoutTrackingStatesInput
+  trackingStates?: Prisma.StateCreateNestedManyWithoutAnchorStateInput
   causalX?: Prisma.ExternalCreateNestedOneWithoutStateInput
   modules?: Prisma.ModuleCreateNestedManyWithoutStateInput
 }
@@ -295,10 +407,16 @@ export type StateUncheckedCreateInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   causalStateId?: string | null
   nextStateId?: string | null
+  anchorStateId?: string | null
   causalXId?: string | null
   nextState?: Prisma.StateUncheckedCreateNestedOneWithoutCausalStateInput
+  trackingStates?: Prisma.StateUncheckedCreateNestedManyWithoutAnchorStateInput
   modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutStateInput
 }
 
@@ -307,10 +425,16 @@ export type StateUpdateInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
   causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
   nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
+  anchorState?: Prisma.StateUpdateOneWithoutTrackingStatesNestedInput
+  trackingStates?: Prisma.StateUpdateManyWithoutAnchorStateNestedInput
   causalX?: Prisma.ExternalUpdateOneWithoutStateNestedInput
   modules?: Prisma.ModuleUpdateManyWithoutStateNestedInput
 }
@@ -321,10 +445,16 @@ export type StateUncheckedUpdateInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchorStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
+  trackingStates?: Prisma.StateUncheckedUpdateManyWithoutAnchorStateNestedInput
   modules?: Prisma.ModuleUncheckedUpdateManyWithoutStateNestedInput
 }
 
@@ -334,8 +464,13 @@ export type StateCreateManyInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   causalStateId?: string | null
   nextStateId?: string | null
+  anchorStateId?: string | null
   causalXId?: string | null
 }
 
@@ -344,6 +479,10 @@ export type StateUpdateManyMutationInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -353,8 +492,13 @@ export type StateUncheckedUpdateManyInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchorStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -379,9 +523,19 @@ export type StateCountOrderByAggregateInput = {
   dateCreated?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  recoveryDays?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
+  isAnchor?: Prisma.SortOrder
   causalStateId?: Prisma.SortOrder
   nextStateId?: Prisma.SortOrder
+  anchorStateId?: Prisma.SortOrder
   causalXId?: Prisma.SortOrder
+}
+
+export type StateAvgOrderByAggregateInput = {
+  recoveryDays?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
 }
 
 export type StateMaxOrderByAggregateInput = {
@@ -390,8 +544,13 @@ export type StateMaxOrderByAggregateInput = {
   dateCreated?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  recoveryDays?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
+  isAnchor?: Prisma.SortOrder
   causalStateId?: Prisma.SortOrder
   nextStateId?: Prisma.SortOrder
+  anchorStateId?: Prisma.SortOrder
   causalXId?: Prisma.SortOrder
 }
 
@@ -401,9 +560,19 @@ export type StateMinOrderByAggregateInput = {
   dateCreated?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  recoveryDays?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
+  isAnchor?: Prisma.SortOrder
   causalStateId?: Prisma.SortOrder
   nextStateId?: Prisma.SortOrder
+  anchorStateId?: Prisma.SortOrder
   causalXId?: Prisma.SortOrder
+}
+
+export type StateSumOrderByAggregateInput = {
+  recoveryDays?: Prisma.SortOrder
+  confidence?: Prisma.SortOrder
 }
 
 export type StateScalarRelationFilter = {
@@ -465,14 +634,54 @@ export type StateCreateNestedOneWithoutCausalStateInput = {
   connect?: Prisma.StateWhereUniqueInput
 }
 
+export type StateCreateNestedOneWithoutTrackingStatesInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutTrackingStatesInput, Prisma.StateUncheckedCreateWithoutTrackingStatesInput>
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutTrackingStatesInput
+  connect?: Prisma.StateWhereUniqueInput
+}
+
+export type StateCreateNestedManyWithoutAnchorStateInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutAnchorStateInput, Prisma.StateUncheckedCreateWithoutAnchorStateInput> | Prisma.StateCreateWithoutAnchorStateInput[] | Prisma.StateUncheckedCreateWithoutAnchorStateInput[]
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutAnchorStateInput | Prisma.StateCreateOrConnectWithoutAnchorStateInput[]
+  createMany?: Prisma.StateCreateManyAnchorStateInputEnvelope
+  connect?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+}
+
 export type StateUncheckedCreateNestedOneWithoutCausalStateInput = {
   create?: Prisma.XOR<Prisma.StateCreateWithoutCausalStateInput, Prisma.StateUncheckedCreateWithoutCausalStateInput>
   connectOrCreate?: Prisma.StateCreateOrConnectWithoutCausalStateInput
   connect?: Prisma.StateWhereUniqueInput
 }
 
+export type StateUncheckedCreateNestedManyWithoutAnchorStateInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutAnchorStateInput, Prisma.StateUncheckedCreateWithoutAnchorStateInput> | Prisma.StateCreateWithoutAnchorStateInput[] | Prisma.StateUncheckedCreateWithoutAnchorStateInput[]
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutAnchorStateInput | Prisma.StateCreateOrConnectWithoutAnchorStateInput[]
+  createMany?: Prisma.StateCreateManyAnchorStateInputEnvelope
+  connect?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+}
+
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type EnumPlanStatusFieldUpdateOperationsInput = {
+  set?: $Enums.PlanStatus
+}
+
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type StateUpdateOneWithoutNextStateNestedInput = {
@@ -495,6 +704,30 @@ export type StateUpdateOneWithoutCausalStateNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StateUpdateToOneWithWhereWithoutCausalStateInput, Prisma.StateUpdateWithoutCausalStateInput>, Prisma.StateUncheckedUpdateWithoutCausalStateInput>
 }
 
+export type StateUpdateOneWithoutTrackingStatesNestedInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutTrackingStatesInput, Prisma.StateUncheckedCreateWithoutTrackingStatesInput>
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutTrackingStatesInput
+  upsert?: Prisma.StateUpsertWithoutTrackingStatesInput
+  disconnect?: Prisma.StateWhereInput | boolean
+  delete?: Prisma.StateWhereInput | boolean
+  connect?: Prisma.StateWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StateUpdateToOneWithWhereWithoutTrackingStatesInput, Prisma.StateUpdateWithoutTrackingStatesInput>, Prisma.StateUncheckedUpdateWithoutTrackingStatesInput>
+}
+
+export type StateUpdateManyWithoutAnchorStateNestedInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutAnchorStateInput, Prisma.StateUncheckedCreateWithoutAnchorStateInput> | Prisma.StateCreateWithoutAnchorStateInput[] | Prisma.StateUncheckedCreateWithoutAnchorStateInput[]
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutAnchorStateInput | Prisma.StateCreateOrConnectWithoutAnchorStateInput[]
+  upsert?: Prisma.StateUpsertWithWhereUniqueWithoutAnchorStateInput | Prisma.StateUpsertWithWhereUniqueWithoutAnchorStateInput[]
+  createMany?: Prisma.StateCreateManyAnchorStateInputEnvelope
+  set?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  disconnect?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  delete?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  connect?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  update?: Prisma.StateUpdateWithWhereUniqueWithoutAnchorStateInput | Prisma.StateUpdateWithWhereUniqueWithoutAnchorStateInput[]
+  updateMany?: Prisma.StateUpdateManyWithWhereWithoutAnchorStateInput | Prisma.StateUpdateManyWithWhereWithoutAnchorStateInput[]
+  deleteMany?: Prisma.StateScalarWhereInput | Prisma.StateScalarWhereInput[]
+}
+
 export type StateUncheckedUpdateOneWithoutCausalStateNestedInput = {
   create?: Prisma.XOR<Prisma.StateCreateWithoutCausalStateInput, Prisma.StateUncheckedCreateWithoutCausalStateInput>
   connectOrCreate?: Prisma.StateCreateOrConnectWithoutCausalStateInput
@@ -503,6 +736,20 @@ export type StateUncheckedUpdateOneWithoutCausalStateNestedInput = {
   delete?: Prisma.StateWhereInput | boolean
   connect?: Prisma.StateWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.StateUpdateToOneWithWhereWithoutCausalStateInput, Prisma.StateUpdateWithoutCausalStateInput>, Prisma.StateUncheckedUpdateWithoutCausalStateInput>
+}
+
+export type StateUncheckedUpdateManyWithoutAnchorStateNestedInput = {
+  create?: Prisma.XOR<Prisma.StateCreateWithoutAnchorStateInput, Prisma.StateUncheckedCreateWithoutAnchorStateInput> | Prisma.StateCreateWithoutAnchorStateInput[] | Prisma.StateUncheckedCreateWithoutAnchorStateInput[]
+  connectOrCreate?: Prisma.StateCreateOrConnectWithoutAnchorStateInput | Prisma.StateCreateOrConnectWithoutAnchorStateInput[]
+  upsert?: Prisma.StateUpsertWithWhereUniqueWithoutAnchorStateInput | Prisma.StateUpsertWithWhereUniqueWithoutAnchorStateInput[]
+  createMany?: Prisma.StateCreateManyAnchorStateInputEnvelope
+  set?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  disconnect?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  delete?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  connect?: Prisma.StateWhereUniqueInput | Prisma.StateWhereUniqueInput[]
+  update?: Prisma.StateUpdateWithWhereUniqueWithoutAnchorStateInput | Prisma.StateUpdateWithWhereUniqueWithoutAnchorStateInput[]
+  updateMany?: Prisma.StateUpdateManyWithWhereWithoutAnchorStateInput | Prisma.StateUpdateManyWithWhereWithoutAnchorStateInput[]
+  deleteMany?: Prisma.StateScalarWhereInput | Prisma.StateScalarWhereInput[]
 }
 
 export type StateCreateNestedOneWithoutModulesInput = {
@@ -566,9 +813,15 @@ export type StateCreateWithoutUserInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   nextStateId?: string | null
   causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
   nextState?: Prisma.StateCreateNestedOneWithoutCausalStateInput
+  anchorState?: Prisma.StateCreateNestedOneWithoutTrackingStatesInput
+  trackingStates?: Prisma.StateCreateNestedManyWithoutAnchorStateInput
   causalX?: Prisma.ExternalCreateNestedOneWithoutStateInput
   modules?: Prisma.ModuleCreateNestedManyWithoutStateInput
 }
@@ -578,10 +831,16 @@ export type StateUncheckedCreateWithoutUserInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   causalStateId?: string | null
   nextStateId?: string | null
+  anchorStateId?: string | null
   causalXId?: string | null
   nextState?: Prisma.StateUncheckedCreateNestedOneWithoutCausalStateInput
+  trackingStates?: Prisma.StateUncheckedCreateNestedManyWithoutAnchorStateInput
   modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutStateInput
 }
 
@@ -620,8 +879,13 @@ export type StateScalarWhereInput = {
   dateCreated?: Prisma.DateTimeFilter<"State"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"State"> | Date | string
   isActive?: Prisma.BoolFilter<"State"> | boolean
+  recoveryDays?: Prisma.IntNullableFilter<"State"> | number | null
+  status?: Prisma.EnumPlanStatusFilter<"State"> | $Enums.PlanStatus
+  confidence?: Prisma.FloatNullableFilter<"State"> | number | null
+  isAnchor?: Prisma.BoolFilter<"State"> | boolean
   causalStateId?: Prisma.StringNullableFilter<"State"> | string | null
   nextStateId?: Prisma.StringNullableFilter<"State"> | string | null
+  anchorStateId?: Prisma.StringNullableFilter<"State"> | string | null
   causalXId?: Prisma.StringNullableFilter<"State"> | string | null
 }
 
@@ -630,9 +894,15 @@ export type StateCreateWithoutNextStateInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   nextStateId?: string | null
   user: Prisma.UserCreateNestedOneWithoutStatesInput
   causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
+  anchorState?: Prisma.StateCreateNestedOneWithoutTrackingStatesInput
+  trackingStates?: Prisma.StateCreateNestedManyWithoutAnchorStateInput
   causalX?: Prisma.ExternalCreateNestedOneWithoutStateInput
   modules?: Prisma.ModuleCreateNestedManyWithoutStateInput
 }
@@ -643,9 +913,15 @@ export type StateUncheckedCreateWithoutNextStateInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   causalStateId?: string | null
   nextStateId?: string | null
+  anchorStateId?: string | null
   causalXId?: string | null
+  trackingStates?: Prisma.StateUncheckedCreateNestedManyWithoutAnchorStateInput
   modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutStateInput
 }
 
@@ -659,9 +935,15 @@ export type StateCreateWithoutCausalStateInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   nextStateId?: string | null
   user: Prisma.UserCreateNestedOneWithoutStatesInput
   nextState?: Prisma.StateCreateNestedOneWithoutCausalStateInput
+  anchorState?: Prisma.StateCreateNestedOneWithoutTrackingStatesInput
+  trackingStates?: Prisma.StateCreateNestedManyWithoutAnchorStateInput
   causalX?: Prisma.ExternalCreateNestedOneWithoutStateInput
   modules?: Prisma.ModuleCreateNestedManyWithoutStateInput
 }
@@ -672,15 +954,108 @@ export type StateUncheckedCreateWithoutCausalStateInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   nextStateId?: string | null
+  anchorStateId?: string | null
   causalXId?: string | null
   nextState?: Prisma.StateUncheckedCreateNestedOneWithoutCausalStateInput
+  trackingStates?: Prisma.StateUncheckedCreateNestedManyWithoutAnchorStateInput
   modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutStateInput
 }
 
 export type StateCreateOrConnectWithoutCausalStateInput = {
   where: Prisma.StateWhereUniqueInput
   create: Prisma.XOR<Prisma.StateCreateWithoutCausalStateInput, Prisma.StateUncheckedCreateWithoutCausalStateInput>
+}
+
+export type StateCreateWithoutTrackingStatesInput = {
+  id?: string
+  dateCreated: Date | string
+  createdAt?: Date | string
+  isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
+  nextStateId?: string | null
+  user: Prisma.UserCreateNestedOneWithoutStatesInput
+  causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
+  nextState?: Prisma.StateCreateNestedOneWithoutCausalStateInput
+  anchorState?: Prisma.StateCreateNestedOneWithoutTrackingStatesInput
+  causalX?: Prisma.ExternalCreateNestedOneWithoutStateInput
+  modules?: Prisma.ModuleCreateNestedManyWithoutStateInput
+}
+
+export type StateUncheckedCreateWithoutTrackingStatesInput = {
+  id?: string
+  userId: string
+  dateCreated: Date | string
+  createdAt?: Date | string
+  isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
+  causalStateId?: string | null
+  nextStateId?: string | null
+  anchorStateId?: string | null
+  causalXId?: string | null
+  nextState?: Prisma.StateUncheckedCreateNestedOneWithoutCausalStateInput
+  modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutStateInput
+}
+
+export type StateCreateOrConnectWithoutTrackingStatesInput = {
+  where: Prisma.StateWhereUniqueInput
+  create: Prisma.XOR<Prisma.StateCreateWithoutTrackingStatesInput, Prisma.StateUncheckedCreateWithoutTrackingStatesInput>
+}
+
+export type StateCreateWithoutAnchorStateInput = {
+  id?: string
+  dateCreated: Date | string
+  createdAt?: Date | string
+  isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
+  nextStateId?: string | null
+  user: Prisma.UserCreateNestedOneWithoutStatesInput
+  causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
+  nextState?: Prisma.StateCreateNestedOneWithoutCausalStateInput
+  trackingStates?: Prisma.StateCreateNestedManyWithoutAnchorStateInput
+  causalX?: Prisma.ExternalCreateNestedOneWithoutStateInput
+  modules?: Prisma.ModuleCreateNestedManyWithoutStateInput
+}
+
+export type StateUncheckedCreateWithoutAnchorStateInput = {
+  id?: string
+  userId: string
+  dateCreated: Date | string
+  createdAt?: Date | string
+  isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
+  causalStateId?: string | null
+  nextStateId?: string | null
+  causalXId?: string | null
+  nextState?: Prisma.StateUncheckedCreateNestedOneWithoutCausalStateInput
+  trackingStates?: Prisma.StateUncheckedCreateNestedManyWithoutAnchorStateInput
+  modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutStateInput
+}
+
+export type StateCreateOrConnectWithoutAnchorStateInput = {
+  where: Prisma.StateWhereUniqueInput
+  create: Prisma.XOR<Prisma.StateCreateWithoutAnchorStateInput, Prisma.StateUncheckedCreateWithoutAnchorStateInput>
+}
+
+export type StateCreateManyAnchorStateInputEnvelope = {
+  data: Prisma.StateCreateManyAnchorStateInput | Prisma.StateCreateManyAnchorStateInput[]
+  skipDuplicates?: boolean
 }
 
 export type StateUpsertWithoutNextStateInput = {
@@ -699,9 +1074,15 @@ export type StateUpdateWithoutNextStateInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
   causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
+  anchorState?: Prisma.StateUpdateOneWithoutTrackingStatesNestedInput
+  trackingStates?: Prisma.StateUpdateManyWithoutAnchorStateNestedInput
   causalX?: Prisma.ExternalUpdateOneWithoutStateNestedInput
   modules?: Prisma.ModuleUpdateManyWithoutStateNestedInput
 }
@@ -712,9 +1093,15 @@ export type StateUncheckedUpdateWithoutNextStateInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchorStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trackingStates?: Prisma.StateUncheckedUpdateManyWithoutAnchorStateNestedInput
   modules?: Prisma.ModuleUncheckedUpdateManyWithoutStateNestedInput
 }
 
@@ -734,9 +1121,15 @@ export type StateUpdateWithoutCausalStateInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
   nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
+  anchorState?: Prisma.StateUpdateOneWithoutTrackingStatesNestedInput
+  trackingStates?: Prisma.StateUpdateManyWithoutAnchorStateNestedInput
   causalX?: Prisma.ExternalUpdateOneWithoutStateNestedInput
   modules?: Prisma.ModuleUpdateManyWithoutStateNestedInput
 }
@@ -747,10 +1140,79 @@ export type StateUncheckedUpdateWithoutCausalStateInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchorStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
+  trackingStates?: Prisma.StateUncheckedUpdateManyWithoutAnchorStateNestedInput
+  modules?: Prisma.ModuleUncheckedUpdateManyWithoutStateNestedInput
+}
+
+export type StateUpsertWithoutTrackingStatesInput = {
+  update: Prisma.XOR<Prisma.StateUpdateWithoutTrackingStatesInput, Prisma.StateUncheckedUpdateWithoutTrackingStatesInput>
+  create: Prisma.XOR<Prisma.StateCreateWithoutTrackingStatesInput, Prisma.StateUncheckedCreateWithoutTrackingStatesInput>
+  where?: Prisma.StateWhereInput
+}
+
+export type StateUpdateToOneWithWhereWithoutTrackingStatesInput = {
+  where?: Prisma.StateWhereInput
+  data: Prisma.XOR<Prisma.StateUpdateWithoutTrackingStatesInput, Prisma.StateUncheckedUpdateWithoutTrackingStatesInput>
+}
+
+export type StateUpdateWithoutTrackingStatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
+  causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
+  nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
+  anchorState?: Prisma.StateUpdateOneWithoutTrackingStatesNestedInput
+  causalX?: Prisma.ExternalUpdateOneWithoutStateNestedInput
+  modules?: Prisma.ModuleUpdateManyWithoutStateNestedInput
+}
+
+export type StateUncheckedUpdateWithoutTrackingStatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchorStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
   modules?: Prisma.ModuleUncheckedUpdateManyWithoutStateNestedInput
+}
+
+export type StateUpsertWithWhereUniqueWithoutAnchorStateInput = {
+  where: Prisma.StateWhereUniqueInput
+  update: Prisma.XOR<Prisma.StateUpdateWithoutAnchorStateInput, Prisma.StateUncheckedUpdateWithoutAnchorStateInput>
+  create: Prisma.XOR<Prisma.StateCreateWithoutAnchorStateInput, Prisma.StateUncheckedCreateWithoutAnchorStateInput>
+}
+
+export type StateUpdateWithWhereUniqueWithoutAnchorStateInput = {
+  where: Prisma.StateWhereUniqueInput
+  data: Prisma.XOR<Prisma.StateUpdateWithoutAnchorStateInput, Prisma.StateUncheckedUpdateWithoutAnchorStateInput>
+}
+
+export type StateUpdateManyWithWhereWithoutAnchorStateInput = {
+  where: Prisma.StateScalarWhereInput
+  data: Prisma.XOR<Prisma.StateUpdateManyMutationInput, Prisma.StateUncheckedUpdateManyWithoutAnchorStateInput>
 }
 
 export type StateCreateWithoutModulesInput = {
@@ -758,10 +1220,16 @@ export type StateCreateWithoutModulesInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   nextStateId?: string | null
   user: Prisma.UserCreateNestedOneWithoutStatesInput
   causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
   nextState?: Prisma.StateCreateNestedOneWithoutCausalStateInput
+  anchorState?: Prisma.StateCreateNestedOneWithoutTrackingStatesInput
+  trackingStates?: Prisma.StateCreateNestedManyWithoutAnchorStateInput
   causalX?: Prisma.ExternalCreateNestedOneWithoutStateInput
 }
 
@@ -771,10 +1239,16 @@ export type StateUncheckedCreateWithoutModulesInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   causalStateId?: string | null
   nextStateId?: string | null
+  anchorStateId?: string | null
   causalXId?: string | null
   nextState?: Prisma.StateUncheckedCreateNestedOneWithoutCausalStateInput
+  trackingStates?: Prisma.StateUncheckedCreateNestedManyWithoutAnchorStateInput
 }
 
 export type StateCreateOrConnectWithoutModulesInput = {
@@ -798,10 +1272,16 @@ export type StateUpdateWithoutModulesInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
   causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
   nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
+  anchorState?: Prisma.StateUpdateOneWithoutTrackingStatesNestedInput
+  trackingStates?: Prisma.StateUpdateManyWithoutAnchorStateNestedInput
   causalX?: Prisma.ExternalUpdateOneWithoutStateNestedInput
 }
 
@@ -811,10 +1291,16 @@ export type StateUncheckedUpdateWithoutModulesInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchorStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
+  trackingStates?: Prisma.StateUncheckedUpdateManyWithoutAnchorStateNestedInput
 }
 
 export type StateCreateWithoutCausalXInput = {
@@ -822,10 +1308,16 @@ export type StateCreateWithoutCausalXInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   nextStateId?: string | null
   user: Prisma.UserCreateNestedOneWithoutStatesInput
   causalState?: Prisma.StateCreateNestedOneWithoutNextStateInput
   nextState?: Prisma.StateCreateNestedOneWithoutCausalStateInput
+  anchorState?: Prisma.StateCreateNestedOneWithoutTrackingStatesInput
+  trackingStates?: Prisma.StateCreateNestedManyWithoutAnchorStateInput
   modules?: Prisma.ModuleCreateNestedManyWithoutStateInput
 }
 
@@ -835,9 +1327,15 @@ export type StateUncheckedCreateWithoutCausalXInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   causalStateId?: string | null
   nextStateId?: string | null
+  anchorStateId?: string | null
   nextState?: Prisma.StateUncheckedCreateNestedOneWithoutCausalStateInput
+  trackingStates?: Prisma.StateUncheckedCreateNestedManyWithoutAnchorStateInput
   modules?: Prisma.ModuleUncheckedCreateNestedManyWithoutStateInput
 }
 
@@ -872,8 +1370,13 @@ export type StateCreateManyUserInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   causalStateId?: string | null
   nextStateId?: string | null
+  anchorStateId?: string | null
   causalXId?: string | null
 }
 
@@ -882,9 +1385,15 @@ export type StateUpdateWithoutUserInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
   nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
+  anchorState?: Prisma.StateUpdateOneWithoutTrackingStatesNestedInput
+  trackingStates?: Prisma.StateUpdateManyWithoutAnchorStateNestedInput
   causalX?: Prisma.ExternalUpdateOneWithoutStateNestedInput
   modules?: Prisma.ModuleUpdateManyWithoutStateNestedInput
 }
@@ -894,10 +1403,16 @@ export type StateUncheckedUpdateWithoutUserInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchorStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
+  trackingStates?: Prisma.StateUncheckedUpdateManyWithoutAnchorStateNestedInput
   modules?: Prisma.ModuleUncheckedUpdateManyWithoutStateNestedInput
 }
 
@@ -906,6 +1421,77 @@ export type StateUncheckedUpdateManyWithoutUserInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchorStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type StateCreateManyAnchorStateInput = {
+  id?: string
+  userId: string
+  dateCreated: Date | string
+  createdAt?: Date | string
+  isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
+  causalStateId?: string | null
+  nextStateId?: string | null
+  causalXId?: string | null
+}
+
+export type StateUpdateWithoutAnchorStateInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
+  causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
+  nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
+  trackingStates?: Prisma.StateUpdateManyWithoutAnchorStateNestedInput
+  causalX?: Prisma.ExternalUpdateOneWithoutStateNestedInput
+  modules?: Prisma.ModuleUpdateManyWithoutStateNestedInput
+}
+
+export type StateUncheckedUpdateWithoutAnchorStateInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
+  trackingStates?: Prisma.StateUncheckedUpdateManyWithoutAnchorStateNestedInput
+  modules?: Prisma.ModuleUncheckedUpdateManyWithoutStateNestedInput
+}
+
+export type StateUncheckedUpdateManyWithoutAnchorStateInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   causalXId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -917,8 +1503,13 @@ export type StateCreateManyCausalXInput = {
   dateCreated: Date | string
   createdAt?: Date | string
   isActive: boolean
+  recoveryDays?: number | null
+  status?: $Enums.PlanStatus
+  confidence?: number | null
+  isAnchor?: boolean
   causalStateId?: string | null
   nextStateId?: string | null
+  anchorStateId?: string | null
 }
 
 export type StateUpdateWithoutCausalXInput = {
@@ -926,10 +1517,16 @@ export type StateUpdateWithoutCausalXInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutStatesNestedInput
   causalState?: Prisma.StateUpdateOneWithoutNextStateNestedInput
   nextState?: Prisma.StateUpdateOneWithoutCausalStateNestedInput
+  anchorState?: Prisma.StateUpdateOneWithoutTrackingStatesNestedInput
+  trackingStates?: Prisma.StateUpdateManyWithoutAnchorStateNestedInput
   modules?: Prisma.ModuleUpdateManyWithoutStateNestedInput
 }
 
@@ -939,9 +1536,15 @@ export type StateUncheckedUpdateWithoutCausalXInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchorStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextState?: Prisma.StateUncheckedUpdateOneWithoutCausalStateNestedInput
+  trackingStates?: Prisma.StateUncheckedUpdateManyWithoutAnchorStateNestedInput
   modules?: Prisma.ModuleUncheckedUpdateManyWithoutStateNestedInput
 }
 
@@ -951,8 +1554,13 @@ export type StateUncheckedUpdateManyWithoutCausalXInput = {
   dateCreated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recoveryDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnchor?: Prisma.BoolFieldUpdateOperationsInput | boolean
   causalStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   nextStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  anchorStateId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -961,10 +1569,12 @@ export type StateUncheckedUpdateManyWithoutCausalXInput = {
  */
 
 export type StateCountOutputType = {
+  trackingStates: number
   modules: number
 }
 
 export type StateCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  trackingStates?: boolean | StateCountOutputTypeCountTrackingStatesArgs
   modules?: boolean | StateCountOutputTypeCountModulesArgs
 }
 
@@ -981,6 +1591,13 @@ export type StateCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
 /**
  * StateCountOutputType without action
  */
+export type StateCountOutputTypeCountTrackingStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StateWhereInput
+}
+
+/**
+ * StateCountOutputType without action
+ */
 export type StateCountOutputTypeCountModulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ModuleWhereInput
 }
@@ -992,12 +1609,19 @@ export type StateSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   dateCreated?: boolean
   createdAt?: boolean
   isActive?: boolean
+  recoveryDays?: boolean
+  status?: boolean
+  confidence?: boolean
+  isAnchor?: boolean
   causalStateId?: boolean
   nextStateId?: boolean
+  anchorStateId?: boolean
   causalXId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   causalState?: boolean | Prisma.State$causalStateArgs<ExtArgs>
   nextState?: boolean | Prisma.State$nextStateArgs<ExtArgs>
+  anchorState?: boolean | Prisma.State$anchorStateArgs<ExtArgs>
+  trackingStates?: boolean | Prisma.State$trackingStatesArgs<ExtArgs>
   causalX?: boolean | Prisma.State$causalXArgs<ExtArgs>
   modules?: boolean | Prisma.State$modulesArgs<ExtArgs>
   _count?: boolean | Prisma.StateCountOutputTypeDefaultArgs<ExtArgs>
@@ -1009,11 +1633,17 @@ export type StateSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   dateCreated?: boolean
   createdAt?: boolean
   isActive?: boolean
+  recoveryDays?: boolean
+  status?: boolean
+  confidence?: boolean
+  isAnchor?: boolean
   causalStateId?: boolean
   nextStateId?: boolean
+  anchorStateId?: boolean
   causalXId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   causalState?: boolean | Prisma.State$causalStateArgs<ExtArgs>
+  anchorState?: boolean | Prisma.State$anchorStateArgs<ExtArgs>
   causalX?: boolean | Prisma.State$causalXArgs<ExtArgs>
 }, ExtArgs["result"]["state"]>
 
@@ -1023,11 +1653,17 @@ export type StateSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   dateCreated?: boolean
   createdAt?: boolean
   isActive?: boolean
+  recoveryDays?: boolean
+  status?: boolean
+  confidence?: boolean
+  isAnchor?: boolean
   causalStateId?: boolean
   nextStateId?: boolean
+  anchorStateId?: boolean
   causalXId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   causalState?: boolean | Prisma.State$causalStateArgs<ExtArgs>
+  anchorState?: boolean | Prisma.State$anchorStateArgs<ExtArgs>
   causalX?: boolean | Prisma.State$causalXArgs<ExtArgs>
 }, ExtArgs["result"]["state"]>
 
@@ -1037,16 +1673,23 @@ export type StateSelectScalar = {
   dateCreated?: boolean
   createdAt?: boolean
   isActive?: boolean
+  recoveryDays?: boolean
+  status?: boolean
+  confidence?: boolean
+  isAnchor?: boolean
   causalStateId?: boolean
   nextStateId?: boolean
+  anchorStateId?: boolean
   causalXId?: boolean
 }
 
-export type StateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "dateCreated" | "createdAt" | "isActive" | "causalStateId" | "nextStateId" | "causalXId", ExtArgs["result"]["state"]>
+export type StateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "dateCreated" | "createdAt" | "isActive" | "recoveryDays" | "status" | "confidence" | "isAnchor" | "causalStateId" | "nextStateId" | "anchorStateId" | "causalXId", ExtArgs["result"]["state"]>
 export type StateInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   causalState?: boolean | Prisma.State$causalStateArgs<ExtArgs>
   nextState?: boolean | Prisma.State$nextStateArgs<ExtArgs>
+  anchorState?: boolean | Prisma.State$anchorStateArgs<ExtArgs>
+  trackingStates?: boolean | Prisma.State$trackingStatesArgs<ExtArgs>
   causalX?: boolean | Prisma.State$causalXArgs<ExtArgs>
   modules?: boolean | Prisma.State$modulesArgs<ExtArgs>
   _count?: boolean | Prisma.StateCountOutputTypeDefaultArgs<ExtArgs>
@@ -1054,11 +1697,13 @@ export type StateInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type StateIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   causalState?: boolean | Prisma.State$causalStateArgs<ExtArgs>
+  anchorState?: boolean | Prisma.State$anchorStateArgs<ExtArgs>
   causalX?: boolean | Prisma.State$causalXArgs<ExtArgs>
 }
 export type StateIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   causalState?: boolean | Prisma.State$causalStateArgs<ExtArgs>
+  anchorState?: boolean | Prisma.State$anchorStateArgs<ExtArgs>
   causalX?: boolean | Prisma.State$causalXArgs<ExtArgs>
 }
 
@@ -1068,6 +1713,8 @@ export type $StatePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     user: Prisma.$UserPayload<ExtArgs>
     causalState: Prisma.$StatePayload<ExtArgs> | null
     nextState: Prisma.$StatePayload<ExtArgs> | null
+    anchorState: Prisma.$StatePayload<ExtArgs> | null
+    trackingStates: Prisma.$StatePayload<ExtArgs>[]
     causalX: Prisma.$ExternalPayload<ExtArgs> | null
     modules: Prisma.$ModulePayload<ExtArgs>[]
   }
@@ -1077,8 +1724,13 @@ export type $StatePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     dateCreated: Date
     createdAt: Date
     isActive: boolean
+    recoveryDays: number | null
+    status: $Enums.PlanStatus
+    confidence: number | null
+    isAnchor: boolean
     causalStateId: string | null
     nextStateId: string | null
+    anchorStateId: string | null
     causalXId: string | null
   }, ExtArgs["result"]["state"]>
   composites: {}
@@ -1477,6 +2129,8 @@ export interface Prisma__StateClient<T, Null = never, ExtArgs extends runtime.Ty
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   causalState<T extends Prisma.State$causalStateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$causalStateArgs<ExtArgs>>): Prisma.Prisma__StateClient<runtime.Types.Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   nextState<T extends Prisma.State$nextStateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$nextStateArgs<ExtArgs>>): Prisma.Prisma__StateClient<runtime.Types.Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  anchorState<T extends Prisma.State$anchorStateArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$anchorStateArgs<ExtArgs>>): Prisma.Prisma__StateClient<runtime.Types.Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  trackingStates<T extends Prisma.State$trackingStatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$trackingStatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   causalX<T extends Prisma.State$causalXArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$causalXArgs<ExtArgs>>): Prisma.Prisma__ExternalClient<runtime.Types.Result.GetResult<Prisma.$ExternalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   modules<T extends Prisma.State$modulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.State$modulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1513,8 +2167,13 @@ export interface StateFieldRefs {
   readonly dateCreated: Prisma.FieldRef<"State", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"State", 'DateTime'>
   readonly isActive: Prisma.FieldRef<"State", 'Boolean'>
+  readonly recoveryDays: Prisma.FieldRef<"State", 'Int'>
+  readonly status: Prisma.FieldRef<"State", 'PlanStatus'>
+  readonly confidence: Prisma.FieldRef<"State", 'Float'>
+  readonly isAnchor: Prisma.FieldRef<"State", 'Boolean'>
   readonly causalStateId: Prisma.FieldRef<"State", 'String'>
   readonly nextStateId: Prisma.FieldRef<"State", 'String'>
+  readonly anchorStateId: Prisma.FieldRef<"State", 'String'>
   readonly causalXId: Prisma.FieldRef<"State", 'String'>
 }
     
@@ -1947,6 +2606,49 @@ export type State$nextStateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.StateInclude<ExtArgs> | null
   where?: Prisma.StateWhereInput
+}
+
+/**
+ * State.anchorState
+ */
+export type State$anchorStateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the State
+   */
+  select?: Prisma.StateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the State
+   */
+  omit?: Prisma.StateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StateInclude<ExtArgs> | null
+  where?: Prisma.StateWhereInput
+}
+
+/**
+ * State.trackingStates
+ */
+export type State$trackingStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the State
+   */
+  select?: Prisma.StateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the State
+   */
+  omit?: Prisma.StateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StateInclude<ExtArgs> | null
+  where?: Prisma.StateWhereInput
+  orderBy?: Prisma.StateOrderByWithRelationInput | Prisma.StateOrderByWithRelationInput[]
+  cursor?: Prisma.StateWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StateScalarFieldEnum | Prisma.StateScalarFieldEnum[]
 }
 
 /**

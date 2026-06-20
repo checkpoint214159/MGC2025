@@ -72,3 +72,13 @@ export type Thread = Prisma.ThreadModel
  * 
  */
 export type Message = Prisma.MessageModel
+/**
+ * Model ModuleComment
+ * 
+ */
+export type ModuleComment = Prisma.ModuleCommentModel
+/**
+ * Model Flag
+ * 
+ */
+export type Flag = Prisma.FlagModel

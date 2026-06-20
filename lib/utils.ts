@@ -2,11 +2,15 @@ import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { NutritionModule } from "./state/schemas/nutrition"
 import { ExerciseModule } from "./state/schemas/exercise"
+import { SleepModule } from "./state/schemas/sleep"
+import { SymptomModule } from "./state/schemas/symptoms"
 import { State } from "@/lib/state/schemas/state"
 
 interface ModuleRegistry {
   exercise: ExerciseModule,
   nutrition: NutritionModule,
+  sleep: SleepModule,
+  symptoms: SymptomModule,
 }
 
 export function getModuleFromState<K extends keyof ModuleRegistry>(

@@ -77,7 +77,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         async session({ session, token }) {
             if (session.user) {
                 session.user.id = token.id as string;
-                session.user.role = token.role as 'patient' | 'admin';
+                session.user.role = token.role as 'patient' | 'admin' | 'physiotherapist' | 'dietician';
                 session.user.doneOnboarding = token.doneOnboarding as boolean;
                 session.hasTodayState = token.hasTodayState as boolean;
                 
