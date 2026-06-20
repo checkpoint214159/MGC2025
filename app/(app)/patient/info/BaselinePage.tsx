@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Biometrics } from "@/lib/user/schema";
 import { BaselineSchema, QueryBaseline, QueryBaselineSchema, QueryICFEntry } from "@/lib/user/baseline"; // Our Zod schema
-import { Slider } from "@/components/ui/slider"; 
+import { Slider } from "@/components/ui/slider";
 import { Card } from "@/components/ui/Card";
 import { generateBaselineAction, generateQueryBaselineAction, getQueryBaselineAction, setBaselineAction, setQueryBaselineAction } from "@/lib/actions";
 import { Button } from "@/components/ui/Button";
@@ -25,12 +25,15 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
   // local state management
   const queryClient = useQueryClient();
   const { data: session, status, update } = useSession();
-  const [ queryGenStatus, setqueryGenStatus] = useState<"loading" | "error" | "success">("loading");
+  // "success" is derived from queryBaseline being present, so we only track
+  // generation loading vs error here (no more orphaned "success" flag).
+  const [genState, setGenState] = useState<"loading" | "error">("loading");
+  const startedRef = useRef(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const flatMetrics: QueryICFEntry[] = useMemo(() => {
     if (!queryBaseline?.axes) return [];
-    
+
     return [
     ...Object.values(queryBaseline.axes.biomechanical?.entries || {}),
     ...Object.values(queryBaseline.axes.functional?.entries || []),
@@ -46,33 +49,47 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
   }, [flatMetrics]);
 
   const [responses, setResponses] = useState<Record<string, number>>({});
-    
-  // first-entry generate query
-  useEffect(() => {
-    const initQueryBaseline = async () => {
-      if (!queryBaseline) {
-        const llmOutcome = await generateQueryBaselineAction(biometrics);
-        if (!llmOutcome.success) throw new Error("LLM Generation failed");
 
-        const validatedData = QueryBaselineSchema.parse(llmOutcome.data);
+  // Generate the query baseline once on first entry. Bounded by a timeout and a
+  // recoverable error state, so a slow or failed model call no longer hangs the
+  // spinner forever (previously the throw was swallowed and status stuck on loading).
+  const runGeneration = useCallback(async () => {
+    try {
+      const llmOutcome = await Promise.race([
+        generateQueryBaselineAction(biometrics),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Generation timed out")), 90_000)
+        ),
+      ]);
+      if (!llmOutcome.success) throw new Error("LLM Generation failed");
 
-        await setQueryBaselineAction(validatedData);
-        await queryClient.invalidateQueries({ 
-          queryKey: ['onboarding', session?.user?.id] 
-        });
-        await update({session})
-      }
-    } 
-    initQueryBaseline()
+      const validatedData = QueryBaselineSchema.parse(llmOutcome.data);
+      await setQueryBaselineAction(validatedData);
+      await queryClient.invalidateQueries({ queryKey: ["onboarding", session?.user?.id] });
+      await update({ session });
+      // On success the parent re-passes a non-null queryBaseline, which renders
+      // the question flow below; no extra local state needed.
+    } catch (error) {
+      console.error("Query baseline generation failed:", error);
+      setGenState("error");
     }
-  , [queryBaseline])
+  }, [biometrics, queryClient, session, update]);
+
+  // first-entry generate query (runs once; retry is explicit)
+  useEffect(() => {
+    if (queryBaseline || startedRef.current) return;
+    startedRef.current = true;
+    void runGeneration();
+  }, [queryBaseline, runGeneration]);
+
+  const handleRetry = () => {
+    setGenState("loading");
+    startedRef.current = true;
+    void runGeneration();
+  };
 
   const createBaselines = async (biometrics: Biometrics, responses: Record<string, number>, queryBaseline: QueryBaseline) => {
     return await generateBaselineAction(biometrics, responses, queryBaseline)
-  }
-
-  if (queryBaseline && queryGenStatus === "loading") {
-    setqueryGenStatus("success")
   }
 
 
@@ -103,7 +120,8 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
     return ["Limited", "Full"];
   };
 
-  if (queryGenStatus === "loading") {
+  // 1. Loading State (only while there is no baseline yet)
+  if (!queryBaseline && genState === "loading") {
     return (
       <div className="max-w-xl w-full mx-auto p-12 flex flex-col items-center justify-center gap-4 text-center">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
@@ -115,21 +133,24 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
     );
   }
 
-  // 2. Error State
-  if (queryGenStatus === "error") {
+  // 2. Error State (recoverable — wired to retry)
+  if (!queryBaseline && genState === "error") {
     return (
       <Card className="max-w-xl w-full mx-auto m-6 p-8 border-red-100 bg-red-50/30 text-center space-y-4">
         <AlertCircle className="h-10 w-10 text-red-500 mx-auto" />
         <div className="space-y-2">
           <h3 className="font-bold text-red-900">Generation Failed</h3>
-          <p className="text-sm text-red-700">We couldn't generate the specific baseline for this procedure. Please try again.</p>
+          <p className="text-sm text-red-700">We couldn&apos;t map the WHO-ICF baseline for this procedure. This can happen if the model is slow or overloaded.</p>
         </div>
+        <Button onClick={handleRetry} className="bg-blue-600 hover:bg-blue-700">
+          <RefreshCcw className="h-4 w-4 mr-2" /> Try again
+        </Button>
       </Card>
     );
   }
 
   // 3. Empty Data State (LLM returned nothing)
-  if (queryGenStatus === "success" && flatMetrics.length === 0) {
+  if (queryBaseline && flatMetrics.length === 0) {
     return (
       <Card className="max-w-xl w-full mx-auto m-6 p-8 text-center">
         <p className="text-slate-500">No specific metrics found for this procedure. Please contact your clinical lead.</p>
@@ -151,12 +172,12 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
             FRAMEWORK: WHO-ICF
           </div>
         </div>
-        
+
         <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-          <motion.div 
+          <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
-            className="h-full bg-blue-600" 
+            className="h-full bg-blue-600"
           />
         </div>
       </div>
@@ -173,7 +194,7 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 {/* <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white ${
-                  currentMetric.axisType === 'A' ? 'bg-orange-500' : 
+                  currentMetric.axisType === 'A' ? 'bg-orange-500' :
                   currentMetric.axisType === 'B' ? 'bg-blue-500' : 'bg-emerald-500'
                 }`}>
                   AXISType {currentMetric.axisType}
@@ -186,7 +207,7 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
               <h3 className="text-xl font-semibold text-slate-800 leading-snug">
                 {currentMetric.question?.questionText || `Rate your ${currentMetric.indicator}`}
               </h3>
-              
+
               <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
                 <p className="text-xs text-slate-600 italic">
                    {currentMetric.justification}
@@ -208,7 +229,7 @@ export function BaselinePage({ biometrics, queryBaseline }: BaselinePageProps) {
                 value={[responses[currentMetric.code] || Math.round(currentMetric.range / 2)]}
                 onValueChange={([val]) => setResponses(prev => ({ ...prev, [currentMetric.code]: val }))}
               />
-              
+
               <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
                 <span>{getUnitLabels(currentMetric.unit)[0]}</span>
                 <span>{getUnitLabels(currentMetric.unit)[1]}</span>
