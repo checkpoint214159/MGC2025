@@ -11,8 +11,8 @@ import { getRecoveryPhase, type RecoveryPhase } from "@/lib/engagement";
 const MAX_DAY = 21;
 const PHASES: { key: RecoveryPhase; label: string }[] = [
   { key: "early", label: "Early" },
-  { key: "re-engagement", label: "Re-engagement" },
-  { key: "late", label: "Late" },
+  { key: "re-engagement", label: "Midway" },
+  { key: "late", label: "Later" },
 ];
 
 type Pt = { x: number; y: number };
@@ -49,27 +49,27 @@ export function RecoveryArc({ day }: { day: number | null }) {
           role="img"
           aria-label={day ? `Day ${day} of recovery — ${phase.replace("-", " ")} phase` : "Recovery timeline"}
         >
-          <path d={fullD} fill="none" stroke="var(--border)" strokeWidth={1.5} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+          <path d={fullD} fill="none" stroke="var(--border-strong)" strokeWidth={2.5} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
           <path
             d={traveledD}
             fill="none"
             stroke="var(--accent)"
-            strokeWidth={1.5}
+            strokeWidth={2.5}
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
           />
         </svg>
         {day !== null && (
           <div
-            className="absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-surface bg-accent shadow-sm"
+            className="absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-surface bg-accent shadow-sm"
             style={{ left: `${(m.x / VW) * 100}%`, top: `${(m.y / VH) * 100}%` }}
             aria-hidden
           />
         )}
       </div>
-      <div className="mt-2 flex justify-between text-[12px]">
+      <div className="mt-2.5 flex justify-between text-[13px]">
         {PHASES.map((p) => (
-          <span key={p.key} className={p.key === phase ? "font-medium text-ink" : "text-ink-subtle"}>
+          <span key={p.key} className={p.key === phase ? "font-semibold text-ink" : "text-ink-muted"}>
             {p.label}
           </span>
         ))}

@@ -59,7 +59,8 @@ export function TodayHero({ name, recoveryDay, phaseLabel, priorities, reviewedB
 
       {/* Recovery arc — the signature motif */}
       {recoveryDay !== null && (
-        <div className="mt-6">
+        <div className="mt-6 space-y-2.5">
+          <p className="text-[14px] text-ink-muted">Your recovery, one day at a time.</p>
           <RecoveryArc day={recoveryDay} />
         </div>
       )}

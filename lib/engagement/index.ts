@@ -20,11 +20,13 @@ export function getRecoveryPhase(day: number | null): RecoveryPhase {
   return "late";
 }
 
+// Patient-facing labels: plain and warm, never clinical jargon. The cohort is
+// older cancer patients — "re-engagement window" means nothing to them.
 export function getPhaseLabel(phase: RecoveryPhase): string {
   switch (phase) {
-    case "early": return "Early recovery";
-    case "re-engagement": return "Re-engagement window";
-    case "late": return "Late recovery";
+    case "early": return "Early days";
+    case "re-engagement": return "Two weeks in";
+    case "late": return "Further along";
   }
 }
 
