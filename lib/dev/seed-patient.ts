@@ -4,19 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
 import { getDevAdminId } from "./init";
 import { BiometricsSchema, Biometrics } from "@/lib/user/schema";
-import { QueryBaseline, Baseline } from "@/lib/user/baseline";
+import { PARQ_QUESTIONS, ScreeningResult } from "@/lib/onboarding/screening";
 import { BaseMessage } from "@/lib/external/schemas/message";
 import { Prisma } from "@/generated/prisma/client";
-import {
-  COLOSTOMY_QUERY_BASELINE,
-  ACL_QUERY_BASELINE,
-  HIP_QUERY_BASELINE,
-} from "./templates/queryBaseline";
-import {
-  COLOSTOMY_BASELINE,
-  ACL_BASELINE,
-  HIP_BASELINE,
-} from "./templates/baseline";
 import {
   COLOSTOMY_THREAD_MESSAGES,
   ACL_THREAD_MESSAGES,
@@ -43,14 +33,24 @@ export interface SeedPatientOptions {
 
 interface PresetConfig {
   biometrics: Biometrics;
-  queryBaseline: QueryBaseline;
-  baseline: Baseline;
+  screening: ScreeningResult;
   threadMessages: BaseMessage[];
   profile: string;
 }
 
 /**
- * Preset configurations mapping treatment + baseline data
+ * A passing PAR-Q screening (all "NO"). Seeded patients are assigned to the dev
+ * admin, so they count as supervised and pass the gate either way.
+ */
+const PASSED_SCREENING: ScreeningResult = {
+  answers: Object.fromEntries(PARQ_QUESTIONS.map((q) => [q.id, false])),
+  anyFlag: false,
+  supervised: true,
+  passed: true,
+};
+
+/**
+ * Preset configurations mapping treatment + onboarding data
  */
 const PRESETS: Record<PatientPreset, PresetConfig> = {
   "colostomy-default": {
@@ -60,8 +60,7 @@ const PRESETS: Record<PatientPreset, PresetConfig> = {
       treatment: "Colostomy",
       surgeryDate: new Date(),
     },
-    queryBaseline: COLOSTOMY_QUERY_BASELINE,
-    baseline: COLOSTOMY_BASELINE,
+    screening: PASSED_SCREENING,
     threadMessages: COLOSTOMY_THREAD_MESSAGES,
     profile: COLOSTOMY_PROFILE,
   },
@@ -72,8 +71,7 @@ const PRESETS: Record<PatientPreset, PresetConfig> = {
       treatment: "ACL Reconstruction",
       surgeryDate: new Date(),
     },
-    queryBaseline: ACL_QUERY_BASELINE,
-    baseline: ACL_BASELINE,
+    screening: PASSED_SCREENING,
     threadMessages: ACL_THREAD_MESSAGES,
     profile: ACL_PROFILE,
   },
@@ -84,8 +82,7 @@ const PRESETS: Record<PatientPreset, PresetConfig> = {
       treatment: "Hip Replacement",
       surgeryDate: new Date(),
     },
-    queryBaseline: HIP_QUERY_BASELINE,
-    baseline: HIP_BASELINE,
+    screening: PASSED_SCREENING,
     threadMessages: HIP_THREAD_MESSAGES,
     profile: HIP_PROFILE,
   },
@@ -165,23 +162,15 @@ export async function seedPatient(opts: SeedPatientOptions): Promise<SeedPatient
       },
     });
 
-    // 3. Set QueryBaseline on User
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        queryBaseline: config.queryBaseline as unknown as Prisma.InputJsonValue,
-      },
-    });
-
-    // 4. Create Baseline
-    await prisma.baseline.create({
+    // 3. Create Screening
+    await prisma.screening.create({
       data: {
         userId: user.id,
-        data: config.baseline as unknown as Prisma.InputJsonValue,
+        data: config.screening as unknown as Prisma.InputJsonValue,
       },
     });
 
-    // 5. Create Thread + Messages
+    // 4. Create Thread + Messages
     const messageData = config.threadMessages.map((msg) => ({
       role: msg.role as "user" | "assistant" | "system",
       content: msg.content,

@@ -2,7 +2,7 @@
   // Cloudflare Workers config for the OpenNext build of this Next.js app.
   // Docs: https://opennext.js.org/cloudflare
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mgc2025",
+  "name": "wally",
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-04-05",
   // nodejs_compat is REQUIRED by OpenNext so Node APIs (Buffer, etc.) work in the Worker.
@@ -11,8 +11,37 @@
     "binding": "ASSETS",
     "directory": ".open-next/assets"
   },
+  // Non-secret config (plain text, committed). Becomes process.env.* at runtime.
+  // Secrets (API keys, DATABASE_URL) do NOT go here — set those with `wrangler secret put`.
+  "vars": {
+    "AI_MODEL": "anthropic/claude-sonnet-4",
+    "CHAT_MODEL": "deepseek/deepseek-chat",
+    "LLM_MAX_OUTPUT_TOKENS": "16384"
+  },
+  // OpenNext's worker exports these Durable Objects (revalidation queue, sharded
+  // tag cache, cache purge). They MUST be declared here or the worker throws
+  // "Cannot read properties of undefined (reading 'classes')" at runtime.
+  "durable_objects": {
+    "bindings": [
+      { "name": "NEXT_CACHE_DO_QUEUE", "class_name": "DOQueueHandler" },
+      { "name": "NEXT_TAG_CACHE_DO_SHARDED", "class_name": "DOShardedTagCache" },
+      { "name": "NEXT_CACHE_DO_PURGE", "class_name": "BucketCachePurge" }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["DOQueueHandler", "DOShardedTagCache", "BucketCachePurge"]
+    }
+  ],
   "observability": {
-    "enabled": true
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": false
+    }
   }
 
   // --- Added in later phases (left here as a reference, keep commented until then) ---

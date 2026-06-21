@@ -12,7 +12,7 @@ export const patientTools = [
   {
     name: "get_patient_profile",
     description:
-      "Retrieve a patient's demographics, biometrics, baseline assessment, and onboarding status",
+      "Retrieve a patient's demographics, biometrics, screening results, and onboarding status",
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -25,7 +25,7 @@ export const patientTools = [
         where: { id: args.userId },
         include: {
           biometric: true,
-          baseline: true,
+          screening: true,
         },
       });
 
@@ -36,11 +36,10 @@ export const patientTools = [
         name: user.name,
         role: user.role,
         biometrics: user.biometric ?? null,
-        baseline: user.baseline?.data ?? null,
-        queryBaseline: user.queryBaseline ?? null,
+        screening: user.screening?.data ?? null,
         profile: user.profile ?? null,
         // A patient has completed onboarding once all three artefacts exist
-        doneOnboarding: !!user.profile && !!user.biometric && !!user.baseline,
+        doneOnboarding: !!user.profile && !!user.biometric && !!user.screening,
       };
     },
   },

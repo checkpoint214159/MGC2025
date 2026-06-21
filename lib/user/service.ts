@@ -1,17 +1,13 @@
-import { generateObject } from "ai";
-import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { Biometrics } from "./schema";
 import { Thread, ThreadSchema } from "@/lib/external/schemas/thread";
 import { BaseMessage } from "@/lib/external/schemas/message";
-import { Baseline, QueryBaseline } from "./baseline";
-import { NullableJsonNullValueInput } from "@/generated/prisma/internal/prismaNamespace";
-import { Prisma } from "@/generated/prisma/client";
+import { ScreeningResult } from "@/lib/onboarding/screening";
 
 export interface ProfileInput {
   thread: Thread;
   biometrics: Biometrics;
-  baseline: Baseline;
+  screening: ScreeningResult;
 }
 
 // ------------------- BIOMETRICS -------------------
@@ -48,59 +44,40 @@ export async function deleteBiometrics(userId: string) {
 
 
 
-export async function setQueryBaseline(userId: string, queryBaseline: QueryBaseline) {
-  return await prisma.user.update({
-    where: {id: userId},
-    data: {
-      queryBaseline: queryBaseline as unknown as Prisma.InputJsonValue,
-    }
-  })
-}
-
-export async function getQueryBaseline(userId: string) {
-  return await prisma.user.findUnique({
-    where: {id: userId},
-    select: {
-      queryBaseline: true
-    }
-  })
-}
-
-
-
-export async function setBaseline(userId: string, baselineData: Baseline) {
-  return await prisma.baseline.upsert({
+export async function setScreening(userId: string, screening: ScreeningResult) {
+  return await prisma.screening.upsert({
     where: { userId: userId },
-    update: { data: baselineData as any },
+    update: { data: screening as any },
     create: {
       userId: userId,
-      data: baselineData as any,
+      data: screening as any,
     },
   });
 }
 
-export async function getBaseline(userId: string) {
+export async function getScreening(userId: string) {
   return await prisma.user.findUnique({
-    where: {id: userId},
+    where: { id: userId },
     select: {
-      baseline: true
+      screening: true
     }
   })
 }
 
-export async function deleteBaselines(userId: string) {
+export async function deleteScreening(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { baseline: true, queryBaseline: true }
+    select: { screening: true }
   });
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      baseline: user?.baseline ? { delete: true } : undefined,
-      queryBaseline: null as unknown as NullableJsonNullValueInput,
-    }
-  });
+  if (user?.screening) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        screening: { delete: true },
+      }
+    });
+  }
 }
 
 
@@ -187,21 +164,20 @@ export async function getExistingOnboardingData(userId: string) {
         include: { messages: { orderBy: { createdAt: 'asc' } } },
         take: 1
       },
-      baseline: true
+      screening: true
     }
   });
 
   return {
     biometrics: user?.biometric || null,
     activeThread: user?.threads[0] || null,
-    baseline: user?.baseline || null,
-    queryBaseline: user?.queryBaseline || null,
+    screening: user?.screening || null,
   };
 }
 
 export async function deleteOnboardingData(userId: string) {
   await Promise.all([
-    deleteBaselines(userId),
+    deleteScreening(userId),
     deleteBiometrics(userId),
     deleteOnboardingThread(userId),
     deleteProfile(userId),
@@ -219,82 +195,4 @@ export async function deleteOnboardingThread(userId: string) {
       },
     }
   })
-}
-
-
-
-
-
-const EXAMPLE_BASELINE_QUERY_OUTPUT: QueryBaseline = {
-  "axes": {
-    "biomechanical": {
-      "axisType": "A",
-      "entries": [
-        {
-          "code": "s540",
-          "domain": "Structures of the Digestive System",
-          "indicator": "Abdominal Wall Integrity",
-          "value": 10,
-          "unit": "1-10 scale",
-          "qualifier": 0,
-          "assessment": "Pre-operative baseline: No herniation or muscular weakness reported in the abdominal wall."
-        },
-        {
-          "code": "b280",
-          "domain": "Sensory Functions",
-          "indicator": "Abdominal Pain",
-          "value": 0,
-          "unit": "1-10 scale",
-          "qualifier": 0,
-          "assessment": "Patient currently reports 0/10 pain; baseline for post-op comparison."
-        }
-      ]
-    },
-    "functional": {
-      "axisType": "B",
-      "entries": [
-        {
-          "code": "d570",
-          "domain": "Self-Care",
-          "indicator": "Toileting Autonomy",
-          "value": 10,
-          "unit": "1-10 scale",
-          "qualifier": 0,
-          "assessment": "Patient is currently independent in all bowel/bladder management."
-        },
-        {
-          "code": "d410",
-          "domain": "Mobility",
-          "indicator": "Supine-to-Stand Transition",
-          "value": 10,
-          "unit": "1-10 scale",
-          "qualifier": 0,
-          "assessment": "Full core-strength utilized for bed transfers without assistance."
-        }
-      ]
-    },
-    "systemic": {
-      "axisType": "C",
-      "entries": [
-        {
-          "code": "b515",
-          "domain": "Digestive Functions",
-          "indicator": "Bowel Motility",
-          "value": 10,
-          "unit": "1-10 scale",
-          "qualifier": 0,
-          "assessment": "Regular bowel movements; no history of chronic ileus or obstruction."
-        },
-        {
-          "code": "b440",
-          "domain": "Respiratory Functions",
-          "indicator": "Inspiratory Capacity",
-          "value": 2500,
-          "unit": "ml",
-          "qualifier": 0,
-          "assessment": "Age-appropriate lung volume; critical for post-op pneumonia prevention."
-        }
-      ]
-    }
-  }
 }

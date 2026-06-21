@@ -28,15 +28,18 @@ export async function saveStateNode(
     throw new Error("External context missing — graph state corrupted");
   }
 
-  const savedState = await prisma.$transaction(async (tx) => {
+  // Batch transaction (array form). Neon's HTTP adapter (used on Cloudflare
+  // Workers) does NOT support the interactive callback form. These two ops are
+  // independent (the create doesn't read the updateMany result), so batching is
+  // equivalent and still atomic.
+  const [, savedState] = await prisma.$transaction([
     // Deactivate any existing state for today (one active state per day per user)
-    await tx.state.updateMany({
+    prisma.state.updateMany({
       where: { userId: state.userId, dateCreated: state.date, isActive: true },
       data: { isActive: false },
-    });
-
+    }),
     // Create the new state record with all modules
-    return tx.state.create({
+    prisma.state.create({
       data: {
         userId: state.userId,
         dateCreated: state.date,
@@ -63,8 +66,8 @@ export async function saveStateNode(
         },
       },
       include: { modules: { include: { progress: true } } },
-    });
-  });
+    }),
+  ]);
 
   return { savedState: StateSchema.parse(savedState) };
 }

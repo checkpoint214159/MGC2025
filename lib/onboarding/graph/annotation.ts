@@ -1,6 +1,6 @@
 import { Annotation } from "@langchain/langgraph";
 import { Biometrics } from "@/lib/user/schema";
-import { QueryBaseline, Baseline } from "@/lib/user/baseline";
+import { ScreeningAnswers, ScreeningResult } from "@/lib/onboarding/screening";
 import { Thread } from "@/lib/external/schemas/thread";
 import { BaseQuestion } from "@/lib/llm/schemas/base";
 
@@ -13,9 +13,10 @@ import { BaseQuestion } from "@/lib/llm/schemas/base";
  * they left off.
  *
  * Flow:
- *   load_biometrics → generate_query_baseline → collect_baseline_responses (interrupt)
- *   → generate_baseline → generate_question ↔ interrupt_question (loop, interrupt)
- *   → generate_profile → save_profile → [__end__]
+ *   load_biometrics → collect_screening_responses (interrupt) → evaluate_screening
+ *     ├─(blocked)→ [__end__]
+ *     └─(passed) → generate_question ↔ interrupt_question (loop, interrupt)
+ *                  → generate_profile → save_profile → [__end__]
  */
 export const OnboardingAnnotation = Annotation.Root({
   // --- Input: provided on first invocation ---
@@ -27,21 +28,22 @@ export const OnboardingAnnotation = Annotation.Root({
     reducer: (_, incoming) => incoming,
   }),
 
-  // --- LLM-generated questions used for baseline sliders ---
-  queryBaseline: Annotation<QueryBaseline | null>({
-    default: () => null,
-    reducer: (_, incoming) => incoming,
-  }),
-
-  // --- User slider responses (submitted at the collect_baseline_responses interrupt) ---
-  baselineResponses: Annotation<Record<string, number>>({
+  // --- User PAR-Q answers (submitted at the collect_screening_responses interrupt) ---
+  // true = "YES" (potential contraindication), false = "NO".
+  screeningResponses: Annotation<ScreeningAnswers>({
     default: () => ({}),
     reducer: (_, incoming) => incoming,
   }),
 
-  // --- Clinical baseline synthesized from slider responses ---
-  baseline: Annotation<Baseline | null>({
+  // --- Deterministic screening result computed by evaluate_screening ---
+  screening: Annotation<ScreeningResult | null>({
     default: () => null,
+    reducer: (_, incoming) => incoming,
+  }),
+
+  // --- Set true by evaluate_screening when an unsupervised patient fails the gate ---
+  screeningBlocked: Annotation<boolean>({
+    default: () => false,
     reducer: (_, incoming) => incoming,
   }),
 

@@ -17,12 +17,12 @@ interface PatientDetailViewProps {
 
 /**
  * Admin view for detailed patient information with multiple tabs.
- * Shows biometrics, recovery progress, onboarding threads, and baseline assessment.
+ * Shows biometrics, recovery progress, onboarding threads, and screening results.
  */
 export function PatientDetailView({ patientId }: PatientDetailViewProps) {
   const router = useRouter();
   const { data: session } = useSession();
-  const [activeTab, setActiveTab] = useState<"overview" | "progress" | "threads" | "baseline">(
+  const [activeTab, setActiveTab] = useState<"overview" | "progress" | "threads" | "screening">(
     "overview"
   );
 
@@ -70,11 +70,11 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
     );
   }
 
-  const tabs: Array<"overview" | "progress" | "threads" | "baseline"> = [
+  const tabs: Array<"overview" | "progress" | "threads" | "screening"> = [
     "overview",
     "progress",
     "threads",
-    "baseline",
+    "screening",
   ];
 
   return (
@@ -204,18 +204,18 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
           </Card>
         )}
 
-        {/* Baseline Tab */}
-        {activeTab === "baseline" && (
+        {/* Screening Tab */}
+        {activeTab === "screening" && (
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">ICF Baseline Assessment</h2>
-            {patient.baseline && (patient.baseline as any).data ? (
+            <h2 className="text-xl font-semibold mb-4">PAR-Q Activity Readiness Screening</h2>
+            {patient.screening && (patient.screening as any).data ? (
               <div className="space-y-6">
-                <p className="text-gray-600">
-                  Baseline assessment data: {JSON.stringify((patient.baseline as any).data, null, 2)}
-                </p>
+                <pre className="text-gray-600 whitespace-pre-wrap text-sm">
+                  {JSON.stringify((patient.screening as any).data, null, 2)}
+                </pre>
               </div>
             ) : (
-              <p className="text-gray-500">No baseline assessment available</p>
+              <p className="text-gray-500">No screening on record</p>
             )}
           </Card>
         )}

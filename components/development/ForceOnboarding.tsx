@@ -31,7 +31,7 @@ export default function ForceOnboardingAction() {
             <span>Processing...</span>
         </div>
       ) : (
-        "Force Re-onboarding (delete profile, bio, baselines)"
+        "Force Re-onboarding (delete profile, bio, screening)"
       )}
     </button>
 }

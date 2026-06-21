@@ -8,7 +8,7 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/client"
+import type * as runtime from "@prisma/client/runtime/wasm-engine-edge"
 import type * as $Enums from "../enums"
 import type * as Prisma from "../internal/prismaNamespace"
 
@@ -154,7 +154,7 @@ export type ExternalGroupByOutputType = {
   _max: ExternalMaxAggregateOutputType | null
 }
 
-export type GetExternalGroupByPayload<T extends ExternalGroupByArgs> = Prisma.PrismaPromise<
+type GetExternalGroupByPayload<T extends ExternalGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ExternalGroupByOutputType, T['by']> &
       {
@@ -1231,11 +1231,6 @@ export type ExternalFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Skip the first `n` Externals.
    */
   skip?: number
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-   * 
-   * Filter by unique combinations of Externals.
-   */
   distinct?: Prisma.ExternalScalarFieldEnum | Prisma.ExternalScalarFieldEnum[]
 }
 

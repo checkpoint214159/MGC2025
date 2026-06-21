@@ -7,20 +7,17 @@ import { setProfile,
   getExistingOnboardingData, deleteOnboardingData,
   setBiometric,
   updateThread,
-  getQueryBaseline, setQueryBaseline, setBaseline, getBaseline,
-  deleteBiometrics, deleteBaselines, deleteOnboardingThread  } from "@/lib/user/service"
+  deleteScreening,
+  deleteBiometrics, deleteOnboardingThread  } from "@/lib/user/service"
 import { BaseMessage } from "./external/schemas/message";
 import { Thread, ThreadContext } from "@/lib/external/schemas/thread";
 import { prisma } from "./prisma";
 import { compileExternal } from "./external/service";
 import { State } from "./state/schemas/state";
-import { Baseline, QueryBaseline } from "./user/baseline";
 import { requireRole, requirePatientAccess, getAdminManagedPatientIds } from "@/lib/auth-utils";
 import { semanticSearch } from "@/lib/rag/service";
 import { MetadataFilter } from "@/lib/rag/schemas/rag";
 import { selectAndBuildQuery } from "@/lib/rag/rag_query";
-import { generateQueryBaseline, generateBaseline } from "@/lib/onboarding/baselines"
-import { generateUserProfile } from "@/lib/onboarding/profile"
 import { getOnboardingState, startOnboarding, resumeOnboarding } from "@/lib/onboarding/service"
 
 
@@ -55,40 +52,6 @@ export async function updateBiometricsAction(bio: Biometrics) {
   });
 }
 
-export async function generateQueryBaselineAction(biometrics: Biometrics) {
-  return authenticatedAction(async (userId) => {
-    return await generateQueryBaseline(userId, biometrics);
-  });
-}
-
-export async function setQueryBaselineAction(queryBaseline: QueryBaseline) {
-  return authenticatedAction(async (userId) => {
-    return await setQueryBaseline(userId, queryBaseline);
-  })
-}
-export async function getQueryBaselineAction() {
-  return authenticatedAction(async (userId) => {
-    return await getQueryBaseline(userId);
-  })
-}
-
-export async function generateBaselineAction(biometrics: Biometrics, responses: Record<string, number>, queryBaseline: QueryBaseline) {
-  return authenticatedAction(async (userId) => {
-    return await generateBaseline(biometrics, responses, queryBaseline);
-  });
-}
-
-export async function setBaselineAction(queryBaseline: Baseline) {
-  return authenticatedAction(async (userId) => {
-    return await setBaseline(userId, queryBaseline);
-  })
-}
-export async function getBaselineAction() {
-  return authenticatedAction(async (userId) => {
-    return await getBaseline(userId);
-  })
-}
-
 export async function updateThreadAction({ threadId, threadType, messages }: {
   threadId: string | null;
   threadType: string | null;
@@ -97,16 +60,6 @@ export async function updateThreadAction({ threadId, threadType, messages }: {
   return authenticatedAction(async (userId) => {
     return await updateThread(userId, threadId, threadType, messages);
   });
-}
-
-export async function generateUserProfileAction({thread, biometrics, baseline}: {
-  thread: Thread,
-  biometrics: Biometrics,
-  baseline: Baseline
-}) {
-  return authenticatedAction(async (userId) => {
-    return generateUserProfile({thread: thread, biometrics: biometrics, baseline: baseline})
-  })
 }
 
 export async function getOnBoardingAction() {
@@ -149,10 +102,10 @@ export async function deleteBiometricsAction() {
     });
 }
 
-export async function deleteBaselinesAction() {
+export async function deleteScreeningAction() {
   authenticatedAction(
     async (userId) => {
-      return await deleteBaselines(userId);
+      return await deleteScreening(userId);
     });
 }
 
@@ -231,7 +184,7 @@ export async function getPatientDetailsForAdminAction(patientId: string) {
       where: { id: patientId },
       include: {
         biometric: true,
-        baseline: true,
+        screening: true,
         threads: {
           include: {
             messages: {

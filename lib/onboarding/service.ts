@@ -1,7 +1,7 @@
 import { Command } from "@langchain/langgraph";
 import { prisma } from "@/lib/prisma";
 import { getCompiledOnboardingGraph } from "./graph/graph";
-import { QueryBaseline } from "@/lib/user/baseline";
+import { ParqQuestion } from "@/lib/onboarding/screening";
 import { BaseQuestion } from "@/lib/llm/schemas/base";
 import { Thread } from "@/lib/external/schemas/thread";
 
@@ -10,8 +10,8 @@ import { Thread } from "@/lib/external/schemas/thread";
 export type OnboardingPhase =
   | { phase: "biometrics" }
   | {
-      phase: "collect_baseline_responses";
-      queryBaseline: QueryBaseline;
+      phase: "collect_screening_responses";
+      questions: ParqQuestion[];
     }
   | {
       phase: "answer_question";
@@ -19,6 +19,7 @@ export type OnboardingPhase =
       questionCount: number;
       thread: Thread | null;
     }
+  | { phase: "screening_blocked" }
   | { phase: "complete" }
   | { phase: "error"; message: string };
 
@@ -48,8 +49,12 @@ export async function getOnboardingState(userId: string): Promise<OnboardingPhas
       return { phase: "biometrics" };
     }
 
-    // Graph ran to completion (no pending nodes)
+    // Graph ran to completion (no pending nodes). This is either a normal finish
+    // (profile saved) or a hard stop from the screening gate (unsupervised + flagged).
     if (snapshot.next.length === 0) {
+      if (snapshot.values.screeningBlocked) {
+        return { phase: "screening_blocked" };
+      }
       return { phase: "complete" };
     }
 
@@ -63,10 +68,10 @@ export async function getOnboardingState(userId: string): Promise<OnboardingPhas
       return { phase: "biometrics" };
     }
 
-    if (interruptValue.type === "collect_baseline_responses") {
+    if (interruptValue.type === "collect_screening_responses") {
       return {
-        phase: "collect_baseline_responses",
-        queryBaseline: interruptValue.queryBaseline,
+        phase: "collect_screening_responses",
+        questions: interruptValue.questions,
       };
     }
 
@@ -88,7 +93,7 @@ export async function getOnboardingState(userId: string): Promise<OnboardingPhas
 
 /**
  * Starts the onboarding graph for a user who has just submitted biometrics.
- * Runs the graph until the first interrupt (collect_baseline_responses).
+ * Runs the graph until the first interrupt (collect_screening_responses).
  */
 export async function startOnboarding(userId: string): Promise<OnboardingPhase> {
   const graph = await getCompiledOnboardingGraph();
@@ -100,8 +105,8 @@ export async function startOnboarding(userId: string): Promise<OnboardingPhase> 
  * Resumes the onboarding graph after a user submits input at an interrupt point.
  *
  * input is typed as any because it varies by interrupt:
- *   - collect_baseline_responses: Record<string, number>  (slider values)
- *   - answer_question: string                             (free-text answer)
+ *   - collect_screening_responses: Record<string, boolean>  (PAR-Q YES/NO answers)
+ *   - answer_question: string                               (free-text answer)
  */
 export async function resumeOnboarding(userId: string, input: any): Promise<OnboardingPhase> {
   const graph = await getCompiledOnboardingGraph();

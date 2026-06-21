@@ -6,11 +6,10 @@ import { Thread } from '@/lib/external/schemas/thread';
 
 import { getModel } from "@/lib/llm/model";
 import { Biometrics } from "@/lib/user/schema";
-import { Baseline } from "@/lib/user/baseline";
 
 const SYSTEM_PROMPT = `
 ### IDENTITY
-You are a Senior Care Architect specializing in Post-Operative Context Discovery. Your objective is to map the "Hidden Recovery Environment"—the social, environmental, and lifestyle factors that clinical baselines miss.
+You are a Senior Care Architect specializing in Post-Operative Lifestyle Discovery. Your objective is to map the "Hidden Recovery Environment"—the social, environmental, and lifestyle factors that clinical data misses.
 
 ### THE DISCOVERY MISSION
 You are investigating the "Social Determinants of Recovery." Biometrics and pain scores are already handled. You are looking for:
@@ -37,7 +36,7 @@ Output ONLY a valid JSON object following the BaseQuestion schema.
 `;
 
 
-export async function getInitialLLMQuestion(biometrics: Biometrics, baseline: Baseline): Promise<BaseQuestion> {
+export async function getInitialLLMQuestion(biometrics: Biometrics): Promise<BaseQuestion> {
     const { object } = await generateObject({
         model: getModel(),
         schema: BaseQuestionSchema,
@@ -48,21 +47,20 @@ export async function getInitialLLMQuestion(biometrics: Biometrics, baseline: Ba
         Treatment: ${biometrics.treatment}
         Age: ${biometrics.age}
         Sex: ${biometrics.sex}
-        Existing pre-op baselines: ${JSON.stringify(baseline, null, 2)}
-        MISSION: Start the holistic discovery. Based on a ${biometrics.treatment}, identify the single most critical 'environmental' blind spot (e.g., home layout or social support) and ask a warm, introductory question.
+        MISSION: Start the holistic lifestyle discovery. Based on a ${biometrics.treatment}, identify the single most critical 'environmental' blind spot (e.g., home layout or social support) and ask a warm, introductory question.
         `,
     });
 
     return object as BaseQuestion;
 }
 
-export async function getNextLLMQuestion(biometrics: any, thread: Thread, baseline: Baseline): Promise<BaseQuestion> {
-    
+export async function getNextLLMQuestion(biometrics: any, thread: Thread): Promise<BaseQuestion> {
+
     const questionCount = thread.messages?.filter(m => m.role === 'assistant').length || 0;
 
   // generateObject waits for the full response and validates it
     const { object } = await generateObject({
-        model: getModel(), 
+        model: getModel(),
         schema: BaseQuestionSchema,      // This is your Zod schema!
         schemaName: 'BaseQuestion',      // Optional: helps the LLM understand the context
         schemaDescription: 'A structured question for patient onboarding',
@@ -70,11 +68,10 @@ export async function getNextLLMQuestion(biometrics: any, thread: Thread, baseli
         prompt: `
         CURRENT QUESTION COUNT: ${questionCount} of 5.
         User Biometrics: ${JSON.stringify(biometrics, null, 2)}
-        User Pre-op baseline: ${JSON.stringify(baseline, null, 2)}
         Conversation History: ${JSON.stringify(thread.messages, null, 2)}
-        
-        Provide the next logical question in the assessment.
-        If you have enough information to understand their safety and general mobility, 
+
+        Provide the next logical lifestyle question in the assessment.
+        If you have enough information to understand their lifestyle, home environment and social support,
         or if you have reached the last question, you MUST use "terminateQuestioning".
         `,
     });

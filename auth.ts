@@ -5,6 +5,10 @@ import Credentials from "next-auth/providers/credentials";
 import { getNormalizedAppDate } from "@/lib/date-utils";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+    // Auth.js auto-trusts the host only on platforms it detects (e.g. Vercel).
+    // On Cloudflare Workers it doesn't, so opt in explicitly — Cloudflare sets a
+    // correct Host header, so trusting it is safe. (Equivalent env: AUTH_TRUST_HOST=true.)
+    trustHost: true,
     providers: [
         Credentials({
             credentials: {
@@ -81,17 +85,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         select: {
                             profile: true,
                             biometric: true,
-                            baseline: true,
+                            screening: true,
                             threads: {
                                 where: { type: "onboarding" },
                                 take: 1
                             }
                         }
                     });
-                    
+
                     if (dbUser) {
                         session.user.doneOnboarding = !!dbUser.profile && !!dbUser.biometric
-                            && !!dbUser.baseline && !!dbUser.threads;
+                            && !!dbUser.screening && !!dbUser.threads;
                     }
                 } catch (error) {
                     console.error("[SESSION] Failed to fetch doneOnboarding state:", error);

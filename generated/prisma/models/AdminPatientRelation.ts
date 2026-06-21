@@ -8,7 +8,7 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/client"
+import type * as runtime from "@prisma/client/runtime/wasm-engine-edge"
 import type * as $Enums from "../enums"
 import type * as Prisma from "../internal/prismaNamespace"
 
@@ -151,7 +151,7 @@ export type AdminPatientRelationGroupByOutputType = {
   _max: AdminPatientRelationMaxAggregateOutputType | null
 }
 
-export type GetAdminPatientRelationGroupByPayload<T extends AdminPatientRelationGroupByArgs> = Prisma.PrismaPromise<
+type GetAdminPatientRelationGroupByPayload<T extends AdminPatientRelationGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<AdminPatientRelationGroupByOutputType, T['by']> &
       {
@@ -1180,11 +1180,6 @@ export type AdminPatientRelationFindManyArgs<ExtArgs extends runtime.Types.Exten
    * Skip the first `n` AdminPatientRelations.
    */
   skip?: number
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-   * 
-   * Filter by unique combinations of AdminPatientRelations.
-   */
   distinct?: Prisma.AdminPatientRelationScalarFieldEnum | Prisma.AdminPatientRelationScalarFieldEnum[]
 }
 

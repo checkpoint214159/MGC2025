@@ -8,7 +8,7 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/client"
+import type * as runtime from "@prisma/client/runtime/wasm-engine-edge"
 import type * as $Enums from "../enums"
 import type * as Prisma from "../internal/prismaNamespace"
 
@@ -179,7 +179,7 @@ export type StateGroupByOutputType = {
   _max: StateMaxAggregateOutputType | null
 }
 
-export type GetStateGroupByPayload<T extends StateGroupByArgs> = Prisma.PrismaPromise<
+type GetStateGroupByPayload<T extends StateGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<StateGroupByOutputType, T['by']> &
       {
@@ -1712,11 +1712,6 @@ export type StateFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Skip the first `n` States.
    */
   skip?: number
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-   * 
-   * Filter by unique combinations of States.
-   */
   distinct?: Prisma.StateScalarFieldEnum | Prisma.StateScalarFieldEnum[]
 }
 

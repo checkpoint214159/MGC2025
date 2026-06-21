@@ -4,8 +4,8 @@ import { OnboardingLangGraphState } from "@/lib/onboarding/graph/annotation";
 /**
  * Node: generate_profile
  *
- * LLM call: synthesizes the full onboarding thread, biometrics, and baseline
- * into a clinical profile string.
+ * LLM call: synthesizes the full onboarding thread, biometrics, and screening
+ * result into a clinical profile string.
  */
 export async function generateProfileNode(
   state: OnboardingLangGraphState
@@ -13,7 +13,7 @@ export async function generateProfileNode(
   const profile = await generateUserProfile({
     thread: state.thread!,
     biometrics: state.biometrics!,
-    baseline: state.baseline!,
+    screening: state.screening!,
   });
 
   return { profile };

@@ -2,13 +2,23 @@ import { StateGraph } from "@langchain/langgraph";
 import { OnboardingAnnotation, OnboardingLangGraphState } from "./annotation";
 import { getOnboardingCheckpointer } from "./checkpointer";
 import { loadBiometricsNode } from "./nodes/load_biometrics";
-import { generateQueryBaselineNode } from "./nodes/query_baseline";
-import { collectBaselineResponsesNode } from "./nodes/collect_responses";
-import { generateBaselineNode } from "./nodes/generate_baseline";
+import { collectScreeningResponsesNode } from "./nodes/collect_screening_responses";
+import { evaluateScreeningNode } from "./nodes/evaluate_screening";
 import { generateQuestionNode } from "./nodes/generate_question";
 import { interruptQuestionNode } from "./nodes/interrupt_question";
 import { generateProfileNode } from "./nodes/generate_profile";
 import { saveProfileNode } from "./nodes/save_profile";
+
+/**
+ * Routes after evaluate_screening. An unsupervised patient who flagged any PAR-Q
+ * item is blocked: the graph ends without building a profile. Everyone else
+ * proceeds into the lifestyle conversation.
+ */
+function routeAfterScreening(
+  state: OnboardingLangGraphState
+): "generate_question" | "__end__" {
+  return state.screeningBlocked ? "__end__" : "generate_question";
+}
 
 /**
  * Routes after generate_question based on whether the conversation is done.
@@ -33,9 +43,8 @@ async function buildGraph() {
   return new StateGraph(OnboardingAnnotation)
     // --- Nodes ---
     .addNode("load_biometrics", loadBiometricsNode)
-    .addNode("generate_query_baseline", generateQueryBaselineNode)
-    .addNode("collect_baseline_responses", collectBaselineResponsesNode)
-    .addNode("generate_baseline", generateBaselineNode)
+    .addNode("collect_screening_responses", collectScreeningResponsesNode)
+    .addNode("evaluate_screening", evaluateScreeningNode)
     .addNode("generate_question", generateQuestionNode)
     .addNode("interrupt_question", interruptQuestionNode)
     .addNode("generate_profile", generateProfileNode)
@@ -43,10 +52,14 @@ async function buildGraph() {
 
     // --- Fixed edges: sequential steps ---
     .addEdge("__start__", "load_biometrics")
-    .addEdge("load_biometrics", "generate_query_baseline")
-    .addEdge("generate_query_baseline", "collect_baseline_responses")
-    .addEdge("collect_baseline_responses", "generate_baseline")
-    .addEdge("generate_baseline", "generate_question")
+    .addEdge("load_biometrics", "collect_screening_responses")
+    .addEdge("collect_screening_responses", "evaluate_screening")
+
+    // --- Conditional: gate. Block unsupervised failures, else enter conversation ---
+    .addConditionalEdges("evaluate_screening", routeAfterScreening, [
+      "generate_question",
+      "__end__",
+    ])
 
     // --- Conditional: after generate_question, either ask next question or finalize ---
     .addConditionalEdges("generate_question", routeAfterGenerateQuestion, [

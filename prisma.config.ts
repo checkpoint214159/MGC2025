@@ -9,7 +9,6 @@ export default defineConfig({
         path: "prisma/migrations",
         seed: "tsx prisma/seed.ts",
     },
-    datasource: {
-        url: process.env.DATABASE_URL!,
-    },
+    // datasource url now lives in schema.prisma (url = env("DATABASE_URL")) —
+    // required by Prisma 6.x, which we pin for Cloudflare Workers WASM compat.
 });

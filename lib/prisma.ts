@@ -1,7 +1,6 @@
 import * as dotenv from "dotenv";
 import path from "path";
-import { PrismaNeon } from "@prisma/adapter-neon";
-import { neonConfig } from "@neondatabase/serverless";
+import { PrismaNeonHTTP } from "@prisma/adapter-neon";
 import { PrismaClient } from "@/generated/prisma/client";
 
 // Keep env loading behavior deterministic across Next runtime and one-off scripts.
@@ -24,18 +23,13 @@ if (process.env.PRISMA_DEBUG_CONNECTION === "1") {
 	}
 }
 
-// Neon's wire protocol runs over WebSockets. Cloudflare Workers (workerd)
-// provide a global WebSocket automatically; Node does not, so we attach the
-// `ws` polyfill there. The guard keeps `ws` out of the Workers runtime path.
-const onWorkerd =
-	typeof navigator !== "undefined" &&
-	navigator.userAgent === "Cloudflare-Workers";
-if (!onWorkerd) {
-	// eslint-disable-next-line @typescript-eslint/no-require-imports
-	neonConfig.webSocketConstructor = require("ws");
-}
-
-const adapter = new PrismaNeon({ connectionString });
+// Neon HTTP adapter: stateless fetch-per-query, no persistent connection.
+// Required on Cloudflare Workers — the WebSocket adapter (PrismaNeon) holds a
+// connection that can't be reused across requests ("Cannot perform I/O on behalf
+// of a different request"). HTTP has nothing to share, so this module-level
+// singleton is safe across requests.
+// Trade-off: no INTERACTIVE transactions (callback form) — use batch $transaction([...]).
+const adapter = new PrismaNeonHTTP(connectionString, {});
 const prisma = new PrismaClient({ adapter });
 
 export { prisma };

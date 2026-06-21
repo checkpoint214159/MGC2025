@@ -1,22 +1,26 @@
-import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
+import { MemorySaver } from "@langchain/langgraph";
 
-let _saver: PostgresSaver | null = null;
+// ⚠️ TEMPORARY in-memory checkpointer.
+//
+// The onboarding graph originally used PostgresSaver
+// (@langchain/langgraph-checkpoint-postgres), but that pulls in `pg` →
+// `pg-cloudflare`, which breaks the Cloudflare Workers bundle (the NFT-vs-esbuild
+// condition mismatch). PostgresSaver was the LAST thing using `pg`; removing it
+// lets the Worker bundle cleanly.
+//
+// MemorySaver is per-isolate and NOT durable — onboarding interrupt/resume will
+// NOT survive across Worker invocations. This is a stopgap so the app builds and
+// deploys. Replace with the Durable-Object-backed CheckpointSaver before the
+// onboarding graph goes live. See docs/CLOUDFLARE_MIGRATION.md (Plan B, todo #5).
+
+let _saver: MemorySaver | null = null;
 
 /**
- * Returns a singleton PostgresSaver for the onboarding graph.
- *
- * On first call, runs saver.setup() which creates the LangGraph checkpoint tables
- * (checkpoint, checkpoint_writes, checkpoint_blobs) in your existing Postgres DB.
- * These are idempotent — safe to call multiple times.
- *
- * The saver uses DATABASE_URL from .env.local (same as Prisma), so no extra
- * Postgres connection is needed.
+ * Returns a singleton checkpointer for the onboarding graph.
+ * TEMPORARY: in-memory only (see file header).
  */
-export async function getOnboardingCheckpointer(): Promise<PostgresSaver> {
+export async function getOnboardingCheckpointer(): Promise<MemorySaver> {
   if (_saver) return _saver;
-
-  _saver = PostgresSaver.fromConnString(process.env.DATABASE_URL!);
-  await _saver.setup();
-
+  _saver = new MemorySaver();
   return _saver;
 }

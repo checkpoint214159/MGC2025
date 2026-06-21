@@ -105,7 +105,7 @@ export function SubmitBiometricsPage() {
         setBiometrics(BiometricsSchema.parse(updatedBioResult.data))
 
         // Kick off the onboarding graph — runs until the first interrupt
-        // (collect_baseline_responses), then returns. Page query re-fetch
+        // (collect_screening_responses), then returns. Page query re-fetch
         // will pick up the new phase.
         await startOnboardingAction()
         await queryClient.invalidateQueries({

@@ -8,7 +8,7 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/client"
+import type * as runtime from "@prisma/client/runtime/wasm-engine-edge"
 import type * as $Enums from "../enums"
 import type * as Prisma from "../internal/prismaNamespace"
 
@@ -165,7 +165,7 @@ export type ThreadGroupByOutputType = {
   _max: ThreadMaxAggregateOutputType | null
 }
 
-export type GetThreadGroupByPayload<T extends ThreadGroupByArgs> = Prisma.PrismaPromise<
+type GetThreadGroupByPayload<T extends ThreadGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ThreadGroupByOutputType, T['by']> &
       {
@@ -1274,11 +1274,6 @@ export type ThreadFindManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Skip the first `n` Threads.
    */
   skip?: number
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-   * 
-   * Filter by unique combinations of Threads.
-   */
   distinct?: Prisma.ThreadScalarFieldEnum | Prisma.ThreadScalarFieldEnum[]
 }
 

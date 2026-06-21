@@ -1,10 +1,14 @@
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
+  // Target the Cloudflare Workers runtime so the generated client uses the
+  // edge/wasm engine instead of the Node "library" engine (which needs node:os).
+  runtime  = "workerd"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -34,8 +38,7 @@ model User {
   role UserRole @default(patient) // patient or admin (doctor)
 
   biometric     Biometrics?
-  baseline     Baseline?
-  queryBaseline Json?
+  screening     Screening?
 
   profile String? // LLM generated profile
 
@@ -66,8 +69,10 @@ model AdminPatientRelation {
   @@unique([adminId, patientId])
 }
 
-model Baseline {
+model Screening {
   id   String @id @default(cuid())
+  // Stored shape: { answers: Record<questionId, boolean>, anyFlag, supervised, passed }
+  // PAR-Q physical-activity readiness screening (static questions, deterministic gate).
   data Json
 
   userId String @unique

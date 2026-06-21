@@ -33,10 +33,10 @@ export type User = Prisma.UserModel
  */
 export type AdminPatientRelation = Prisma.AdminPatientRelationModel
 /**
- * Model Baseline
+ * Model Screening
  * 
  */
-export type Baseline = Prisma.BaselineModel
+export type Screening = Prisma.ScreeningModel
 /**
  * Model Biometrics
  * 

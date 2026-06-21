@@ -8,7 +8,7 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/client"
+import type * as runtime from "@prisma/client/runtime/wasm-engine-edge"
 import type * as $Enums from "../enums"
 import type * as Prisma from "../internal/prismaNamespace"
 
@@ -199,7 +199,7 @@ export type BiometricsGroupByOutputType = {
   _max: BiometricsMaxAggregateOutputType | null
 }
 
-export type GetBiometricsGroupByPayload<T extends BiometricsGroupByArgs> = Prisma.PrismaPromise<
+type GetBiometricsGroupByPayload<T extends BiometricsGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<BiometricsGroupByOutputType, T['by']> &
       {
@@ -1156,11 +1156,6 @@ export type BiometricsFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` Biometrics.
    */
   skip?: number
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-   * 
-   * Filter by unique combinations of Biometrics.
-   */
   distinct?: Prisma.BiometricsScalarFieldEnum | Prisma.BiometricsScalarFieldEnum[]
 }
 

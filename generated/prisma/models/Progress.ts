@@ -8,7 +8,7 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/client"
+import type * as runtime from "@prisma/client/runtime/wasm-engine-edge"
 import type * as $Enums from "../enums"
 import type * as Prisma from "../internal/prismaNamespace"
 
@@ -150,7 +150,7 @@ export type ProgressGroupByOutputType = {
   _max: ProgressMaxAggregateOutputType | null
 }
 
-export type GetProgressGroupByPayload<T extends ProgressGroupByArgs> = Prisma.PrismaPromise<
+type GetProgressGroupByPayload<T extends ProgressGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ProgressGroupByOutputType, T['by']> &
       {
@@ -1060,11 +1060,6 @@ export type ProgressFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Skip the first `n` Progresses.
    */
   skip?: number
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-   * 
-   * Filter by unique combinations of Progresses.
-   */
   distinct?: Prisma.ProgressScalarFieldEnum | Prisma.ProgressScalarFieldEnum[]
 }
 

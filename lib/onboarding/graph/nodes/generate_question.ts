@@ -35,8 +35,8 @@ export async function generateQuestionNode(
     (!state.thread || !state.thread.messages?.length);
 
   const question = isFirstQuestion
-    ? await getInitialLLMQuestion(state.biometrics!, state.baseline!)
-    : await getNextLLMQuestion(state.biometrics!, state.thread!, state.baseline!);
+    ? await getInitialLLMQuestion(state.biometrics!)
+    : await getNextLLMQuestion(state.biometrics!, state.thread!);
 
   if (question.inputType === "terminateQuestioning") {
     return { shouldTerminate: true, currentQuestion: null };
