@@ -1,87 +1,156 @@
 "use client";
-import React, { useState } from 'react';
-import SidebarSection from '@/components/layout/SidebarSection'; 
-import { HomeIcon, GearIcon, DesktopIcon, PersonIcon } from '@radix-ui/react-icons';
-import { useRouter } from 'next/navigation';
+
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
+import { Home, Activity, Salad, MessageCircle, LogOut, ChevronLeft, ChevronRight, User, Users } from "lucide-react";
+import { useCaregiver } from "@/context/CaregiverContext";
+import { useTextScale, TEXT_SCALES } from "@/context/TextScaleContext";
+import { FLAGS } from "@/lib/config/flags";
+import { cn } from "@/lib/utils";
+
+type NavItem = { href: string; label: string; icon: typeof Home };
+
+const NAV: NavItem[] = [
+  { href: "/", label: "Today", icon: Home },
+  { href: "/recovery/exercise", label: "Exercise", icon: Activity },
+  { href: "/recovery/nutrition", label: "Nutrition", icon: Salad },
+  { href: "/chat", label: "Ask", icon: MessageCircle },
+];
 
 export default function Sidebar() {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const router = useRouter();
+  const [collapsed, setCollapsed] = useState(false);
+  const pathname = usePathname();
+  const { data: session } = useSession();
+  const { isCaregiver, enter, exit } = useCaregiver();
+  const { scale, setScale } = useTextScale();
 
-  // Tailwind classes for width transition
-  const widthClass = isExpanded ? "w-60" : "w-16"; 
-  
-  // Custom transition settings for Tailwind
-  const transitionClass = "transition-all duration-300 ease-in-out";
-
-  const handleNavigation = (path: string) => {
-    router.push(path);
-  };
+  const name = session?.user?.name?.split(" ")[0] || "Patient";
 
   return (
     <aside
-      className={`
-        fixed top-0 left-0 h-screen bg-gray-900 text-white shadow-xl 
-        p-4 z-50 overflow-x-hidden
-        ${widthClass} ${transitionClass}
-      `}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
+      className={cn(
+        "fixed inset-y-0 left-0 z-40 flex flex-col bg-surface border-r border-border",
+        "transition-[width] duration-300 ease-[var(--ease-out-quart)]",
+        collapsed ? "w-[72px]" : "w-[240px]",
+        "hidden md:flex"
+      )}
     >
-      <div className={`flex flex-col h-full ${isExpanded ? "items-start" : "items-center"}`}>
-        
-        <div className={`mb-8 p-1 ${isExpanded ? 'text-lg font-bold' : 'text-xl'}`}>
-          {isExpanded ? 'LLM App' : 'App'}
+      {/* Brand */}
+      <div className="flex items-center gap-2.5 px-5 pt-6 pb-5">
+        <div className="size-8 rounded-lg bg-accent grid place-items-center text-ink-inverse font-semibold text-[15px]">
+          R
         </div>
+        {!collapsed && (
+          <div className="leading-tight">
+            <div className="text-[15px] font-semibold text-ink">Recovery</div>
+            <div className="text-[12px] text-ink-muted">Your daily companion</div>
+          </div>
+        )}
+      </div>
 
-        <button
-          onClick={() => handleNavigation('/')}
-          className="flex items-center w-full p-2 rounded-lg hover:bg-gray-700 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      {/* Greeting */}
+      {!collapsed && (
+        <div className="mx-3 mb-4 rounded-md bg-surface-sunken px-3 py-2.5">
+          <div className="text-[12px] text-ink-subtle">Signed in as</div>
+          <div className="text-[14px] font-medium text-ink truncate">{name}</div>
+        </div>
+      )}
+
+      {/* Nav */}
+      <nav className="flex flex-col gap-0.5 px-3 flex-1">
+        {NAV.map((item) => {
+          const active =
+            item.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.href);
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-3 rounded-md px-3 h-11 text-[14px] font-medium",
+                "transition-colors duration-150",
+                active
+                  ? "bg-accent-soft text-accent-ink"
+                  : "text-ink-muted hover:bg-surface-sunken hover:text-ink"
+              )}
+              aria-current={active ? "page" : undefined}
+            >
+              <Icon size={20} strokeWidth={1.75} className="shrink-0" />
+              {!collapsed && <span className="truncate">{item.label}</span>}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Footer */}
+      <div className="px-3 pb-4 pt-2 border-t border-border space-y-0.5">
+        {!collapsed && (
+          <div className="px-1 pb-2">
+            <div className="mb-1.5 text-[12px] font-medium text-ink-subtle">Text size</div>
+            <div className="flex gap-1">
+              {TEXT_SCALES.map((s, i) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setScale(s)}
+                  aria-pressed={scale === s}
+                  aria-label={`Text size ${["normal", "large", "largest"][i]}`}
+                  className={cn(
+                    "flex h-11 flex-1 items-center justify-center rounded-md border font-semibold transition-colors",
+                    scale === s
+                      ? "border-accent bg-accent-soft text-accent-ink"
+                      : "border-border text-ink-muted hover:bg-surface-sunken hover:text-ink"
+                  )}
+                >
+                  <span style={{ fontSize: [13, 15, 18][i] }}>A</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        <Link
+          href="/patient/info"
+          className="flex items-center gap-3 rounded-md px-3 h-11 text-[14px] font-medium text-ink-muted hover:bg-surface-sunken hover:text-ink"
         >
-          <HomeIcon className="w-6 h-6 shrink-0" />
-          {isExpanded && <span className="ml-3 whitespace-nowrap">Home</span>}
-        </button>
-
+          <User size={20} strokeWidth={1.75} className="shrink-0" />
+          {!collapsed && <span>Profile</span>}
+        </Link>
+        {FLAGS.caregiverMode && (
+          <button
+            type="button"
+            onClick={() => (isCaregiver ? exit() : enter(name))}
+            className={cn(
+              "w-full flex items-center gap-3 rounded-md px-3 h-11 text-[14px] font-medium",
+              isCaregiver
+                ? "bg-accent-soft text-accent-ink"
+                : "text-ink-muted hover:bg-surface-sunken hover:text-ink"
+            )}
+            aria-pressed={isCaregiver}
+          >
+            <Users size={20} strokeWidth={1.75} className="shrink-0" />
+            {!collapsed && <span>{isCaregiver ? "Exit caregiver view" : "Caregiver view"}</span>}
+          </button>
+        )}
         <button
-          onClick={() => handleNavigation('/profile')}
-          className="flex items-center w-full p-2 rounded-lg hover:bg-gray-700 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          type="button"
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className="w-full flex items-center gap-3 rounded-md px-3 h-11 text-[14px] font-medium text-ink-muted hover:bg-surface-sunken hover:text-ink"
         >
-          <PersonIcon className="w-6 h-6 shrink-0" />
-          {isExpanded && <span className="ml-3 whitespace-nowrap">Profile</span>}
+          <LogOut size={20} strokeWidth={1.75} className="shrink-0" />
+          {!collapsed && <span>Sign out</span>}
         </button>
-
-        {/* <SidebarSection 
-            isExpanded={isExpanded} 
-            title="Profile" 
-            defaultOpen={true} // Default section opened
-            icon={PersonIcon}
-            links={[
-                { name: 'Model V1', path: '/projects/v1' },
-                { name: 'Training Data', path: '/projects/data' },
-            ]}
-            onNavigate={handleNavigation}
-        />
-
-        <SidebarSection 
-            isExpanded={isExpanded} 
-            title="Reports" 
-            icon={FileTextIcon}
-            links={[
-                { name: 'Analytics', path: '/reports/analytics' },
-                { name: 'Logs', path: '/reports/logs' },
-            ]}
-            onNavigate={handleNavigation}
-        /> */}
-        
-        {/* Footer/Settings Link (Always visible) */}
         <button
-          onClick={() => handleNavigation('/settings')}
-          className="flex items-center w-full p-2 rounded-lg hover:bg-gray-700 mt-auto focus:outline-none focus:ring-2 focus:ring-blue-500"
+          type="button"
+          onClick={() => setCollapsed((v) => !v)}
+          className="w-full flex items-center justify-center gap-2 rounded-md px-3 h-9 mt-2 text-[12px] text-ink-subtle hover:text-ink hover:bg-surface-sunken"
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          <GearIcon className="w-6 h-6 shrink-0" />
-          {isExpanded && <span className="ml-3 whitespace-nowrap">Settings</span>}
+          {collapsed ? <ChevronRight size={16} /> : <><ChevronLeft size={16} /> Collapse</>}
         </button>
-        
       </div>
     </aside>
   );

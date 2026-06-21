@@ -20,7 +20,29 @@ export type Role = (typeof Role)[keyof typeof Role]
 
 export const UserRole = {
   patient: 'patient',
-  admin: 'admin'
+  admin: 'admin',
+  physiotherapist: 'physiotherapist',
+  dietician: 'dietician'
 } as const
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+
+export const PlanStatus = {
+  draft: 'draft',
+  verified: 'verified',
+  active: 'active',
+  archived: 'archived'
+} as const
+
+export type PlanStatus = (typeof PlanStatus)[keyof typeof PlanStatus]
+
+
+export const FlagStatus = {
+  open: 'open',
+  reviewing: 'reviewing',
+  escalated: 'escalated',
+  dismissed: 'dismissed'
+} as const
+
+export type FlagStatus = (typeof FlagStatus)[keyof typeof FlagStatus]

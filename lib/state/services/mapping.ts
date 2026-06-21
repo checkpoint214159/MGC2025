@@ -1,5 +1,7 @@
 import { ExerciseModuleBlueprintSchema } from '@/lib/state/schemas/exercise';
 import { NutritionModuleBlueprintSchema } from '@/lib/state/schemas/nutrition';
+import { SleepModuleBlueprintSchema } from '@/lib/state/schemas/sleep';
+import { SymptomModuleBlueprintSchema } from '@/lib/state/schemas/symptoms';
 import { Schema, zodSchema } from 'ai';
 import z from 'zod';
 
@@ -28,10 +30,27 @@ export const MODULE_REGISTRY: Record<string, ModuleDefinition> = {
   nutrition: {
     schema: NutritionModuleBlueprintSchema,
     systemPrompt: `
-    You are a Clinical Dietitian. Create a high-protein recovery nutrition plan 
+    You are a Clinical Dietitian. Create a high-protein recovery nutrition plan
     focusing on tissue repair and energy management.
 
     Create a checklist of food items, providing their impact to the macros (e.g Food item A has 200 calories, 40g protein, etc)
+    `,
+  },
+  sleep: {
+    schema: SleepModuleBlueprintSchema,
+    systemPrompt: `
+    You are a Sleep & Recovery specialist. Define a simple daily sleep target
+    (hours, with an optional quality rating) appropriate to the patient's surgery
+    and stage of recovery. Keep it to one "duration" metric.
+    `,
+  },
+  symptoms: {
+    schema: SymptomModuleBlueprintSchema,
+    systemPrompt: `
+    You are a Post-Op Monitoring specialist. Define the key symptoms to track daily.
+    ALWAYS include a "pain" metric (0-10 severity, with a body location) plus any
+    procedure-specific symptoms (stiffness, swelling, etc.). These are tracked, not
+    targeted — keep goal at 0; the patient logs their current severity each day.
     `,
   },
 };

@@ -3,6 +3,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import { DateProvider } from "@/context/DateContext";
+import { CaregiverProvider } from "@/context/CaregiverContext";
+import { TextScaleProvider } from "@/context/TextScaleContext";
 import { useState } from "react";
 
 /**
@@ -22,7 +24,9 @@ export default function Providers({ children, initialDate }: { children: React.R
     <QueryClientProvider client={queryClient}>
       <DateProvider initialDate={initialDate}>
         <SessionProvider>
-          {children}
+          <TextScaleProvider>
+            <CaregiverProvider>{children}</CaregiverProvider>
+          </TextScaleProvider>
         </SessionProvider>
       </DateProvider>
     </QueryClientProvider>

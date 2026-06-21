@@ -198,6 +198,7 @@ export type UserWhereInput = {
   externals?: Prisma.ExternalListRelationFilter
   adminManagedPatients?: Prisma.AdminPatientRelationListRelationFilter
   managedByAdmin?: Prisma.XOR<Prisma.AdminPatientRelationNullableScalarRelationFilter, Prisma.AdminPatientRelationWhereInput> | null
+  flags?: Prisma.FlagListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -215,6 +216,7 @@ export type UserOrderByWithRelationInput = {
   externals?: Prisma.ExternalOrderByRelationAggregateInput
   adminManagedPatients?: Prisma.AdminPatientRelationOrderByRelationAggregateInput
   managedByAdmin?: Prisma.AdminPatientRelationOrderByWithRelationInput
+  flags?: Prisma.FlagOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -235,6 +237,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   externals?: Prisma.ExternalListRelationFilter
   adminManagedPatients?: Prisma.AdminPatientRelationListRelationFilter
   managedByAdmin?: Prisma.XOR<Prisma.AdminPatientRelationNullableScalarRelationFilter, Prisma.AdminPatientRelationWhereInput> | null
+  flags?: Prisma.FlagListRelationFilter
 }, "id">
 
 export type UserOrderByWithAggregationInput = {
@@ -276,6 +279,7 @@ export type UserCreateInput = {
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -293,6 +297,7 @@ export type UserUncheckedCreateInput = {
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserUpdateInput = {
@@ -310,6 +315,7 @@ export type UserUpdateInput = {
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -327,6 +333,7 @@ export type UserUncheckedUpdateInput = {
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -512,6 +519,20 @@ export type UserUpdateOneRequiredWithoutThreadsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutThreadsInput, Prisma.UserUpdateWithoutThreadsInput>, Prisma.UserUncheckedUpdateWithoutThreadsInput>
 }
 
+export type UserCreateNestedOneWithoutFlagsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFlagsInput, Prisma.UserUncheckedCreateWithoutFlagsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFlagsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutFlagsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFlagsInput, Prisma.UserUncheckedCreateWithoutFlagsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFlagsInput
+  upsert?: Prisma.UserUpsertWithoutFlagsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFlagsInput, Prisma.UserUpdateWithoutFlagsInput>, Prisma.UserUncheckedUpdateWithoutFlagsInput>
+}
+
 export type UserCreateWithoutAccountInput = {
   id?: string
   name: string
@@ -526,6 +547,7 @@ export type UserCreateWithoutAccountInput = {
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutAccountInput = {
@@ -542,6 +564,7 @@ export type UserUncheckedCreateWithoutAccountInput = {
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutAccountInput = {
@@ -574,6 +597,7 @@ export type UserUpdateWithoutAccountInput = {
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountInput = {
@@ -590,6 +614,7 @@ export type UserUncheckedUpdateWithoutAccountInput = {
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutAdminManagedPatientsInput = {
@@ -606,6 +631,7 @@ export type UserCreateWithoutAdminManagedPatientsInput = {
   threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
   managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutAdminManagedPatientsInput = {
@@ -622,6 +648,7 @@ export type UserUncheckedCreateWithoutAdminManagedPatientsInput = {
   threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutAdminManagedPatientsInput = {
@@ -643,6 +670,7 @@ export type UserCreateWithoutManagedByAdminInput = {
   threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
+  flags?: Prisma.FlagCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutManagedByAdminInput = {
@@ -659,6 +687,7 @@ export type UserUncheckedCreateWithoutManagedByAdminInput = {
   threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
+  flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutManagedByAdminInput = {
@@ -691,6 +720,7 @@ export type UserUpdateWithoutAdminManagedPatientsInput = {
   threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAdminManagedPatientsInput = {
@@ -707,6 +737,7 @@ export type UserUncheckedUpdateWithoutAdminManagedPatientsInput = {
   threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUpsertWithoutManagedByAdminInput = {
@@ -734,6 +765,7 @@ export type UserUpdateWithoutManagedByAdminInput = {
   threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
+  flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManagedByAdminInput = {
@@ -750,6 +782,7 @@ export type UserUncheckedUpdateWithoutManagedByAdminInput = {
   threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
+  flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutScreeningInput = {
@@ -766,6 +799,7 @@ export type UserCreateWithoutScreeningInput = {
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutScreeningInput = {
@@ -782,6 +816,7 @@ export type UserUncheckedCreateWithoutScreeningInput = {
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutScreeningInput = {
@@ -814,6 +849,7 @@ export type UserUpdateWithoutScreeningInput = {
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutScreeningInput = {
@@ -830,6 +866,7 @@ export type UserUncheckedUpdateWithoutScreeningInput = {
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutBiometricInput = {
@@ -846,6 +883,7 @@ export type UserCreateWithoutBiometricInput = {
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutBiometricInput = {
@@ -862,6 +900,7 @@ export type UserUncheckedCreateWithoutBiometricInput = {
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutBiometricInput = {
@@ -894,6 +933,7 @@ export type UserUpdateWithoutBiometricInput = {
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBiometricInput = {
@@ -910,6 +950,7 @@ export type UserUncheckedUpdateWithoutBiometricInput = {
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutStatesInput = {
@@ -926,6 +967,7 @@ export type UserCreateWithoutStatesInput = {
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutStatesInput = {
@@ -942,6 +984,7 @@ export type UserUncheckedCreateWithoutStatesInput = {
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutStatesInput = {
@@ -974,6 +1017,7 @@ export type UserUpdateWithoutStatesInput = {
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStatesInput = {
@@ -990,6 +1034,7 @@ export type UserUncheckedUpdateWithoutStatesInput = {
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutExternalsInput = {
@@ -1006,6 +1051,7 @@ export type UserCreateWithoutExternalsInput = {
   threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutExternalsInput = {
@@ -1022,6 +1068,7 @@ export type UserUncheckedCreateWithoutExternalsInput = {
   threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutExternalsInput = {
@@ -1054,6 +1101,7 @@ export type UserUpdateWithoutExternalsInput = {
   threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExternalsInput = {
@@ -1070,6 +1118,7 @@ export type UserUncheckedUpdateWithoutExternalsInput = {
   threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type UserCreateWithoutThreadsInput = {
@@ -1086,6 +1135,7 @@ export type UserCreateWithoutThreadsInput = {
   externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagCreateNestedManyWithoutPatientInput
 }
 
 export type UserUncheckedCreateWithoutThreadsInput = {
@@ -1102,6 +1152,7 @@ export type UserUncheckedCreateWithoutThreadsInput = {
   externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
+  flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput
 }
 
 export type UserCreateOrConnectWithoutThreadsInput = {
@@ -1134,6 +1185,7 @@ export type UserUpdateWithoutThreadsInput = {
   externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutThreadsInput = {
@@ -1150,6 +1202,91 @@ export type UserUncheckedUpdateWithoutThreadsInput = {
   externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
   adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
   managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
+  flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput
+}
+
+export type UserCreateWithoutFlagsInput = {
+  id?: string
+  name: string
+  role?: $Enums.UserRole
+  profile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput
+  screening?: Prisma.ScreeningCreateNestedOneWithoutUserInput
+  account?: Prisma.AccountCreateNestedOneWithoutUserInput
+  states?: Prisma.StateCreateNestedManyWithoutUserInput
+  threads?: Prisma.ThreadCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput
+}
+
+export type UserUncheckedCreateWithoutFlagsInput = {
+  id?: string
+  name: string
+  role?: $Enums.UserRole
+  profile?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput
+  screening?: Prisma.ScreeningUncheckedCreateNestedOneWithoutUserInput
+  account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput
+  states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput
+  threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput
+  externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput
+}
+
+export type UserCreateOrConnectWithoutFlagsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutFlagsInput, Prisma.UserUncheckedCreateWithoutFlagsInput>
+}
+
+export type UserUpsertWithoutFlagsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutFlagsInput, Prisma.UserUncheckedUpdateWithoutFlagsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutFlagsInput, Prisma.UserUncheckedCreateWithoutFlagsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutFlagsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutFlagsInput, Prisma.UserUncheckedUpdateWithoutFlagsInput>
+}
+
+export type UserUpdateWithoutFlagsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput
+  screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput
+  account?: Prisma.AccountUpdateOneWithoutUserNestedInput
+  states?: Prisma.StateUpdateManyWithoutUserNestedInput
+  threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput
+}
+
+export type UserUncheckedUpdateWithoutFlagsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput
+  screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput
+  account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput
+  states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput
+  threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput
+  externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput
+  adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput
+  managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput
 }
 
 
@@ -1162,6 +1299,7 @@ export type UserCountOutputType = {
   threads: number
   externals: number
   adminManagedPatients: number
+  flags: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1169,6 +1307,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   threads?: boolean | UserCountOutputTypeCountThreadsArgs
   externals?: boolean | UserCountOutputTypeCountExternalsArgs
   adminManagedPatients?: boolean | UserCountOutputTypeCountAdminManagedPatientsArgs
+  flags?: boolean | UserCountOutputTypeCountFlagsArgs
 }
 
 /**
@@ -1209,6 +1348,13 @@ export type UserCountOutputTypeCountAdminManagedPatientsArgs<ExtArgs extends run
   where?: Prisma.AdminPatientRelationWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountFlagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FlagWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1225,6 +1371,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   externals?: boolean | Prisma.User$externalsArgs<ExtArgs>
   adminManagedPatients?: boolean | Prisma.User$adminManagedPatientsArgs<ExtArgs>
   managedByAdmin?: boolean | Prisma.User$managedByAdminArgs<ExtArgs>
+  flags?: boolean | Prisma.User$flagsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1265,6 +1412,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   externals?: boolean | Prisma.User$externalsArgs<ExtArgs>
   adminManagedPatients?: boolean | Prisma.User$adminManagedPatientsArgs<ExtArgs>
   managedByAdmin?: boolean | Prisma.User$managedByAdminArgs<ExtArgs>
+  flags?: boolean | Prisma.User$flagsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1281,6 +1429,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     externals: Prisma.$ExternalPayload<ExtArgs>[]
     adminManagedPatients: Prisma.$AdminPatientRelationPayload<ExtArgs>[]
     managedByAdmin: Prisma.$AdminPatientRelationPayload<ExtArgs> | null
+    flags: Prisma.$FlagPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1691,6 +1840,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   externals<T extends Prisma.User$externalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$externalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExternalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   adminManagedPatients<T extends Prisma.User$adminManagedPatientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminManagedPatientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminPatientRelationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   managedByAdmin<T extends Prisma.User$managedByAdminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$managedByAdminArgs<ExtArgs>>): Prisma.Prisma__AdminPatientRelationClient<runtime.Types.Result.GetResult<Prisma.$AdminPatientRelationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  flags<T extends Prisma.User$flagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$flagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2283,6 +2433,30 @@ export type User$managedByAdminArgs<ExtArgs extends runtime.Types.Extensions.Int
    */
   include?: Prisma.AdminPatientRelationInclude<ExtArgs> | null
   where?: Prisma.AdminPatientRelationWhereInput
+}
+
+/**
+ * User.flags
+ */
+export type User$flagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Flag
+   */
+  select?: Prisma.FlagSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Flag
+   */
+  omit?: Prisma.FlagOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FlagInclude<ExtArgs> | null
+  where?: Prisma.FlagWhereInput
+  orderBy?: Prisma.FlagOrderByWithRelationInput | Prisma.FlagOrderByWithRelationInput[]
+  cursor?: Prisma.FlagWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FlagScalarFieldEnum | Prisma.FlagScalarFieldEnum[]
 }
 
 /**

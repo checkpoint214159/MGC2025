@@ -20,6 +20,22 @@ enum Role {
 enum UserRole {
   patient
   admin
+  physiotherapist
+  dietician
+}
+
+enum PlanStatus {
+  draft
+  verified
+  active
+  archived
+}
+
+enum FlagStatus {
+  open
+  reviewing
+  escalated
+  dismissed
 }
 
 model Account {
@@ -54,6 +70,8 @@ model User {
   adminManagedPatients AdminPatientRelation[] @relation("AdminToPatients")
   // Back-relation for patient to know which admin manages them
   managedByAdmin       AdminPatientRelation? @relation("PatientToAdmin")
+
+  flags Flag[] @relation("PatientFlags")
 }
 
 model AdminPatientRelation {
@@ -101,6 +119,13 @@ model State {
 
   isActive Boolean
 
+  // recovery plan / arc fields. The anchor State (isAnchor) is the stable
+  // plan-of-record carrying the X-day arc + lifecycle; daily states track it.
+  recoveryDays Int?
+  status       PlanStatus @default(active)
+  confidence   Float?
+  isAnchor     Boolean    @default(false)
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // links to states that created it / it helped create
@@ -108,6 +133,11 @@ model State {
   causalState   State?  @relation("StateHistory", fields: [causalStateId], references: [id])
   nextStateId   String? @unique
   nextState     State?  @relation("StateHistory") // Back-relation for Prisma
+
+  // anchor plan-of-record this daily state tracks (many daily -> one anchor)
+  anchorStateId  String?
+  anchorState    State?  @relation("StateAnchor", fields: [anchorStateId], references: [id])
+  trackingStates State[] @relation("StateAnchor")
 
   // links to X that created it
   causalXId String?   @unique
@@ -127,7 +157,13 @@ model Module {
   plan       Json
   checklists Json?
 
+  // clinical verification (S3): PT owns exercise, DT owns nutrition
+  ownerRole    UserRole?
+  verifiedAt   DateTime?
+  verifiedById String?
+
   progress Progress?
+  comments ModuleComment[]
 }
 
 model Progress {
@@ -195,4 +231,30 @@ model GraphConfig {
   includeTrajectory   Boolean  @default(false) // Summary instead of full history
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+}
+
+// Clinician inline comments on a module during verification (S3)
+model ModuleComment {
+  id       String   @id @default(cuid())
+  moduleId String
+  module   Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  authorId String
+  role     UserRole
+  body     String
+  createdAt DateTime @default(now())
+}
+
+// Human-in-the-loop flag raised when recovery stalls (S7), e.g. pain not decreasing
+model Flag {
+  id           String     @id @default(cuid())
+  patientId    String
+  patient      User       @relation("PatientFlags", fields: [patientId], references: [id], onDelete: Cascade)
+  type         String // e.g. "pain_stagnation"
+  severity     String // "low" | "medium" | "high"
+  status       FlagStatus @default(open)
+  detail       Json?
+  note         String?
+  createdAt    DateTime   @default(now())
+  resolvedAt   DateTime?
+  resolvedById String?
 }

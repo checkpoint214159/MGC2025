@@ -77,3 +77,13 @@ export type Message = Prisma.MessageModel
  * 
  */
 export type GraphConfig = Prisma.GraphConfigModel
+/**
+ * Model ModuleComment
+ * 
+ */
+export type ModuleComment = Prisma.ModuleCommentModel
+/**
+ * Model Flag
+ * 
+ */
+export type Flag = Prisma.FlagModel

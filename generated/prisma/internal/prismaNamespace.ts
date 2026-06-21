@@ -401,7 +401,9 @@ export const ModelName = {
   External: 'External',
   Thread: 'Thread',
   Message: 'Message',
-  GraphConfig: 'GraphConfig'
+  GraphConfig: 'GraphConfig',
+  ModuleComment: 'ModuleComment',
+  Flag: 'Flag'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -417,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "user" | "adminPatientRelation" | "screening" | "biometrics" | "state" | "module" | "progress" | "external" | "thread" | "message" | "graphConfig"
+    modelProps: "account" | "user" | "adminPatientRelation" | "screening" | "biometrics" | "state" | "module" | "progress" | "external" | "thread" | "message" | "graphConfig" | "moduleComment" | "flag"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1309,6 +1311,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ModuleComment: {
+      payload: Prisma.$ModuleCommentPayload<ExtArgs>
+      fields: Prisma.ModuleCommentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ModuleCommentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleCommentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ModuleCommentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleCommentPayload>
+        }
+        findFirst: {
+          args: Prisma.ModuleCommentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleCommentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ModuleCommentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleCommentPayload>
+        }
+        findMany: {
+          args: Prisma.ModuleCommentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleCommentPayload>[]
+        }
+        create: {
+          args: Prisma.ModuleCommentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleCommentPayload>
+        }
+        createMany: {
+          args: Prisma.ModuleCommentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ModuleCommentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleCommentPayload>[]
+        }
+        delete: {
+          args: Prisma.ModuleCommentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleCommentPayload>
+        }
+        update: {
+          args: Prisma.ModuleCommentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleCommentPayload>
+        }
+        deleteMany: {
+          args: Prisma.ModuleCommentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ModuleCommentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ModuleCommentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleCommentPayload>[]
+        }
+        upsert: {
+          args: Prisma.ModuleCommentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModuleCommentPayload>
+        }
+        aggregate: {
+          args: Prisma.ModuleCommentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateModuleComment>
+        }
+        groupBy: {
+          args: Prisma.ModuleCommentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ModuleCommentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ModuleCommentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ModuleCommentCountAggregateOutputType> | number
+        }
+      }
+    }
+    Flag: {
+      payload: Prisma.$FlagPayload<ExtArgs>
+      fields: Prisma.FlagFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FlagFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlagPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FlagFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlagPayload>
+        }
+        findFirst: {
+          args: Prisma.FlagFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlagPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FlagFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlagPayload>
+        }
+        findMany: {
+          args: Prisma.FlagFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlagPayload>[]
+        }
+        create: {
+          args: Prisma.FlagCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlagPayload>
+        }
+        createMany: {
+          args: Prisma.FlagCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FlagCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlagPayload>[]
+        }
+        delete: {
+          args: Prisma.FlagDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlagPayload>
+        }
+        update: {
+          args: Prisma.FlagUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlagPayload>
+        }
+        deleteMany: {
+          args: Prisma.FlagDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FlagUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FlagUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlagPayload>[]
+        }
+        upsert: {
+          args: Prisma.FlagUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FlagPayload>
+        }
+        aggregate: {
+          args: Prisma.FlagAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFlag>
+        }
+        groupBy: {
+          args: Prisma.FlagGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FlagGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FlagCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FlagCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1407,8 +1557,13 @@ export const StateScalarFieldEnum = {
   dateCreated: 'dateCreated',
   createdAt: 'createdAt',
   isActive: 'isActive',
+  recoveryDays: 'recoveryDays',
+  status: 'status',
+  confidence: 'confidence',
+  isAnchor: 'isAnchor',
   causalStateId: 'causalStateId',
   nextStateId: 'nextStateId',
+  anchorStateId: 'anchorStateId',
   causalXId: 'causalXId'
 } as const
 
@@ -1421,7 +1576,10 @@ export const ModuleScalarFieldEnum = {
   stateId: 'stateId',
   summary: 'summary',
   plan: 'plan',
-  checklists: 'checklists'
+  checklists: 'checklists',
+  ownerRole: 'ownerRole',
+  verifiedAt: 'verifiedAt',
+  verifiedById: 'verifiedById'
 } as const
 
 export type ModuleScalarFieldEnum = (typeof ModuleScalarFieldEnum)[keyof typeof ModuleScalarFieldEnum]
@@ -1486,6 +1644,34 @@ export const GraphConfigScalarFieldEnum = {
 } as const
 
 export type GraphConfigScalarFieldEnum = (typeof GraphConfigScalarFieldEnum)[keyof typeof GraphConfigScalarFieldEnum]
+
+
+export const ModuleCommentScalarFieldEnum = {
+  id: 'id',
+  moduleId: 'moduleId',
+  authorId: 'authorId',
+  role: 'role',
+  body: 'body',
+  createdAt: 'createdAt'
+} as const
+
+export type ModuleCommentScalarFieldEnum = (typeof ModuleCommentScalarFieldEnum)[keyof typeof ModuleCommentScalarFieldEnum]
+
+
+export const FlagScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  type: 'type',
+  severity: 'severity',
+  status: 'status',
+  detail: 'detail',
+  note: 'note',
+  createdAt: 'createdAt',
+  resolvedAt: 'resolvedAt',
+  resolvedById: 'resolvedById'
+} as const
+
+export type FlagScalarFieldEnum = (typeof FlagScalarFieldEnum)[keyof typeof FlagScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1620,16 +1806,16 @@ export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
- * Reference to a field of type 'Role'
+ * Reference to a field of type 'PlanStatus'
  */
-export type EnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role'>
+export type EnumPlanStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanStatus'>
     
 
 
 /**
- * Reference to a field of type 'Role[]'
+ * Reference to a field of type 'PlanStatus[]'
  */
-export type ListEnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role[]'>
+export type ListEnumPlanStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanStatus[]'>
     
 
 
@@ -1644,6 +1830,34 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Role'
+ */
+export type EnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role'>
+    
+
+
+/**
+ * Reference to a field of type 'Role[]'
+ */
+export type ListEnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role[]'>
+    
+
+
+/**
+ * Reference to a field of type 'FlagStatus'
+ */
+export type EnumFlagStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FlagStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'FlagStatus[]'
+ */
+export type ListEnumFlagStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FlagStatus[]'>
     
 
 /**
@@ -1745,6 +1959,8 @@ export type GlobalOmitConfig = {
   thread?: Prisma.ThreadOmit
   message?: Prisma.MessageOmit
   graphConfig?: Prisma.GraphConfigOmit
+  moduleComment?: Prisma.ModuleCommentOmit
+  flag?: Prisma.FlagOmit
 }
 
 /* Types for Logging */
