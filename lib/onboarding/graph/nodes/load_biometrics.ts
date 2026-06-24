@@ -10,18 +10,18 @@ import { OnboardingLangGraphState } from "@/lib/onboarding/graph/annotation";
  * the biometrics form has been submitted.
  */
 export async function loadBiometricsNode(
-  state: OnboardingLangGraphState
+    state: OnboardingLangGraphState,
 ): Promise<Partial<OnboardingLangGraphState>> {
-  const user = await prisma.user.findUnique({
-    where: { id: state.userId },
-    include: { biometric: true },
-  });
+    const user = await prisma.user.findUnique({
+        where: { id: state.userId },
+        include: { biometric: true },
+    });
 
-  if (!user?.biometric) {
-    throw new Error(
-      `No biometrics found for user ${state.userId}. Submit biometrics before starting the onboarding graph.`
-    );
-  }
+    if (!user?.biometric) {
+        throw new Error(
+            `No biometrics found for user ${state.userId}. Submit biometrics before starting the onboarding graph.`,
+        );
+    }
 
-  return { biometrics: BiometricsSchema.parse(user.biometric) };
+    return { biometrics: BiometricsSchema.parse(user.biometric) };
 }

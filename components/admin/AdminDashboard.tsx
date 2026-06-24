@@ -20,7 +20,11 @@ export function AdminDashboard() {
     const [searchQuery, setSearchQuery] = useState("");
 
     // Fetch managed patient IDs
-    const { data: patientIds, isLoading: idsLoading, isError: idsError } = useQuery({
+    const {
+        data: patientIds,
+        isLoading: idsLoading,
+        isError: idsError,
+    } = useQuery({
         queryKey: ["admin", "patients"],
         queryFn: async () => {
             const result = await getAdminManagedPatientsAction();
@@ -36,8 +40,8 @@ export function AdminDashboard() {
             if (!patientIds || patientIds.length === 0) return [];
             const results = await Promise.all(
                 patientIds.map((pid) =>
-                    getPatientDetailsForAdminAction(pid).then(ensureAction)
-                )
+                    getPatientDetailsForAdminAction(pid).then(ensureAction),
+                ),
             );
             return results;
         },
@@ -76,7 +80,9 @@ export function AdminDashboard() {
         return (
             <div className="p-8 max-w-5xl mx-auto">
                 <div className="bg-red-50 border border-red-200 p-6 rounded-lg">
-                    <p className="text-red-700 font-semibold">Error loading patient list</p>
+                    <p className="text-red-700 font-semibold">
+                        Error loading patient list
+                    </p>
                 </div>
             </div>
         );
@@ -89,7 +95,8 @@ export function AdminDashboard() {
                     Admin Dashboard
                 </h1>
                 <p className="text-gray-600 mt-2">
-                    Manage {patientIds?.length || 0} assigned patient{patientIds?.length !== 1 ? "s" : ""}
+                    Manage {patientIds?.length || 0} assigned patient
+                    {patientIds?.length !== 1 ? "s" : ""}
                 </p>
             </header>
 
@@ -110,14 +117,18 @@ export function AdminDashboard() {
                     <table className="w-full border-collapse bg-white rounded-lg shadow">
                         <thead>
                             <tr className="bg-gray-100 border-b">
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Name</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                                    Name
+                                </th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
                                     Surgery Type
                                 </th>
                                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
                                     Days Since Surgery
                                 </th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
+                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                                    Status
+                                </th>
                                 <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">
                                     Actions
                                 </th>
@@ -137,7 +148,9 @@ export function AdminDashboard() {
                                     </td>
                                     <td className="px-6 py-4 text-sm text-gray-600">
                                         {patient.biometric
-                                            ? getDaysSinceSurgery(patient.biometric.surgeryDate)
+                                            ? getDaysSinceSurgery(
+                                                  patient.biometric.surgeryDate,
+                                              )
                                             : "N/A"}{" "}
                                         days
                                     </td>
@@ -149,12 +162,18 @@ export function AdminDashboard() {
                                                     : "bg-yellow-100 text-yellow-800"
                                             }`}
                                         >
-                                            {patient.profile ? "Active" : "Onboarding"}
+                                            {patient.profile
+                                                ? "Active"
+                                                : "Onboarding"}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         <Button
-                                            onClick={() => router.push(`/admin/patients/${patient.id}`)}
+                                            onClick={() =>
+                                                router.push(
+                                                    `/admin/patients/${patient.id}`,
+                                                )
+                                            }
                                             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
                                         >
                                             View Details

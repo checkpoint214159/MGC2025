@@ -94,9 +94,9 @@ flowchart TB
 
 ## Built vs planned
 
-- **Built today:** full UI→actions→services→Prisma path, both LangGraph graphs, RAG,
-  standalone chat route, MCP server with 4 tool groups, admin/role guards.
-- **Planned (dotted):** `COMPONENT_REGISTRY`/`ROUTE_MAP` dynamic dashboard routing
-  (commented in `components/recovery/registry.ts`), symptoms/sleep as first-class LLM
-  modules, `chat_agent_graph` + `doctor_review_graph`, MCP↔service/graph wiring (ghost
-  feature), and the Cloudflare migration.
+-   **Built today:** full UI→actions→services→Prisma path, both LangGraph graphs, RAG,
+    standalone chat route, MCP server with 4 tool groups, admin/role guards.
+-   **Planned (dotted):** `COMPONENT_REGISTRY`/`ROUTE_MAP` dynamic dashboard routing
+    (commented in `components/recovery/registry.ts`), symptoms/sleep as first-class LLM
+    modules, `chat_agent_graph` + `doctor_review_graph`, MCP↔service/graph wiring (ghost
+    feature), and the Cloudflare migration.

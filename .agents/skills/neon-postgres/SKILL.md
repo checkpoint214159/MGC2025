@@ -1,15 +1,15 @@
 ---
 name: neon-postgres
 description: >-
-  Guides and best practices for working with Neon Serverless Postgres.
-  Covers setup, connection methods, branching, autoscaling, scale-to-zero,
-  read replicas, connection pooling, Neon Auth, and the Neon CLI, MCP server,
-  REST API, TypeScript SDK, and Python SDK.
-  Use when users ask about "Neon setup", "connect to Neon", "Neon project",
-  "DATABASE_URL", "serverless Postgres", "Neon CLI", "neonctl", "Neon MCP",
-  "Neon Auth", "@neondatabase/serverless", "@neondatabase/neon-js",
-  "scale to zero", "Neon autoscaling", "Neon read replica", or
-  "Neon connection pooling".
+    Guides and best practices for working with Neon Serverless Postgres.
+    Covers setup, connection methods, branching, autoscaling, scale-to-zero,
+    read replicas, connection pooling, Neon Auth, and the Neon CLI, MCP server,
+    REST API, TypeScript SDK, and Python SDK.
+    Use when users ask about "Neon setup", "connect to Neon", "Neon project",
+    "DATABASE_URL", "serverless Postgres", "Neon CLI", "neonctl", "Neon MCP",
+    "Neon Auth", "@neondatabase/serverless", "@neondatabase/neon-js",
+    "scale to zero", "Neon autoscaling", "Neon read replica", or
+    "Neon connection pooling".
 ---
 
 # Neon Serverless Postgres
@@ -55,10 +55,10 @@ Use this section when guiding a user through first-time Neon setup.
 
 Before starting setup, inspect the user's codebase and environment:
 
-- Existing database connection code
-- Existing Neon MCP server or Neon CLI configuration
-- Existence of a `.env` file and `DATABASE_URL` environment variable
-- Existing ORM (Prisma, Drizzle, TypeORM) configuration
+-   Existing database connection code
+-   Existing Neon MCP server or Neon CLI configuration
+-   Existence of a `.env` file and `DATABASE_URL` environment variable
+-   Existing ORM (Prisma, Drizzle, TypeORM) configuration
 
 ### Self-Driving Setup With Neon's CLI or MCP Server
 
@@ -74,9 +74,9 @@ This installs the Neon extension (for Cursor/VS Code) or MCP server (for other a
 
 If `init` is not suitable, the individual steps can be run non-interactively:
 
-- **Extension:** `cursor --install-extension databricks.neon-local-connect`
-- **MCP server:** `npx -y add-mcp https://mcp.neon.tech/mcp -g -n Neon -y -a <agent-name>`
-- **Agent skill:** `npx skills add neondatabase/agent-skills --skill neon-postgres --agent <agent-name> -y`
+-   **Extension:** `cursor --install-extension databricks.neon-local-connect`
+-   **MCP server:** `npx -y add-mcp https://mcp.neon.tech/mcp -g -n Neon -y -a <agent-name>`
+-   **Agent skill:** `npx skills add neondatabase/agent-skills --skill neon-postgres --agent <agent-name> -y`
 
 For full CLI installation options, see https://neon.com/docs/reference/cli-install.md
 
@@ -104,8 +104,8 @@ Check for existing ORM (Prisma, Drizzle, TypeORM). If none, ask if they want one
 
 **6. Schema Setup**
 
-- Check for existing migration files or ORM schemas
-- If none: offer to create an example schema or design one together
+-   Check for existing migration files or ORM schemas
+-   If none: offer to create an example schema or design one together
 
 ### Resume Support
 
@@ -125,8 +125,8 @@ Link: https://neon.com/docs/connect/choose-connection.md
 
 Always pair Neon with an ORM such as **Drizzle** for easy schema management and migrations. Pick the driver based on how the runtime treats your code:
 
-- **Long-running or shared-runtime environments → node-postgres (`pg`).** Neon Functions, and any host where the function runtime is shared across requests / runs on fluid compute (e.g. **Vercel** with Fluid compute), keep a module-scope process alive across many requests. Open a `pg` pool **once at module scope** and reuse it across requests.
-- **Fully isolated serverless (Lambda-style) → Neon's serverless driver (`@neondatabase/serverless`).** Hosts like **Netlify** spin up a fresh, isolated instance per request, so a persistent TCP pool can't be reused; the serverless driver queries over HTTP and is built for this.
+-   **Long-running or shared-runtime environments → node-postgres (`pg`).** Neon Functions, and any host where the function runtime is shared across requests / runs on fluid compute (e.g. **Vercel** with Fluid compute), keep a module-scope process alive across many requests. Open a `pg` pool **once at module scope** and reuse it across requests.
+-   **Fully isolated serverless (Lambda-style) → Neon's serverless driver (`@neondatabase/serverless`).** Hosts like **Netlify** spin up a fresh, isolated instance per request, so a persistent TCP pool can't be reused; the serverless driver queries over HTTP and is built for this.
 
 **Neon Functions / Vercel / fluid compute — Drizzle + node-postgres:**
 
@@ -237,23 +237,23 @@ npm i @neondatabase/config
 import { defineConfig } from "@neondatabase/config/v1";
 
 export default defineConfig({
-  auth: true, // Neon Auth (adds NEON_AUTH_* env vars)
-  dataApi: true, // Data API (adds NEON_DATA_API_URL); requires auth: true (or an external IdP)
-  // Postgres exists on every branch; tune its compute per branch:
-  branch: (branch) => {
-    if (branch.exists) return {}; // leave existing branches untouched
-    if (branch.isDefault) return { protected: true }; // prod keeps default compute
-    return {
-      ttl: "7d", // non-prod branches auto-expire (max 30d)
-      postgres: {
-        computeSettings: {
-          autoscalingLimitMinCu: 0.25, // scale to zero
-          autoscalingLimitMaxCu: 1, // keep dev/preview cheap
-          suspendTimeout: "5m",
-        },
-      },
-    };
-  },
+    auth: true, // Neon Auth (adds NEON_AUTH_* env vars)
+    dataApi: true, // Data API (adds NEON_DATA_API_URL); requires auth: true (or an external IdP)
+    // Postgres exists on every branch; tune its compute per branch:
+    branch: (branch) => {
+        if (branch.exists) return {}; // leave existing branches untouched
+        if (branch.isDefault) return { protected: true }; // prod keeps default compute
+        return {
+            ttl: "7d", // non-prod branches auto-expire (max 30d)
+            postgres: {
+                computeSettings: {
+                    autoscalingLimitMinCu: 0.25, // scale to zero
+                    autoscalingLimitMaxCu: 1, // keep dev/preview cheap
+                    suspendTimeout: "5m",
+                },
+            },
+        };
+    },
 });
 ```
 
@@ -286,9 +286,9 @@ Use this when the user is planning isolated environments, schema migration testi
 
 Key points:
 
-- Branches are instant, copy-on-write clones (no full data copy).
-- Each branch has its own compute endpoint.
-- Use the neonctl CLI or MCP server to create, inspect, and compare branches.
+-   Branches are instant, copy-on-write clones (no full data copy).
+-   Each branch has its own compute endpoint.
+-   Use the neonctl CLI or MCP server to create, inspect, and compare branches.
 
 Link: https://neon.com/docs/introduction/branching.md
 
@@ -316,9 +316,9 @@ Use this when optimizing idle costs and discussing suspend/resume behavior, incl
 
 Key points:
 
-- Idle computes suspend automatically (default 5 minutes, configurable) (unless disabled - launch & scale plan only)
-- First query after suspend typically has a cold-start penalty (around hundreds of ms)
-- Storage remains active while compute is suspended.
+-   Idle computes suspend automatically (default 5 minutes, configurable) (unless disabled - launch & scale plan only)
+-   First query after suspend typically has a cold-start penalty (around hundreds of ms)
+-   Storage remains active while compute is suspended.
 
 Link: https://neon.com/docs/introduction/scale-to-zero.md
 
@@ -328,9 +328,9 @@ Use this when the user needs point-in-time recovery or wants to restore data sta
 
 Key points:
 
-- History windows for instant restore depend on plan limits.
-- Users can create branches from historical points-in-time.
-- Time Travel queries can be used for historical inspection workflows.
+-   History windows for instant restore depend on plan limits.
+-   Users can create branches from historical points-in-time.
+-   Time Travel queries can be used for historical inspection workflows.
 
 Link: https://neon.com/docs/introduction/branch-restore.md
 
@@ -340,9 +340,9 @@ Use this for read-heavy workloads where the user needs dedicated read-only compu
 
 Key points:
 
-- Replicas are read-only compute endpoints sharing the same storage.
-- Creation is fast and scaling is independent from primary compute.
-- Typical use cases: analytics, reporting, and read-heavy APIs.
+-   Replicas are read-only compute endpoints sharing the same storage.
+-   Creation is fast and scaling is independent from primary compute.
+-   Typical use cases: analytics, reporting, and read-heavy APIs.
 
 Link: https://neon.com/docs/introduction/read-replicas.md
 
@@ -352,9 +352,9 @@ Use this when the user is in serverless or high-concurrency environments and nee
 
 Key points:
 
-- Neon pooling uses PgBouncer.
-- Add `-pooler` to endpoint hostnames to use pooled connections.
-- Pooling is especially important in serverless runtimes with bursty concurrency.
+-   Neon pooling uses PgBouncer.
+-   Add `-pooler` to endpoint hostnames to use pooled connections.
+-   Pooling is especially important in serverless runtimes with bursty concurrency.
 
 Link: https://neon.com/docs/connect/connection-pooling.md
 
@@ -370,7 +370,7 @@ Use this when integrating CDC pipelines, external Postgres sync, or replication-
 
 Key points:
 
-- Neon supports native logical replication workflows.
-- Useful for replicating to/from external Postgres systems.
+-   Neon supports native logical replication workflows.
+-   Useful for replicating to/from external Postgres systems.
 
 Link: https://neon.com/docs/guides/logical-replication-guide.md

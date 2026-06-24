@@ -54,14 +54,14 @@ class PineconeWrapper:
         for doc in docs:
             data, metadata = self._document_to_pinecone_data(doc)
             records.append(data)
-        
+
         # chunk into 96 since pinecone seems to only accept batch size of 96 or less
         n = 96
         record_groups = [records[i:i+n] for i in range(0, len(records), n)]
         self.validify_nonexist(datas=records, namespace=namespace)
         for group in record_groups:
             self.index.upsert_records(namespace=namespace, records=group)
-    
+
     def delete_entries(self, ids: list[str], namespace: str = 'default'):
         chunk_ids = []
         for id in ids:
@@ -77,6 +77,6 @@ class PineconeWrapper:
     #         ],
     #         # **metadata,
     #     )
-    
+
     # # NOTE: insert_entries handles batching; parallel threads are now
     # # mostly unused unless the wrapper is missing

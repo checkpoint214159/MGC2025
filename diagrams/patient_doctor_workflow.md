@@ -52,12 +52,12 @@ flowchart TB
 
 ## Design resolutions
 
-| Branch | Resolution |
-|---|---|
+| Branch               | Resolution                                                                                                                                                                                          |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Doctor influence** | Two channels: `doctorMessage` rides into the next External snapshot, **and** a direct edit spawns a **new causal State** (versioned, preserves immutability) + "physician edited" provenance badge. |
-| **Chat** | Ephemeral RAG Q&A — not persisted, not part of the loop. `External.threadContext` is fed by onboarding (and future `doctor_note`) threads only. |
-| **Symptoms / Sleep** | Planned first-class LLM modules (today they're decorative cards; `ModuleSchema` only knows exercise + nutrition). |
-| **MCP server** | Ghost feature — experimental side-car, no committed integration yet. |
+| **Chat**             | Ephemeral RAG Q&A — not persisted, not part of the loop. `External.threadContext` is fed by onboarding (and future `doctor_note`) threads only.                                                     |
+| **Symptoms / Sleep** | Planned first-class LLM modules (today they're decorative cards; `ModuleSchema` only knows exercise + nutrition).                                                                                   |
+| **MCP server**       | Ghost feature — experimental side-car, no committed integration yet.                                                                                                                                |
 
 > Note: "doctor edit = new causal State" reuses the existing `State.causalStateId` /
 > `StateHistory` self-relation in `prisma/schema.prisma` — a physician edit is just another

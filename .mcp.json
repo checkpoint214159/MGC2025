@@ -1,16 +1,16 @@
 {
-  "mcpServers": {
-    "mgc": {
-      "command": "npx",
-      "args": ["tsx", "mcp_server/src/index.ts"],
-      "env": {}
-    },
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres"],
-      "env": {
-        "DATABASE_URL": "REPLACE_WITH_YOUR_DATABASE_URL_OR_SET_IN_SHELL"
-      }
+    "mcpServers": {
+        "mgc": {
+            "command": "npx",
+            "args": ["tsx", "mcp_server/src/index.ts"],
+            "env": {}
+        },
+        "postgres": {
+            "command": "npx",
+            "args": ["-y", "@modelcontextprotocol/server-postgres"],
+            "env": {
+                "DATABASE_URL": "REPLACE_WITH_YOUR_DATABASE_URL_OR_SET_IN_SHELL"
+            }
+        }
     }
-  }
 }

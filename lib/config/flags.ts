@@ -4,7 +4,7 @@
  * review pipeline) stays off until the backend exists. Override via NEXT_PUBLIC_*.
  */
 export const FLAGS = {
-  reviewedBy: process.env.NEXT_PUBLIC_FLAG_REVIEWED_BY !== "false",
-  caregiverMode: process.env.NEXT_PUBLIC_FLAG_CAREGIVER !== "false",
-  physioSignoff: process.env.NEXT_PUBLIC_FLAG_PHYSIO_SIGNOFF === "true",
+    reviewedBy: process.env.NEXT_PUBLIC_FLAG_REVIEWED_BY !== "false",
+    caregiverMode: process.env.NEXT_PUBLIC_FLAG_CAREGIVER !== "false",
+    physioSignoff: process.env.NEXT_PUBLIC_FLAG_PHYSIO_SIGNOFF === "true",
 } as const;

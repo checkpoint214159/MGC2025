@@ -1,38 +1,46 @@
 import { ExercisePlan } from "./schemas/exercise";
-import { NutritionPlan, NutritionChecklist } from "./schemas/nutrition"
+import { NutritionPlan, NutritionChecklist } from "./schemas/nutrition";
 
-export function createInitialProgress(plan: (ExercisePlan | NutritionPlan)[]): any {
-  return plan.map(part => {
-      const rawMetrics = part.data;
+export function createInitialProgress(
+    plan: (ExercisePlan | NutritionPlan)[],
+): any {
+    return plan.map((part) => {
+        const rawMetrics = part.data;
 
-      if (!rawMetrics) {
-        return { ...part, data: {} };
-      }
+        if (!rawMetrics) {
+            return { ...part, data: {} };
+        }
 
-      const zeroedMetrics = Object.fromEntries(
-        Object.entries(rawMetrics).map(([key, metric]) => {
-          if (typeof metric === 'object' && metric !== null && 'goal' in metric) {
-            return [
-              key,
-              { 
-                ...metric, 
-                value: 0 // reset user progress
-              }
-            ];
-          }
-          return [key, metric];
-        })
-      );
+        const zeroedMetrics = Object.fromEntries(
+            Object.entries(rawMetrics).map(([key, metric]) => {
+                if (
+                    typeof metric === "object" &&
+                    metric !== null &&
+                    "goal" in metric
+                ) {
+                    return [
+                        key,
+                        {
+                            ...metric,
+                            value: 0, // reset user progress
+                        },
+                    ];
+                }
+                return [key, metric];
+            }),
+        );
 
-      return {
-        ...part,
-        data: zeroedMetrics
-      };
-    })
+        return {
+            ...part,
+            data: zeroedMetrics,
+        };
+    });
 }
 
-export function createInitialChecklistState(checklists: NutritionChecklist[]): Record<string, boolean> {
-  return Object.fromEntries(checklists.map((cl) => [cl.id, false]));
+export function createInitialChecklistState(
+    checklists: NutritionChecklist[],
+): Record<string, boolean> {
+    return Object.fromEntries(checklists.map((cl) => [cl.id, false]));
 }
 
 // /** Extracts the lean Trackable from an Exercise Plan */
@@ -70,7 +78,6 @@ export function createInitialChecklistState(checklists: NutritionChecklist[]): R
 //     trackable: found ? found.trackable : task.trackable,
 //   };
 // }
-
 
 // // --- STATE -> TRACKER ---
 

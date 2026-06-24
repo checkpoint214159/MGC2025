@@ -1,19 +1,27 @@
 export type CaregiverCopy = {
-  heading: string;
-  possessive: string;
-  subject: string;
-  actionVerb: string;
+    heading: string;
+    possessive: string;
+    subject: string;
+    actionVerb: string;
 };
 
 /** Copy tokens that reframe the dashboard to second-person-about-the-patient. */
-export function caregiverCopy(isCaregiver: boolean, patientName: string): CaregiverCopy {
-  if (isCaregiver) {
+export function caregiverCopy(
+    isCaregiver: boolean,
+    patientName: string,
+): CaregiverCopy {
+    if (isCaregiver) {
+        return {
+            heading: `Helping ${patientName}`,
+            possessive: "their",
+            subject: "they",
+            actionVerb: "Help them with",
+        };
+    }
     return {
-      heading: `Helping ${patientName}`,
-      possessive: "their",
-      subject: "they",
-      actionVerb: "Help them with",
+        heading: "",
+        possessive: "your",
+        subject: "you",
+        actionVerb: "Do your",
     };
-  }
-  return { heading: "", possessive: "your", subject: "you", actionVerb: "Do your" };
 }

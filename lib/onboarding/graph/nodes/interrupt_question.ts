@@ -28,21 +28,25 @@ import { OnboardingLangGraphState } from "@/lib/onboarding/graph/annotation";
  *   - interrupt_question: on resume, ONLY saves the answer and increments count
  */
 export async function interruptQuestionNode(
-  state: OnboardingLangGraphState
+    state: OnboardingLangGraphState,
 ): Promise<Partial<OnboardingLangGraphState>> {
-  const answer: string = interrupt({
-    type: "answer_question",
-    question: state.currentQuestion,
-    questionCount: state.questionCount,
-  });
+    const answer: string = interrupt({
+        type: "answer_question",
+        question: state.currentQuestion,
+        questionCount: state.questionCount,
+    });
 
-  const userMsg = convertResponseToMessage(answer, state.thread!.id, "onboarding");
-  const updatedThread = await updateThread(
-    state.userId,
-    state.thread!.id,
-    "onboarding",
-    [userMsg]
-  );
+    const userMsg = convertResponseToMessage(
+        answer,
+        state.thread!.id,
+        "onboarding",
+    );
+    const updatedThread = await updateThread(
+        state.userId,
+        state.thread!.id,
+        "onboarding",
+        [userMsg],
+    );
 
-  return { thread: updatedThread, questionCount: state.questionCount + 1 };
+    return { thread: updatedThread, questionCount: state.questionCount + 1 };
 }

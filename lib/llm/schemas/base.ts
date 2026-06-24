@@ -1,4 +1,4 @@
-import z from "zod"
+import z from "zod";
 
 // TODO: union or merge this with a Message? seems a lot more practical...
 // but then again these are blueprints for our llm.
@@ -8,21 +8,27 @@ export const BaseQuestionMetadataSchema = z.object({
     urgency: z.boolean().default(false),
     sliderMin: z.number().default(0),
     sliderMax: z.number().default(10),
-    sliderLabels: z.array(z.string()).optional()
-})
+    sliderLabels: z.array(z.string()).optional(),
+});
 
 export const BaseQuestionSchema = z.object({
-  id: z.string().optional().nullable(),
-  questionText: z.string(),
-  inputType: z.enum(['text', 'slider', 'choice', 'date', 'terminateQuestioning']),
-  options: z.array(z.string()).optional(),
-  metadata: BaseQuestionMetadataSchema, 
+    id: z.string().optional().nullable(),
+    questionText: z.string(),
+    inputType: z.enum([
+        "text",
+        "slider",
+        "choice",
+        "date",
+        "terminateQuestioning",
+    ]),
+    options: z.array(z.string()).optional(),
+    metadata: BaseQuestionMetadataSchema,
 });
 
 export const BaseUserResponseSchema = z.object({
-  id: z.string(),
-  answerText: z.string()
-})
+    id: z.string(),
+    answerText: z.string(),
+});
 
 // const AnswerResponsePair = z.object({
 //   id: z.string(),
@@ -30,10 +36,9 @@ export const BaseUserResponseSchema = z.object({
 //   answer: BaseUserResponseSchema.optional(),
 // })
 
-export type BaseQuestion = z.infer<typeof BaseQuestionSchema>
-export type BaseQuestionMetadata = z.infer<typeof BaseQuestionMetadataSchema>
-export type BaseUserResponse = z.infer<typeof BaseUserResponseSchema>
-
+export type BaseQuestion = z.infer<typeof BaseQuestionSchema>;
+export type BaseQuestionMetadata = z.infer<typeof BaseQuestionMetadataSchema>;
+export type BaseUserResponse = z.infer<typeof BaseUserResponseSchema>;
 
 // export const BaseRAGSchema = z.object({
 //   content: z.string(),
@@ -52,17 +57,17 @@ export type BaseUserResponse = z.infer<typeof BaseUserResponseSchema>
 // });
 
 // export const OnboardingTurnSchema = z.discriminatedUnion("type", [
-//   z.object({ 
-//     type: z.literal("question"), 
-//     data: BaseCotSchema 
+//   z.object({
+//     type: z.literal("question"),
+//     data: BaseCotSchema
 //   }),
-//   z.object({ 
-//     type: z.literal("insight"), 
-//     data: BaseRAGSchema 
+//   z.object({
+//     type: z.literal("insight"),
+//     data: BaseRAGSchema
 //   }),
-//   z.object({ 
-//     type: z.literal("complete"), 
-//     summary: z.string() 
+//   z.object({
+//     type: z.literal("complete"),
+//     summary: z.string()
 //   }),
 // ]);
 
@@ -74,5 +79,3 @@ export type BaseUserResponse = z.infer<typeof BaseUserResponseSchema>
 //     data: dataSchema, // where our question schemas go
 //   });
 // }
-
-

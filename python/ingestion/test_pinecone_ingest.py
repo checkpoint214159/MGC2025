@@ -23,7 +23,7 @@ index.upsert_records(
         {
             "_id": "rec1",
             "text": "Apples are a great source of dietary fiber, which supports digestion and helps maintain a healthy gut.",
-            "category": "digestive system", 
+            "category": "digestive system",
             "other": "metafield"
         },
     ]
@@ -35,7 +35,7 @@ docs = loader.load()
 # 3. Chunking (Critical for clinical accuracy)
 # We use a 1000 character chunk with overlap so recovery steps aren't cut in half
 text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1000, 
+    chunk_size=1000,
     chunk_overlap=100
 )
 split_docs = text_splitter.split_documents(docs)

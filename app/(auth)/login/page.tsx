@@ -9,89 +9,104 @@ import { Button } from "@/components/ui/primitives";
 import { AuthShell, Field, authInputClass } from "../AuthShell";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-        callbackUrl: "/",
-      });
-      if (result?.error) {
-        setError("Login failed. Please check your email and password.");
-      } else {
-        router.push("/");
-      }
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError("");
+        setLoading(true);
+        try {
+            const result = await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
+                callbackUrl: "/",
+            });
+            if (result?.error) {
+                setError("Login failed. Please check your email and password.");
+            } else {
+                router.push("/");
+            }
+        } catch {
+            setError("Something went wrong. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  return (
-    <AuthShell
-      title="Welcome back"
-      subtitle="Sign in to pick up your recovery."
-      error={error}
-      footer={
-        <>
-          New here?{" "}
-          <Link href="/signup" className="font-medium text-accent-ink hover:underline">
-            Create an account
-          </Link>
-        </>
-      }
-    >
-      <form onSubmit={handleLogin} className="mt-6 space-y-4">
-        <Field label="Email" htmlFor="email">
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className={authInputClass}
-          />
-        </Field>
+    return (
+        <AuthShell
+            title="Welcome back"
+            subtitle="Sign in to pick up your recovery."
+            error={error}
+            footer={
+                <>
+                    New here?{" "}
+                    <Link
+                        href="/signup"
+                        className="font-medium text-accent-ink hover:underline"
+                    >
+                        Create an account
+                    </Link>
+                </>
+            }
+        >
+            <form onSubmit={handleLogin} className="mt-6 space-y-4">
+                <Field label="Email" htmlFor="email">
+                    <input
+                        id="email"
+                        type="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className={authInputClass}
+                    />
+                </Field>
 
-        <Field label="Password" htmlFor="password">
-          <div className="relative">
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className={`${authInputClass} pr-11`}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
-              className="absolute right-1 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded text-ink-subtle hover:text-ink"
-            >
-              {showPassword ? <EyeOff size={18} strokeWidth={1.75} /> : <Eye size={18} strokeWidth={1.75} />}
-            </button>
-          </div>
-        </Field>
+                <Field label="Password" htmlFor="password">
+                    <div className="relative">
+                        <input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            autoComplete="current-password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className={`${authInputClass} pr-11`}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword((v) => !v)}
+                            aria-label={
+                                showPassword ? "Hide password" : "Show password"
+                            }
+                            className="absolute right-1 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded text-ink-subtle hover:text-ink"
+                        >
+                            {showPassword ? (
+                                <EyeOff size={18} strokeWidth={1.75} />
+                            ) : (
+                                <Eye size={18} strokeWidth={1.75} />
+                            )}
+                        </button>
+                    </div>
+                </Field>
 
-        <Button type="submit" variant="primary" size="lg" loading={loading} className="w-full">
-          Sign in
-        </Button>
-      </form>
-    </AuthShell>
-  );
+                <Button
+                    type="submit"
+                    variant="primary"
+                    size="lg"
+                    loading={loading}
+                    className="w-full"
+                >
+                    Sign in
+                </Button>
+            </form>
+        </AuthShell>
+    );
 }

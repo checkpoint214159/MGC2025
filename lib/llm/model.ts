@@ -13,6 +13,11 @@ const openrouter = createOpenRouter({
 const DEFAULT_MAX_OUTPUT_TOKENS =
     Number(process.env.LLM_MAX_OUTPUT_TOKENS) || 16384;
 
+// AI-SDK retry count for object generation. 0 = single attempt (no retries) — the dev
+// default, because a schema/validation failure almost always repeats and just multiplies
+// cost. Set LLM_MAX_RETRIES=2 in prod (wrangler vars) for resilience against transient 5xx.
+export const LLM_MAX_RETRIES = Number(process.env.LLM_MAX_RETRIES ?? 0);
+
 /**
  * Returns a language model from OpenRouter, with a default output-token cap.
  * @param modelId Optional OpenRouter model slug (e.g. "deepseek/deepseek-chat").

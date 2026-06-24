@@ -1,0 +1,20 @@
+{
+    "extends": ["next/core-web-vitals"],
+    "rules": {
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn"
+    },
+    "ignorePatterns": [
+        "node_modules/",
+        ".next/",
+        "dist/",
+        "build/",
+        "generated/",
+        ".wrangler/",
+        "spikes/",
+        ".agents/",
+        ".claude/",
+        ".codex/",
+        ".github/"
+    ]
+}

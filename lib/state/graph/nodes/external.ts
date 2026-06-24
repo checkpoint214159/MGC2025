@@ -19,26 +19,26 @@ import { StateGenerationLangGraphState } from "@/lib/state/graph/annotation";
  * before the module generation fan-out.
  */
 export async function compileExternalNode(
-  state: StateGenerationLangGraphState
+    state: StateGenerationLangGraphState,
 ): Promise<Partial<StateGenerationLangGraphState>> {
-  const user = await prisma.user.findUnique({
-    where: { id: state.userId },
-    include: { threads: { include: { messages: true } } },
-  });
+    const user = await prisma.user.findUnique({
+        where: { id: state.userId },
+        include: { threads: { include: { messages: true } } },
+    });
 
-  if (!user) throw new Error("User not found");
+    if (!user) throw new Error("User not found");
 
-  const safeProfile = (user.profile as string) ?? "No profile data provided";
+    const safeProfile = (user.profile as string) ?? "No profile data provided";
 
-  // compileExternal calls prisma.external.create and returns the External record
-  const external = await compileExternal(
-    state.userId,
-    user.threads as any,
-    safeProfile
-  );
+    // compileExternal calls prisma.external.create and returns the External record
+    const external = await compileExternal(
+        state.userId,
+        user.threads as any,
+        safeProfile,
+    );
 
-  // Validate against schema
-  const validatedExternal = ExternalSchema.parse(external);
+    // Validate against schema
+    const validatedExternal = ExternalSchema.parse(external);
 
-  return { external: validatedExternal };
+    return { external: validatedExternal };
 }

@@ -1,7 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { getActiveState } from "@/lib/state/service";
+import { getActiveState, getStateHistory } from "@/lib/state/service";
 import { getStateGenerationConfig } from "@/lib/state/graph/config";
 import { StateGenerationLangGraphState } from "@/lib/state/graph/annotation";
+import { getPatientMemory, buildRawWindow } from "@/lib/memory/service";
+import { buildHeuristicDigest } from "@/lib/state/services/digest";
+import { getRecoveryDay, getRecoveryPhase } from "@/lib/engagement";
 
 /**
  * Node: load_context
@@ -23,95 +26,160 @@ import { StateGenerationLangGraphState } from "@/lib/state/graph/annotation";
  * - smartFiltering: if true, only include states with significant changes
  */
 export async function loadContextNode(
-  state: StateGenerationLangGraphState
+    state: StateGenerationLangGraphState,
 ): Promise<Partial<StateGenerationLangGraphState>> {
-  // 📋 Load runtime configuration
-  console.log("[loadContextNode] ⏱️ Starting node for userId:", state.userId, "date:", state.date);
-  const config = await getStateGenerationConfig();
-  console.log("[loadContextNode] ✅ Config loaded:", config);
+    // 📋 Load runtime configuration
+    console.log(
+        "[loadContextNode] ⏱️ Starting node for userId:",
+        state.userId,
+        "date:",
+        state.date,
+    );
+    const config = await getStateGenerationConfig();
+    console.log("[loadContextNode] ✅ Config loaded:", config);
 
-  const yesterday = new Date(state.date);
-  yesterday.setDate(yesterday.getDate() - 1);
+    const yesterday = new Date(state.date);
+    yesterday.setDate(yesterday.getDate() - 1);
 
-  // 📖 Determine lookback window
-  let historicalStates: any[] = [];
+    // 📖 Determine lookback window
+    let historicalStates: any[] = [];
 
-  if (config.contextWindowDays === -1) {
-    // Load ALL history (unlimited lookback)
-    historicalStates = await loadAllStateHistory(state.userId);
-  } else if (config.contextWindowDays === 1) {
-    // Load only yesterday (default, fastest)
-    const yesterday_state = await getActiveState(state.userId, yesterday);
-    if (yesterday_state) historicalStates = [yesterday_state];
-  } else {
-    // Load last N days
-    for (let i = 0; i < config.contextWindowDays; i++) {
-      const d = new Date(yesterday);
-      d.setDate(d.getDate() - i);
-      const s = await getActiveState(state.userId, d);
-      if (s) historicalStates.push(s);
+    if (config.contextWindowDays === -1) {
+        // Load ALL history (unlimited lookback)
+        historicalStates = await loadAllStateHistory(state.userId);
+    } else if (config.contextWindowDays === 1) {
+        // Load only yesterday (default, fastest)
+        const yesterday_state = await getActiveState(state.userId, yesterday);
+        if (yesterday_state) historicalStates = [yesterday_state];
+    } else {
+        // Load last N days
+        for (let i = 0; i < config.contextWindowDays; i++) {
+            const d = new Date(yesterday);
+            d.setDate(d.getDate() - i);
+            const s = await getActiveState(state.userId, d);
+            if (s) historicalStates.push(s);
+        }
     }
-  }
 
-  // Apply smart filtering if enabled
-  if (config.smartFiltering && historicalStates.length > 0) {
-    historicalStates = filterSignificantStates(historicalStates);
-  }
+    // Apply smart filtering if enabled
+    if (config.smartFiltering && historicalStates.length > 0) {
+        historicalStates = filterSignificantStates(historicalStates);
+    }
 
-  // 📖 Fetch user and threads
-  const user = await prisma.user.findUnique({
-    where: { id: state.userId },
-    include: { threads: { include: { messages: true } } },
-  });
+    // 📖 Fetch user, threads, and biometrics (surgery date drives recovery day/phase)
+    const user = await prisma.user.findUnique({
+        where: { id: state.userId },
+        include: { threads: { include: { messages: true } }, biometric: true },
+    });
 
-  if (!user) throw new Error(`User ${state.userId} not found`);
+    if (!user) throw new Error(`User ${state.userId} not found`);
 
-  // 🧮 Build the transcript string from all threads
-  const threadContext = user.threads;
-  const transcripts = threadContext
-    .map((thread: any) => {
-      const msgs = thread.messages
-        ?.map((m: any) => `[${m.role.toUpperCase()}]: ${m.content}`)
-        .join("\n") || "No messages";
-      return `### Thread: ${thread.title || "General"}\n${msgs}`;
-    })
-    .join("\n\n---\n\n");
+    // 🧮 Build the transcript string from all threads
+    const threadContext = user.threads;
+    const transcripts = threadContext
+        .map((thread: any) => {
+            const msgs =
+                thread.messages
+                    ?.map((m: any) => `[${m.role.toUpperCase()}]: ${m.content}`)
+                    .join("\n") || "No messages";
+            return `### Thread: ${thread.title || "General"}\n${msgs}`;
+        })
+        .join("\n\n---\n\n");
 
-  // 📝 Metadata about context selection (audit trail)
-  const contextMetadata = {
-    configApplied: {
-      contextWindowDays: config.contextWindowDays,
-      smartFiltering: config.smartFiltering,
-    },
-    statesLoaded: historicalStates.length,
-    transcriptSize: transcripts.length,
-  };
+    // 🧠 Compaction layer: consolidated memory + deterministic digest + the unconsolidated
+    // raw window. The full active-state chain (cheap, read-only) feeds the digest's trends,
+    // independent of the contextWindowDays config that governs raw state carry-forward.
+    const surgeryDate = user.biometric?.surgeryDate ?? null;
+    const recoveryDay = getRecoveryDay({
+        surgeryDate,
+        today: new Date(state.date),
+    });
+    const recoveryPhase = getRecoveryPhase(recoveryDay);
 
-  return {
-    previousState: historicalStates[0] ?? null, // Most recent historical state
-    stateHistory: historicalStates,
-    transcripts,
-    contextMetadata,
-  };
+    const fullHistory = await getStateHistory(state.userId);
+    const heuristicDigest = buildHeuristicDigest({
+        history: fullHistory,
+        surgeryDate,
+        now: new Date(state.date),
+    });
+
+    const patientMemory = await getPatientMemory(state.userId);
+    const rawWindow = buildRawWindow(
+        threadContext,
+        patientMemory?.consolidatedThrough ?? new Date(0),
+    );
+
+    console.log(
+        `[state-gen] compaction | memory=${
+            patientMemory ? "present" : "none"
+        } | ` +
+            `rawWindow=${rawWindow.messageCount} msg/${rawWindow.text.length} chars` +
+            `${rawWindow.hasDoctorNote ? " (doctor note)" : ""} | recoveryDay=${
+                recoveryDay ?? "?"
+            } (${recoveryPhase})`,
+    );
+
+    // 📝 Metadata about context selection (audit trail)
+    const contextMetadata = {
+        configApplied: {
+            contextWindowDays: config.contextWindowDays,
+            smartFiltering: config.smartFiltering,
+        },
+        statesLoaded: historicalStates.length,
+        transcriptSize: transcripts.length,
+    };
+
+    // Visibility into how much context we're feeding the LLM (the transcript is the bulk
+    // of every module-generation prompt — see generateModule). Logs thread count, the
+    // total transcript size, and a per-thread breakdown of message count + char length.
+    const perThread = threadContext
+        .map(
+            (t: any) =>
+                `"${t.title || "General"}"(${t.messages?.length ?? 0} msgs, ${(
+                    t.messages ?? []
+                ).reduce(
+                    (n: number, m: any) => n + (m.content?.length ?? 0),
+                    0,
+                )} chars)`,
+        )
+        .join(", ");
+    console.log(
+        `[state-gen] context loaded | ${threadContext.length} thread(s), ${transcripts.length} chars total transcript | ` +
+            `history states: ${historicalStates.length} (window=${
+                config.contextWindowDays
+            }d) | ${perThread || "no threads"}`,
+    );
+
+    return {
+        previousState: historicalStates[0] ?? null, // Most recent historical state
+        stateHistory: historicalStates,
+        transcripts,
+        contextMetadata,
+        patientMemory,
+        heuristicDigest,
+        rawWindow,
+        recoveryDay,
+        recoveryPhase,
+    };
 }
 
 /**
  * Load all available state history for a user (limited to last 90 days for safety).
  */
 async function loadAllStateHistory(userId: string): Promise<any[]> {
-  const ninetyDaysAgo = new Date();
-  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
-  const states = await prisma.state.findMany({
-    where: {
-      userId,
-      dateCreated: { gte: ninetyDaysAgo },
-    },
-    orderBy: { dateCreated: "desc" },
-    include: { modules: true },
-  });
+    const states = await prisma.state.findMany({
+        where: {
+            userId,
+            dateCreated: { gte: ninetyDaysAgo },
+        },
+        orderBy: { dateCreated: "desc" },
+        include: { modules: true },
+    });
 
-  return states;
+    return states;
 }
 
 /**
@@ -124,67 +192,67 @@ async function loadAllStateHistory(userId: string): Promise<any[]> {
  * - Include states where module summaries or plans changed significantly
  */
 function filterSignificantStates(states: any[]): any[] {
-  if (states.length <= 2) return states;
+    if (states.length <= 2) return states;
 
-  const filtered = [states[0]]; // Always include most recent
+    const filtered = [states[0]]; // Always include most recent
 
-  for (let i = 1; i < states.length - 1; i++) {
-    const current = states[i];
-    const previous = states[i - 1];
+    for (let i = 1; i < states.length - 1; i++) {
+        const current = states[i];
+        const previous = states[i - 1];
 
-    // Compute a simple "change score" between states
-    const changeScore = computeStateChangeScore(previous, current);
+        // Compute a simple "change score" between states
+        const changeScore = computeStateChangeScore(previous, current);
 
-    if (changeScore > 0.2) {
-      // 20% threshold for significant change
-      filtered.push(current);
+        if (changeScore > 0.2) {
+            // 20% threshold for significant change
+            filtered.push(current);
+        }
     }
-  }
 
-  if (states.length > 1 && !filtered.includes(states[states.length - 1])) {
-    filtered.push(states[states.length - 1]); // Always include oldest
-  }
+    if (states.length > 1 && !filtered.includes(states[states.length - 1])) {
+        filtered.push(states[states.length - 1]); // Always include oldest
+    }
 
-  return filtered.reverse(); // Chronological order
+    return filtered.reverse(); // Chronological order
 }
 
 /**
  * Compute how much a state changed relative to the previous one (0-1 scale).
  * Measures: module summaries, plan changes, etc.
  */
-function computeStateChangeScore(
-  prevState: any,
-  currState: any
-): number {
-  if (!prevState || !currState) return 1.0; // Treat missing as maximum change
+function computeStateChangeScore(prevState: any, currState: any): number {
+    if (!prevState || !currState) return 1.0; // Treat missing as maximum change
 
-  let score = 0;
-  let comparisons = 0;
+    let score = 0;
+    let comparisons = 0;
 
-  // Compare each module
-  const prevModules = new Map(
-    (prevState.modules as any[])?.map((m: any) => [m.type, m]) ?? []
-  );
-  const currModules = new Map(
-    (currState.modules as any[])?.map((m: any) => [m.type, m]) ?? []
-  );
+    // Compare each module
+    const prevModules = new Map(
+        (prevState.modules as any[])?.map((m: any) => [m.type, m]) ?? [],
+    );
+    const currModules = new Map(
+        (currState.modules as any[])?.map((m: any) => [m.type, m]) ?? [],
+    );
 
-  for (const [type, currMod] of currModules) {
-    const prevMod = prevModules.get(type);
-    if (!prevMod) {
-      score += 1.0; // New module = big change
-    } else {
-      // Compare summaries (simple text diff heuristic)
-      const summaryDiff =
-        (prevMod as any).summary !== (currMod as any).summary ? 0.5 : 0.0;
-      const planDiff =
-        JSON.stringify((prevMod as any).plan) !== JSON.stringify((currMod as any).plan)
-          ? 0.3
-          : 0.0;
-      score += summaryDiff + planDiff;
+    for (const [type, currMod] of currModules) {
+        const prevMod = prevModules.get(type);
+        if (!prevMod) {
+            score += 1.0; // New module = big change
+        } else {
+            // Compare summaries (simple text diff heuristic)
+            const summaryDiff =
+                (prevMod as any).summary !== (currMod as any).summary
+                    ? 0.5
+                    : 0.0;
+            const planDiff =
+                JSON.stringify((prevMod as any).plan) !==
+                JSON.stringify((currMod as any).plan)
+                    ? 0.3
+                    : 0.0;
+            score += summaryDiff + planDiff;
+        }
+        comparisons++;
     }
-    comparisons++;
-  }
 
-  return comparisons > 0 ? score / comparisons : 0;
+    return comparisons > 0 ? score / comparisons : 0;
 }

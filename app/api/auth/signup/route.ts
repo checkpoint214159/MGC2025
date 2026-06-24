@@ -5,20 +5,23 @@ import { getDevAdminId } from "@/lib/dev/init";
 
 // determine if email is accepted under accepted admin emails
 function isAdminEmail(email: string): boolean {
-  const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
-  if (adminEmails.includes(email.toLowerCase())) {
-    return true;
-  }
+    const adminEmails =
+        process.env.ADMIN_EMAILS?.split(",").map((e) =>
+            e.trim().toLowerCase(),
+        ) || [];
+    if (adminEmails.includes(email.toLowerCase())) {
+        return true;
+    }
 
-//   // Check if email matches one of the admin domains
-//   const adminDomains = process.env.ADMIN_EMAIL_DOMAINS?.split(',').map(d => d.trim().toLowerCase()) || [];
-//   for (const domain of adminDomains) {
-//     if (email.toLowerCase().endsWith(`@${domain}`)) {
-//       return true;
-//     }
-//   }
+    //   // Check if email matches one of the admin domains
+    //   const adminDomains = process.env.ADMIN_EMAIL_DOMAINS?.split(',').map(d => d.trim().toLowerCase()) || [];
+    //   for (const domain of adminDomains) {
+    //     if (email.toLowerCase().endsWith(`@${domain}`)) {
+    //       return true;
+    //     }
+    //   }
 
-  return false;
+    return false;
 }
 
 export async function POST(request: Request) {
@@ -27,9 +30,7 @@ export async function POST(request: Request) {
 
         const existingUser = await prisma.account.findFirst({
             where: {
-                OR: [
-                    { email: email },
-                ],
+                OR: [{ email: email }],
             },
         });
 
@@ -38,18 +39,18 @@ export async function POST(request: Request) {
             if (existingUser.email === email) {
                 message += "This email address is already registered.";
             }
-            
+
             // Return a 409 status with the specific error message in the body
             return new NextResponse(JSON.stringify({ message: message }), {
                 status: 409,
-                headers: { 'Content-Type': 'application/json' },
+                headers: { "Content-Type": "application/json" },
             });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        
+
         // Determine role based on email
-        const role = isAdminEmail(email) ? 'admin' : 'patient';
+        const role = isAdminEmail(email) ? "admin" : "patient";
 
         const newUser = await prisma.user.create({
             data: {
@@ -59,12 +60,12 @@ export async function POST(request: Request) {
                     create: {
                         email: email,
                         password: hashedPassword,
-                    }
-                }
+                    },
+                },
             },
             include: {
-                account: true
-            }
+                account: true,
+            },
         });
 
         // Auto-assign patient to dev admin in development mode
@@ -79,17 +80,20 @@ export async function POST(request: Request) {
                         },
                     });
                     console.warn(
-                        `[DEV] ⚠️  Auto-assigned patient "${email}" to dev admin`
+                        `[DEV] ⚠️  Auto-assigned patient "${email}" to dev admin`,
                     );
                 } catch (error: any) {
                     // Silently ignore if relation already exists
                     if (error.code !== "P2002") {
-                        console.error("[DEV] Failed to auto-assign patient to dev admin:", error);
+                        console.error(
+                            "[DEV] Failed to auto-assign patient to dev admin:",
+                            error,
+                        );
                     }
                 }
             }
         }
-        
+
         const accounts = await prisma.account.findMany({
             select: {
                 id: true,
@@ -99,12 +103,12 @@ export async function POST(request: Request) {
             },
         });
 
-        console.log(accounts)
+        console.log(accounts);
 
         return NextResponse.json(
             {
                 message: "Account created successfully",
-                role: role
+                role: role,
             },
             { status: 201 },
         );

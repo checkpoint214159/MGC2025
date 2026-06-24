@@ -1,5 +1,5 @@
 1. Graph execution patterns (the "buckets")
-You've identified the key distinction. But there are actually a few more patterns to be aware of:
+   You've identified the key distinction. But there are actually a few more patterns to be aware of:
 
 Bucket 1: One-shot, atomic (like stateGenerationGraph)
 

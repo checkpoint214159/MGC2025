@@ -1,11 +1,10 @@
 import { z } from "zod";
 
-
 export const BiometricsSchema = z.object({
-  age: z.coerce.number().min(0).max(120),
-  sex: z.enum(["Male", "Female", "Other"]),
-  treatment: z.string().min(2, "Please specify your surgery/treatment"),
-  surgeryDate: z.coerce.date(),
+    age: z.coerce.number().min(0).max(120),
+    sex: z.enum(["Male", "Female", "Other"]),
+    treatment: z.string().min(2, "Please specify your surgery/treatment"),
+    surgeryDate: z.coerce.date(),
 });
 
 // export const BaselineSchema = z.object({
@@ -19,4 +18,3 @@ export const BiometricsSchema = z.object({
 // );
 
 export type Biometrics = z.infer<typeof BiometricsSchema>;
-

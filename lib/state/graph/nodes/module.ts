@@ -6,10 +6,11 @@ import { StateGenerationLangGraphState } from "@/lib/state/graph/annotation";
  * This is the input structure created by dispatchModules() for each Send.
  */
 interface ModuleGenerationInput {
-  moduleKey: string;
-  profile: string;
-  transcripts: string;
-  previousModule: any | null;
+    moduleKey: string;
+    memoryBlock: string; // rendered consolidated memory (semantic + phase narrative)
+    digest: string; // deterministic heuristic signals
+    rawWindow: string; // unconsolidated prose since the memory watermark
+    previousModule: any | null;
 }
 
 /**
@@ -30,14 +31,17 @@ interface ModuleGenerationInput {
  * focused on what it actually needs.
  */
 export async function generateModuleNode(
-  input: ModuleGenerationInput
+    input: ModuleGenerationInput,
 ): Promise<Partial<StateGenerationLangGraphState>> {
-  const result = await generateModule(
-    input.moduleKey,
-    input.profile,
-    input.transcripts,
-    input.previousModule
-  );
+    const result = await generateModule(
+        input.moduleKey,
+        {
+            memoryBlock: input.memoryBlock,
+            digest: input.digest,
+            rawWindow: input.rawWindow,
+        },
+        input.previousModule,
+    );
 
-  return { generatedModules: { [input.moduleKey]: result } };
+    return { generatedModules: { [input.moduleKey]: result } };
 }

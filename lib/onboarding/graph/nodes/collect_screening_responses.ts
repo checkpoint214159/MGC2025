@@ -17,12 +17,12 @@ import { PARQ_QUESTIONS, ScreeningAnswers } from "@/lib/onboarding/screening";
  * (true = "YES", false = "NO").
  */
 export async function collectScreeningResponsesNode(
-  state: OnboardingLangGraphState
+    state: OnboardingLangGraphState,
 ): Promise<Partial<OnboardingLangGraphState>> {
-  const responses: ScreeningAnswers = interrupt({
-    type: "collect_screening_responses",
-    questions: PARQ_QUESTIONS,
-  });
+    const responses: ScreeningAnswers = interrupt({
+        type: "collect_screening_responses",
+        questions: PARQ_QUESTIONS,
+    });
 
-  return { screeningResponses: responses };
+    return { screeningResponses: responses };
 }

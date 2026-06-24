@@ -1,26 +1,26 @@
-"use client"
+"use client";
 
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-  const pathname = usePathname();
+    const { data: session, status } = useSession();
+    const router = useRouter();
+    const pathname = usePathname();
 
-  const publicRoutes = ["/login", "/signup"];
-  const isPublicRoute = publicRoutes.includes(pathname);
+    const publicRoutes = ["/login", "/signup"];
+    const isPublicRoute = publicRoutes.includes(pathname);
 
-  useEffect(() => {
-    if (status === "loading") return;
+    useEffect(() => {
+        if (status === "loading") return;
 
-    if (status === "unauthenticated" && !isPublicRoute) {
-      router.replace("/login");
-    }
-  }, [status, router, pathname]);
+        if (status === "unauthenticated" && !isPublicRoute) {
+            router.replace("/login");
+        }
+    }, [status, router, pathname]);
 
-  if (status === "loading") return <div>Loading...</div>;
-  
-  return <>{children}</>;
+    if (status === "loading") return <div>Loading...</div>;
+
+    return <>{children}</>;
 }

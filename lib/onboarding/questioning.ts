@@ -1,11 +1,30 @@
-"use server"
+"use server";
 
-import { generateObject } from 'ai';
-import { BaseQuestionSchema, type BaseQuestion } from '@/lib/llm/schemas/base';
-import { Thread } from '@/lib/external/schemas/thread';
+import { generateObject, type ModelMessage } from "ai";
+import { BaseQuestionSchema, type BaseQuestion } from "@/lib/llm/schemas/base";
+import { Thread } from "@/lib/external/schemas/thread";
 
 import { getModel } from "@/lib/llm/model";
 import { Biometrics } from "@/lib/user/schema";
+
+// A prompt-cache breakpoint for OpenRouter. The provider (@openrouter/ai-sdk-provider)
+// reads providerOptions.openrouter.cacheControl and emits Anthropic `cache_control` on
+// that message, caching the byte-exact prefix UP TO AND INCLUDING it. We place these on
+// stable blocks (system + biometrics, and the latest committed turn) so the volatile
+// instruction that follows never poisons the cached prefix.
+const CACHE_BREAKPOINT = {
+    openrouter: { cacheControl: { type: "ephemeral" as const } },
+};
+
+// Stable per session (biometrics don't change mid-onboarding) → belongs in the cached
+// prefix, ahead of the breakpoint, never in the volatile tail.
+function biometricContext(b: {
+    treatment?: string;
+    age?: number;
+    sex?: string;
+}): string {
+    return `### PATIENT CONTEXT\nTreatment: ${b?.treatment}\nAge: ${b?.age}\nSex: ${b?.sex}`;
+}
 
 const SYSTEM_PROMPT = `
 ### IDENTITY
@@ -20,7 +39,7 @@ You are investigating the "Social Determinants of Recovery." Biometrics and pain
 
 ### OPERATIONAL GUIDELINES
 - **Be a "Warm Human":** Use conversational openings like "Looking at your home..." or "When it comes to meals..."
-- **Conciseness (Strict):** Max 15 words per question. 
+- **Conciseness (Strict):** Max 15 words per question.
 - **Non-Technical:** Never use ICF codes or medical jargon (e.g., say "getting around the house" instead of "mobility").
 - **Avoid Repetition:** Do not ask about pain, symptoms, or anything already covered in the biometrics.
 - **Single Question:** One question per turn. Never "double-barrel."
@@ -35,57 +54,81 @@ You are investigating the "Social Determinants of Recovery." Biometrics and pain
 Output ONLY a valid JSON object following the BaseQuestion schema.
 `;
 
+// Stable instruction + patient block, cached as one prefix and reused across every
+// question in the session. Volatile mission text goes in a separate user turn after it.
+function systemMessage(biometrics: {
+    treatment?: string;
+    age?: number;
+    sex?: string;
+}): ModelMessage {
+    return {
+        role: "system",
+        content: `${SYSTEM_PROMPT}\n\n${biometricContext(biometrics)}`,
+        providerOptions: CACHE_BREAKPOINT,
+    };
+}
 
-export async function getInitialLLMQuestion(biometrics: Biometrics): Promise<BaseQuestion> {
+export async function getInitialLLMQuestion(
+    biometrics: Biometrics,
+): Promise<BaseQuestion> {
     const { object } = await generateObject({
         model: getModel(),
         schema: BaseQuestionSchema,
-        schemaName: 'BaseQuestion',
-        system: SYSTEM_PROMPT,
-        prompt: `
-        USER CONTEXT:
-        Treatment: ${biometrics.treatment}
-        Age: ${biometrics.age}
-        Sex: ${biometrics.sex}
-        MISSION: Start the holistic lifestyle discovery. Based on a ${biometrics.treatment}, identify the single most critical 'environmental' blind spot (e.g., home layout or social support) and ask a warm, introductory question.
-        `,
+        schemaName: "BaseQuestion",
+        messages: [
+            systemMessage(biometrics),
+            {
+                role: "user",
+                content:
+                    "Start the holistic lifestyle discovery. Identify the single most critical environmental blind spot (e.g. home layout or social support) and ask a warm, introductory question.",
+            },
+        ],
     });
 
     return object as BaseQuestion;
 }
 
-export async function getNextLLMQuestion(biometrics: any, thread: Thread): Promise<BaseQuestion> {
+export async function getNextLLMQuestion(
+    biometrics: any,
+    thread: Thread,
+): Promise<BaseQuestion> {
+    const questionCount =
+        thread.messages?.filter((m) => m.role === "assistant").length || 0;
 
-    const questionCount = thread.messages?.filter(m => m.role === 'assistant').length || 0;
+    // Conversation so far as real messages. Append-only, so this prefix is byte-stable
+    // across turns — we put a second cache breakpoint on the latest committed turn so the
+    // accumulated history is cached too (it crosses the model's min-cache size as it grows).
+    const history: ModelMessage[] = (thread.messages ?? [])
+        .filter((m) => m.role === "user" || m.role === "assistant")
+        .map((m) => ({
+            role: m.role as "user" | "assistant",
+            content: m.content,
+        }));
 
-  // generateObject waits for the full response and validates it
+    if (history.length > 0) {
+        const last = history[history.length - 1];
+        history[history.length - 1] = {
+            ...last,
+            providerOptions: CACHE_BREAKPOINT,
+        } as ModelMessage;
+    }
+
     const { object } = await generateObject({
         model: getModel(),
-        schema: BaseQuestionSchema,      // This is your Zod schema!
-        schemaName: 'BaseQuestion',      // Optional: helps the LLM understand the context
-        schemaDescription: 'A structured question for patient onboarding',
-        system: SYSTEM_PROMPT,
-        prompt: `
-        CURRENT QUESTION COUNT: ${questionCount} of 5.
-        User Biometrics: ${JSON.stringify(biometrics, null, 2)}
-        Conversation History: ${JSON.stringify(thread.messages, null, 2)}
-
-        Provide the next logical lifestyle question in the assessment.
-        If you have enough information to understand their lifestyle, home environment and social support,
-        or if you have reached the last question, you MUST use "terminateQuestioning".
-        `,
+        schema: BaseQuestionSchema,
+        schemaName: "BaseQuestion",
+        schemaDescription: "A structured question for patient onboarding",
+        messages: [
+            systemMessage(biometrics),
+            ...history,
+            {
+                // Volatile tail (changes every turn) — kept AFTER the breakpoints so it
+                // never invalidates the cached prefix.
+                role: "user",
+                content: `You have asked ${questionCount} of 5 questions so far. Provide the next logical lifestyle question. If you have enough information about their lifestyle, home environment and social support, or you have reached the last question, you MUST use "terminateQuestioning".`,
+            },
+        ],
     });
-    // console.log('PROMPT??', `
-    //     CURRENT QUESTION COUNT: ${questionCount} of 5.
-    //     User Biometrics: ${JSON.stringify(biometrics)}
-    //     Conversation History: ${JSON.stringify(thread.messages)}
-        
-    //     Provide the next logical question in the assessment.
-    //     If you have enough information to understand their safety and general mobility, 
-    //     or if you have reached the last question, you MUST use "terminateQuestioning".
-    //     `,)
-    // console.log('system prompt?', SYSTEM_PROMPT)
-    // console.log('bio???', biometrics)
-    // console.log('nextqnllm', object)
-  return object; 
+
+    return object;
 }

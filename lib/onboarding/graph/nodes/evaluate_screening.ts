@@ -14,18 +14,18 @@ import { OnboardingLangGraphState } from "@/lib/onboarding/graph/annotation";
  * straight to __end__ (blocking onboarding) instead of into the lifestyle loop.
  */
 export async function evaluateScreeningNode(
-  state: OnboardingLangGraphState
+    state: OnboardingLangGraphState,
 ): Promise<Partial<OnboardingLangGraphState>> {
-  // A patient is "supervised" if a doctor manages them (patientId is unique on the relation).
-  const relation = await prisma.adminPatientRelation.findUnique({
-    where: { patientId: state.userId },
-    select: { id: true },
-  });
-  const supervised = relation !== null;
+    // A patient is "supervised" if a doctor manages them (patientId is unique on the relation).
+    const relation = await prisma.adminPatientRelation.findUnique({
+        where: { patientId: state.userId },
+        select: { id: true },
+    });
+    const supervised = relation !== null;
 
-  const screening = evaluateScreening(state.screeningResponses, supervised);
+    const screening = evaluateScreening(state.screeningResponses, supervised);
 
-  await setScreening(state.userId, screening);
+    await setScreening(state.userId, screening);
 
-  return { screening, screeningBlocked: !screening.passed };
+    return { screening, screeningBlocked: !screening.passed };
 }

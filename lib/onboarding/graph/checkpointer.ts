@@ -20,7 +20,7 @@ let _saver: MemorySaver | null = null;
  * TEMPORARY: in-memory only (see file header).
  */
 export async function getOnboardingCheckpointer(): Promise<MemorySaver> {
-  if (_saver) return _saver;
-  _saver = new MemorySaver();
-  return _saver;
+    if (_saver) return _saver;
+    _saver = new MemorySaver();
+    return _saver;
 }

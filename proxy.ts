@@ -7,12 +7,15 @@ import type { NextRequest } from "next/server";
  * through and the gallery renders. (page.tsx keeps a notFound() backstop.)
  */
 export function proxy(req: NextRequest) {
-  if (process.env.NODE_ENV === "production" && req.nextUrl.pathname.startsWith("/preview")) {
-    return new NextResponse("Not found", { status: 404 });
-  }
-  return NextResponse.next();
+    if (
+        process.env.NODE_ENV === "production" &&
+        req.nextUrl.pathname.startsWith("/preview")
+    ) {
+        return new NextResponse("Not found", { status: 404 });
+    }
+    return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/preview", "/preview/:path*"],
+    matcher: ["/preview", "/preview/:path*"],
 };

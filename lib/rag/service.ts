@@ -1,113 +1,141 @@
 import { Pinecone } from "@pinecone-database/pinecone";
-import { RAGResponse,
-  RAGResult,
-  RAGConfig,
-  MetadataFilter } from "@/lib/rag/schemas/rag";
+import {
+    RAGResponse,
+    RAGResult,
+    RAGConfig,
+    MetadataFilter,
+} from "@/lib/rag/schemas/rag";
 import { getEnvNamespace, getIndex, getPineconeClient } from "./client";
 
 function getRAGConfig(): RAGConfig {
-  return {
-    searchType: (process.env.RAG_SEARCH_TYPE as any) || "hybrid",
-    topK: parseInt(process.env.RAG_TOP_K || "10"),
-    alpha: parseFloat(process.env.RAG_ALPHA || "0.75"),
-    enableReranking: process.env.RAG_ENABLE_RERANKING === "true",
-    rerankerModel: process.env.RAG_RERANKER_MODEL || "bge-reranker-v2-m3",
-    rerankerTopN: parseInt(process.env.RAG_RERANKER_TOP_N || "5"),
-    rerankingMode: (process.env.RAG_RERANKING_MODE as any) || "standalone",
-    devMode: process.env.RAG_DEV_MODE === "true" || process.env.NODE_ENV === "development",
-  };
+    return {
+        searchType: (process.env.RAG_SEARCH_TYPE as any) || "hybrid",
+        topK: parseInt(process.env.RAG_TOP_K || "10"),
+        alpha: parseFloat(process.env.RAG_ALPHA || "0.75"),
+        enableReranking: process.env.RAG_ENABLE_RERANKING === "true",
+        rerankerModel: process.env.RAG_RERANKER_MODEL || "bge-reranker-v2-m3",
+        rerankerTopN: parseInt(process.env.RAG_RERANKER_TOP_N || "5"),
+        rerankingMode: (process.env.RAG_RERANKING_MODE as any) || "standalone",
+        devMode:
+            process.env.RAG_DEV_MODE === "true" ||
+            process.env.NODE_ENV === "development",
+    };
 }
 
 function logDev(message: string, data?: unknown) {
-  if (getRAGConfig().devMode) {
-    // TODO: insufficient logging for production
-    console.log(`[RAG Dev] ${message}`, data ? JSON.stringify(data, null, 2) : "");
-  }
+    if (getRAGConfig().devMode) {
+        // TODO: insufficient logging for production
+        console.log(
+            `[RAG Dev] ${message}`,
+            data ? JSON.stringify(data, null, 2) : "",
+        );
+    }
 }
-
 
 // ============================================================================
 // METADATA FILTERING
 // ============================================================================
 
 export function buildMetadataFilter(
-  field: string,
-  operator: string,
-  value: any
+    field: string,
+    operator: string,
+    value: any,
 ): MetadataFilter {
-  const validOperators = ["$eq", "$ne", "$gt", "$gte", "$lt", "$lte", "$in", "$nin", "$exists"];
+    const validOperators = [
+        "$eq",
+        "$ne",
+        "$gt",
+        "$gte",
+        "$lt",
+        "$lte",
+        "$in",
+        "$nin",
+        "$exists",
+    ];
 
-  if (!validOperators.includes(operator)) {
-    throw new Error(
-      `Invalid operator: ${operator}. Valid operators are: ${validOperators.join(", ")}`
-    );
-  }
+    if (!validOperators.includes(operator)) {
+        throw new Error(
+            `Invalid operator: ${operator}. Valid operators are: ${validOperators.join(
+                ", ",
+            )}`,
+        );
+    }
 
-  return {
-    [field]: {
-      [operator]: value,
-    },
-  };
+    return {
+        [field]: {
+            [operator]: value,
+        },
+    };
 }
 
 export async function semanticSearch(
-  query: string,
-  topK?: number,
-  filter?: MetadataFilter,
-  namespace?: string,
-  rerank?: boolean,
+    query: string,
+    topK?: number,
+    filter?: MetadataFilter,
+    namespace?: string,
+    rerank?: boolean,
 ): Promise<RAGResponse> {
-  const startTime = Date.now();
-  const config = getRAGConfig();
-  const _topK = topK ?? config.topK;
-  const _namespace = namespace ?? getEnvNamespace();
-  const doRerank = rerank ?? true;
+    const startTime = Date.now();
+    const config = getRAGConfig();
+    const _topK = topK ?? config.topK;
+    const _namespace = namespace ?? getEnvNamespace();
+    const doRerank = rerank ?? true;
 
-  try {
-    logDev("Semantic Search", {
-      query,
-      topK: _topK,
-      filter,
-      namespace: _namespace,
-      rerank: doRerank
-    });
+    try {
+        logDev("Semantic Search", {
+            query,
+            topK: _topK,
+            filter,
+            namespace: _namespace,
+            rerank: doRerank,
+        });
 
-    const index = getIndex(namespace);
+        const index = getIndex(namespace);
 
-    const searchResults = await index.searchRecords({
-      query: {
-        topK: 2,
-        inputs: { text: 'Disease prevention' },
-      },
-      fields: ['text', 'category'],
-      ...(doRerank && {
-        rerank: {
-          model: process.env.RAG_RERANKER_MODEL ?? 'bge-reranker-v2-m3',
-          rankFields: ['text'],
-          topN: 2,
-        }
-      })
-    });
+        const searchResults = await index.searchRecords({
+            query: {
+                topK: 2,
+                inputs: { text: "Disease prevention" },
+            },
+            fields: ["text", "category"],
+            ...(doRerank && {
+                rerank: {
+                    model:
+                        process.env.RAG_RERANKER_MODEL ?? "bge-reranker-v2-m3",
+                    rankFields: ["text"],
+                    topN: 2,
+                },
+            }),
+        });
 
-    const results: RAGResult[] = (searchResults.result?.hits || []).map((hit: any) => ({
-      id: hit._id,
-      score: hit._score,
-      text: hit.fields?.text || hit.fields?.text || "",
-      metadata: hit.fields,
-    }));
+        const results: RAGResult[] = (searchResults.result?.hits || []).map(
+            (hit: any) => ({
+                id: hit._id,
+                score: hit._score,
+                text: hit.fields?.text || hit.fields?.text || "",
+                metadata: hit.fields,
+            }),
+        );
 
-    logDev("Semantic Search Results", { count: results.length, scores: results.map((r) => r.score) });
+        logDev("Semantic Search Results", {
+            count: results.length,
+            scores: results.map((r) => r.score),
+        });
 
-    return {
-      results,
-      totalCount: results.length,
-      searchType: "semantic",
-      executionTime: Date.now() - startTime,
-    };
-  } catch (error) {
-    console.error("Semantic search error:", error);
-    throw new Error(`Semantic search failed: ${error instanceof Error ? error.message : String(error)}`);
-  }
+        return {
+            results,
+            totalCount: results.length,
+            searchType: "semantic",
+            executionTime: Date.now() - startTime,
+        };
+    } catch (error) {
+        console.error("Semantic search error:", error);
+        throw new Error(
+            `Semantic search failed: ${
+                error instanceof Error ? error.message : String(error)
+            }`,
+        );
+    }
 }
 
 // // ============================================================================
@@ -337,10 +365,15 @@ export async function semanticSearch(
  * Legacy function for retrieving context. Combines semantic search with metadata filtering.
  * @deprecated Use semanticSearch, lexicalSearch, or hybridSearch instead
  */
-export async function getContext(query: string, surgeryType?: string): Promise<string> {
-  const filter = surgeryType ? buildMetadataFilter("surgeryType", "$eq", surgeryType) : undefined;
+export async function getContext(
+    query: string,
+    surgeryType?: string,
+): Promise<string> {
+    const filter = surgeryType
+        ? buildMetadataFilter("surgeryType", "$eq", surgeryType)
+        : undefined;
 
-  const response = await semanticSearch(query, 3, filter);
+    const response = await semanticSearch(query, 3, filter);
 
-  return response.results.map((result) => result.text).join("\n\n");
+    return response.results.map((result) => result.text).join("\n\n");
 }

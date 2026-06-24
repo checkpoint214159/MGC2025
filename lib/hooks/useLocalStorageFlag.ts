@@ -8,37 +8,37 @@ import { useCallback, useSyncExternalStore } from "react";
  * and a setter that flips it to true permanently.
  */
 export function useLocalStorageFlag(key: string): [boolean, () => void] {
-  const subscribe = useCallback(
-    (cb: () => void) => {
-      const evt = `local-flag:${key}`;
-      window.addEventListener("storage", cb);
-      window.addEventListener(evt, cb);
-      return () => {
-        window.removeEventListener("storage", cb);
-        window.removeEventListener(evt, cb);
-      };
-    },
-    [key],
-  );
+    const subscribe = useCallback(
+        (cb: () => void) => {
+            const evt = `local-flag:${key}`;
+            window.addEventListener("storage", cb);
+            window.addEventListener(evt, cb);
+            return () => {
+                window.removeEventListener("storage", cb);
+                window.removeEventListener(evt, cb);
+            };
+        },
+        [key],
+    );
 
-  const getSnapshot = useCallback(() => {
-    try {
-      return localStorage.getItem(key) === "true";
-    } catch {
-      return false;
-    }
-  }, [key]);
+    const getSnapshot = useCallback(() => {
+        try {
+            return localStorage.getItem(key) === "true";
+        } catch {
+            return false;
+        }
+    }, [key]);
 
-  const value = useSyncExternalStore(subscribe, getSnapshot, () => false);
+    const value = useSyncExternalStore(subscribe, getSnapshot, () => false);
 
-  const setTrue = useCallback(() => {
-    try {
-      localStorage.setItem(key, "true");
-    } catch {
-      /* ignore */
-    }
-    window.dispatchEvent(new Event(`local-flag:${key}`));
-  }, [key]);
+    const setTrue = useCallback(() => {
+        try {
+            localStorage.setItem(key, "true");
+        } catch {
+            /* ignore */
+        }
+        window.dispatchEvent(new Event(`local-flag:${key}`));
+    }, [key]);
 
-  return [value, setTrue];
+    return [value, setTrue];
 }

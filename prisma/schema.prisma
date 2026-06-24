@@ -49,14 +49,15 @@ model Account {
 }
 
 model User {
-  id   String @id @default(cuid())
+  id   String   @id @default(cuid())
   name String
   role UserRole @default(patient) // patient or admin (doctor)
 
-  biometric     Biometrics?
-  screening     Screening?
+  biometric Biometrics?
+  screening Screening?
 
-  profile String? // LLM generated profile
+  profile String? // LLM generated profile (seeds PatientMemory.semantic)
+  memory  PatientMemory?
 
   account   Account?
   createdAt DateTime @default(now())
@@ -69,9 +70,31 @@ model User {
   // Admin relations: one doctor manages many patients
   adminManagedPatients AdminPatientRelation[] @relation("AdminToPatients")
   // Back-relation for patient to know which admin manages them
-  managedByAdmin       AdminPatientRelation? @relation("PatientToAdmin")
+  managedByAdmin       AdminPatientRelation?  @relation("PatientToAdmin")
 
   flags Flag[] @relation("PatientFlags")
+}
+
+// Long-running, consolidated PATIENT MEMORY (context-compaction layer for plan generation).
+// One row per patient (1:1 with User). Two tiers, split by volatility:
+//   - semantic: stable clinical facts (surgery, comorbidities, allergies, meds, constraints).
+//     Carried forward VERBATIM by the consolidator — never re-summarized, so it cannot erode.
+//     Seeded from the onboarding profile.
+//   - episodic: the qualitative recovery NARRATIVE, organized by recovery phase. A closed
+//     phase's section is frozen. Stored as JSON: [{ phase, narrative, closed }].
+// `consolidatedThrough` is the watermark: messages newer than this are the unconsolidated raw
+// window fed verbatim to plan-gen, then folded in on the next consolidation pass.
+model PatientMemory {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  semantic            String   @default("") // stable facts, verbatim
+  episodic            Json     @default("[]") // [{ phase, narrative, closed }]
+  consolidatedThrough DateTime @default(now()) // raw-window watermark
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model AdminPatientRelation {
@@ -224,23 +247,23 @@ model Message {
 }
 
 model GraphConfig {
-  graphName           String   @id @unique // e.g., "state-generation"
-  contextWindowDays   Int      @default(1)     // 1=yesterday, N=last N days, -1=all
-  smartFiltering      Boolean  @default(false) // Filter states for relevance
-  maxContextTokens    Int      @default(8000)  // Token limit for LLM context
-  includeTrajectory   Boolean  @default(false) // Summary instead of full history
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  graphName         String   @id @unique // e.g., "state-generation"
+  contextWindowDays Int      @default(1) // 1=yesterday, N=last N days, -1=all
+  smartFiltering    Boolean  @default(false) // Filter states for relevance
+  maxContextTokens  Int      @default(8000) // Token limit for LLM context
+  includeTrajectory Boolean  @default(false) // Summary instead of full history
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 // Clinician inline comments on a module during verification (S3)
 model ModuleComment {
-  id       String   @id @default(cuid())
-  moduleId String
-  module   Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  authorId String
-  role     UserRole
-  body     String
+  id        String   @id @default(cuid())
+  moduleId  String
+  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  authorId  String
+  role      UserRole
+  body      String
   createdAt DateTime @default(now())
 }
 

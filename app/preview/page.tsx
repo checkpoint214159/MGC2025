@@ -7,6 +7,6 @@ import { PreviewGallery } from "./PreviewGallery";
  * http://localhost:3000/preview .
  */
 export default function PreviewPage() {
-  if (process.env.NODE_ENV === "production") notFound();
-  return <PreviewGallery />;
+    if (process.env.NODE_ENV === "production") notFound();
+    return <PreviewGallery />;
 }

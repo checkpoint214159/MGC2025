@@ -1,7 +1,7 @@
-import * as Collapsible from '@radix-ui/react-collapsible';
-import { ChevronDownIcon } from '@radix-ui/react-icons';
-import * as Separator from '@radix-ui/react-separator';
-import React from 'react';
+import * as Collapsible from "@radix-ui/react-collapsible";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
+import * as Separator from "@radix-ui/react-separator";
+import React from "react";
 
 interface SidebarSectionProps {
     isExpanded: boolean;
@@ -12,25 +12,24 @@ interface SidebarSectionProps {
     onNavigate: (path: string) => void;
 }
 
-export default function SidebarSection({ 
-    isExpanded, 
-    title, 
-    icon: Icon, 
-    defaultOpen = false, 
-    links, 
-    onNavigate 
+export default function SidebarSection({
+    isExpanded,
+    title,
+    icon: Icon,
+    defaultOpen = false,
+    links,
+    onNavigate,
 }: SidebarSectionProps) {
-    
     // We only allow the section to be collapsible if the whole sidebar is expanded
-    const isCollapsible = isExpanded; 
+    const isCollapsible = isExpanded;
 
     return (
-        <Collapsible.Root 
-            defaultOpen={defaultOpen} 
+        <Collapsible.Root
+            defaultOpen={defaultOpen}
             className="w-full mb-4"
-            // The disabled prop prevents the user from clicking to collapse 
+            // The disabled prop prevents the user from clicking to collapse
             // when the sidebar is collapsed (w-16)
-            disabled={!isCollapsible} 
+            disabled={!isCollapsible}
         >
             {/* The Trigger for the Collapsible section */}
             <Collapsible.Trigger asChild>
@@ -40,21 +39,27 @@ export default function SidebarSection({
                 >
                     <div className="flex items-center">
                         <Icon className="w-6 h-6 shrink-0 group-hover:text-blue-400" />
-                        {isExpanded && <span className="ml-3 text-sm font-medium whitespace-nowrap">{title}</span>}
+                        {isExpanded && (
+                            <span className="ml-3 text-sm font-medium whitespace-nowrap">
+                                {title}
+                            </span>
+                        )}
                     </div>
                     {/* Only show and rotate Chevron when expanded and collapsible */}
                     {isCollapsible && (
-                        <ChevronDownIcon 
+                        <ChevronDownIcon
                             className="w-4 h-4 transition-transform duration-300 CollapsibleChevron"
                             // Radix handles the data-state for us!
-                            data-state={!isCollapsible ? 'closed' : undefined} 
+                            data-state={!isCollapsible ? "closed" : undefined}
                         />
                     )}
                 </button>
             </Collapsible.Trigger>
 
             {/* The Separator only appears when the Sidebar is expanded */}
-            {isExpanded && <Separator.Root className="bg-gray-700 h-[1px] my-2 w-full" />}
+            {isExpanded && (
+                <Separator.Root className="bg-gray-700 h-[1px] my-2 w-full" />
+            )}
 
             {/* The Content that Collapses */}
             <Collapsible.Content className="overflow-hidden data-[state=closed]:animate-slideUp data-[state=open]:animate-slideDown">

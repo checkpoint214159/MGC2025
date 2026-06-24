@@ -14,7 +14,7 @@ def clean_medical_text(text: str) -> str:
     text = re.sub(r"(\w)-\n(\w)", r"\1\2", text)
     text = re.sub(r"\n(?=[a-z])", " ", text)
     text = re.sub(r"\s+", " ", text)
-    
+
     return text.strip()
 
 class GDriveIngestor:
@@ -26,14 +26,14 @@ class GDriveIngestor:
         self.folder_service = self.setup_service()
         self.pinecone_client = PineconeWrapper()
         self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000, 
+            chunk_size=1000,
             chunk_overlap=100
         )
 
     def process_to_langchain(self, service, file_id, file_name):
         raw_text = read_file_to_memory(service, file_id)
         cleaned_text = clean_medical_text(raw_text)
-        
+
         return Document(
             page_content=cleaned_text,
             metadata={"source_id": file_id, "file_name": file_name}
@@ -80,7 +80,7 @@ class GDriveIngestor:
     def ingest_file(self, id, filename):
         doc: Document = self.process_to_langchain(
             self.folder_service, id, filename)
-        
+
         chunks: list[Document] = self._chunkify(id, doc)
 
         # parallelize insertion to Pinecone
@@ -97,13 +97,13 @@ class GDriveIngestor:
                     fut.result()
 
         return chunks
-    
+
     def delete_entries(self, ids):
         # delete all ids. Dangerous!
         self.pinecone_client.delete_entries(ids)
-    
-        
-        
+
+
+
 
 if __name__ == "__main__":
     # basic test when running main script.

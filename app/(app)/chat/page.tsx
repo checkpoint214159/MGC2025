@@ -37,7 +37,11 @@ export default function ChatComponent() {
                 {messages.map((m) => (
                     <div
                         key={m.id}
-                        className={`p-4 rounded-xl shadow-md ${m.role === "user" ? "bg-blue-50 text-right ml-auto" : "bg-gray-50 text-left mr-auto"}`}
+                        className={`p-4 rounded-xl shadow-md ${
+                            m.role === "user"
+                                ? "bg-blue-50 text-right ml-auto"
+                                : "bg-gray-50 text-left mr-auto"
+                        }`}
                     >
                         <span className="font-bold block mb-1 text-sm text-gray-700">
                             {m.role === "user" ? "You" : "AI"}
