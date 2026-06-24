@@ -3,10 +3,6 @@ repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
       rev: v4.5.0
       hooks:
-          - id: trailing-whitespace
-            name: Trim trailing whitespace
-          - id: end-of-file-fixer
-            name: Fix end-of-file
           - id: check-yaml
             name: Check YAML syntax
           - id: check-json
@@ -19,9 +15,6 @@ repos:
             name: Check for case conflicts in filenames
           - id: detect-private-key
             name: Detect private keys
-          - id: mixed-line-ending
-            name: Fix mixed line endings
-            args: [--fix=lf]
 
     # Prettier (formatting)
     - repo: https://github.com/pre-commit/mirrors-prettier
