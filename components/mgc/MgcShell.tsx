@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
+import { LayoutGrid } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /** Shared nav shell that links the MGC mockup screens into one demo flow. */
@@ -37,7 +38,15 @@ export function MgcShell({
                             MGC mockup
                         </span>
                     </a>
-                    <nav className="flex gap-1 overflow-x-auto">
+                    <nav className="flex items-center gap-1 overflow-x-auto">
+                        <a
+                            href="/preview"
+                            className="flex h-9 items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 text-[13px] font-medium text-ink-muted hover:bg-surface-sunken hover:text-ink"
+                        >
+                            <LayoutGrid size={15} strokeWidth={1.75} />
+                            All pages
+                        </a>
+                        <span className="mx-0.5 h-5 w-px bg-border" aria-hidden />
                         {STEPS.map((s, i) => (
                             <a
                                 key={s.key}
