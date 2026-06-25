@@ -52,7 +52,7 @@ export default function OnboardingFlow() {
     }
 
     return (
-        <div className="flex flex-col items-center justify-start min-h-screen bg-[#f8fafc] p-6 overflow-hidden pt-20">
+        <div className="flex flex-col items-center justify-start min-h-screen bg-bg p-6 overflow-hidden pt-20">
             {onboardingState.phase === "biometrics" && <SubmitBiometricsPage />}
 
             {onboardingState.phase === "collect_screening_responses" && (
@@ -81,7 +81,7 @@ function LoadingScreen({ message }: { message: string }) {
 
 function ScreeningBlockedScreen() {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-[#f8fafc] p-6 text-center">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-bg p-6 text-center">
             <div className="max-w-md space-y-4">
                 <h2 className="text-2xl font-bold text-slate-900">
                     Please check with your doctor first

@@ -65,7 +65,7 @@ export function QuestionPage({
     console.log("visibleHistory?", visibleHistory);
 
     return (
-        <div className="flex flex-col items-center justify-start min-h-screen bg-[#f8fafc] p-6 overflow-hidden pt-20">
+        <div className="flex flex-col items-center justify-start min-h-screen bg-bg p-6 overflow-hidden pt-20">
             <div className="w-full max-w-xl flex flex-col gap-6">
                 {/* Progress pips — one per question answered so far */}
                 <div className="flex gap-2 justify-center px-10 mb-4">
