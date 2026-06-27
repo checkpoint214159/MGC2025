@@ -45,6 +45,9 @@ cloudflare-env.d.ts
 next-env.d.ts
 
 test_data
+
+# dev harness (captured server logs, scratch)
+.dev/
 credentials.json
 service_account.json
 

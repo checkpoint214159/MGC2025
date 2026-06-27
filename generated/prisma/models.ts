@@ -10,6 +10,7 @@
 export type * from "./models/Account";
 export type * from "./models/User";
 export type * from "./models/PatientMemory";
+export type * from "./models/PatientMemoryVersion";
 export type * from "./models/AdminPatientRelation";
 export type * from "./models/Screening";
 export type * from "./models/Biometrics";
@@ -21,5 +22,6 @@ export type * from "./models/Thread";
 export type * from "./models/Message";
 export type * from "./models/GraphConfig";
 export type * from "./models/ModuleComment";
+export type * from "./models/PushSubscription";
 export type * from "./models/Flag";
 export type * from "./commonInputTypes";

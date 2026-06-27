@@ -37,7 +37,11 @@ export async function consolidateMemoryNode(
             newWatermark: state.rawWindow.newestAt ?? new Date(),
         });
 
-        await persistPatientMemory(state.userId, updated);
+        await persistPatientMemory(state.userId, updated, {
+            trigger: state.rawWindow.hasDoctorNote
+                ? "doctor_note"
+                : "threshold",
+        });
         console.log(
             `[state-gen] ✓ consolidated memory | +${output.newSemanticFacts.length} fact(s) | ` +
                 `phase=${state.recoveryPhase} | window folded (${state.rawWindow.messageCount} msg)`,

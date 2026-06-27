@@ -30,21 +30,17 @@ export async function ensureDevAdminExists() {
             return;
         }
 
-        // Create dev admin account
+        // Create dev admin account — two single-row writes (Neon HTTP has no transactions).
         const hashedPassword = await hash(DEV_ADMIN_PASSWORD, 10);
-
         const devAdmin = await prisma.user.create({
+            data: { name: "Development Admin", role: "admin" },
+        });
+        await prisma.account.create({
             data: {
-                name: "Development Admin",
-                role: "admin",
-                account: {
-                    create: {
-                        email: DEV_ADMIN_EMAIL,
-                        password: hashedPassword,
-                    },
-                },
+                user_id: devAdmin.id,
+                email: DEV_ADMIN_EMAIL,
+                password: hashedPassword,
             },
-            include: { account: true },
         });
 
         console.warn(

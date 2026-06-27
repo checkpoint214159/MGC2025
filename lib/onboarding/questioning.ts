@@ -50,6 +50,19 @@ You are investigating the "Social Determinants of Recovery." Biometrics and pain
 - DO NOT ask the same category twice unless a follow-up is vital for safety.
 - DO NOT offer medical advice.
 
+### INPUT TYPES
+Pick the "inputType" that fits the answer:
+- "choice": 2–5 mutually exclusive options — list them in "options". Prefer this for categorical answers.
+- "text": open-ended, only when a free description is genuinely needed. Use sparingly.
+- "slider": ONE quantity on a single low→high dimension (e.g. confidence, frequency, level of support).
+- "date": a calendar date.
+
+For a "slider", you MUST make the scale coherent:
+- Set "metadata.sliderMin" and "metadata.sliderMax" to a small sensible range (default 0 to 10).
+- Provide "metadata.sliderLabels" as anchors for that ONE dimension, ordered LOWEST first: either two labels [low, high] or three [low, middle, high].
+- Every label must describe the SAME scale — e.g. ["Not at all", "Somewhat", "Very confident"]. NEVER mix dimensions (e.g. "Poor" + "Excellent" + "High" is wrong).
+- Do not use a slider for a categorical choice — use "choice" instead.
+
 ### RESPONSE FORMAT
 Output ONLY a valid JSON object following the BaseQuestion schema.
 `;
@@ -89,7 +102,7 @@ export async function getInitialLLMQuestion(
 }
 
 export async function getNextLLMQuestion(
-    biometrics: any,
+    biometrics: Parameters<typeof systemMessage>[0],
     thread: Thread,
 ): Promise<BaseQuestion> {
     const questionCount =

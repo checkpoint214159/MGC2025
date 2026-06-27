@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { Stethoscope, TriangleAlert } from "lucide-react";
 import { getOnboardingStateAction } from "@/lib/actions";
 import { SubmitBiometricsPage } from "./BiometricsPage";
 import { ScreeningPage } from "./ScreeningPage";
@@ -23,26 +25,39 @@ export default function OnboardingFlow() {
         staleTime: 0,
     });
 
-    // Session flag is the fastest "done" signal — no need to wait for the query
-    if (session?.user?.doneOnboarding) {
-        router.push("/");
-        return null;
+    // Onboarding is finished — either the session flag (fastest signal) or the
+    // graph reports "complete". Navigate in an effect, never during render, or React
+    // throws "Cannot update a component (Router) while rendering OnboardingFlow".
+    const isComplete =
+        !!session?.user?.doneOnboarding ||
+        onboardingState?.phase === "complete";
+
+    useEffect(() => {
+        if (isComplete) router.push("/");
+    }, [isComplete, router]);
+
+    if (isComplete) {
+        return <LoadingScreen message="Taking you to your dashboard…" />;
     }
 
     if (isLoading || !onboardingState) {
         return <LoadingScreen message="Loading..." />;
     }
 
-    if (onboardingState.phase === "complete") {
-        router.push("/");
-        return null;
-    }
-
     if (onboardingState.phase === "error") {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen text-red-600">
-                <p className="font-semibold">Something went wrong</p>
-                <p className="text-sm mt-1">{onboardingState.message}</p>
+            <div className="flex min-h-screen flex-col items-center justify-center px-5 text-center">
+                <div className="max-w-md space-y-2">
+                    <div className="mx-auto mb-2 grid size-12 place-items-center rounded-full bg-critical-soft text-critical-ink">
+                        <TriangleAlert size={24} strokeWidth={1.75} />
+                    </div>
+                    <h2 className="text-[22px] font-semibold text-ink">
+                        Something went wrong
+                    </h2>
+                    <p className="text-[15px] text-ink-muted">
+                        {onboardingState.message}
+                    </p>
+                </div>
             </div>
         );
     }
@@ -52,7 +67,7 @@ export default function OnboardingFlow() {
     }
 
     return (
-        <div className="flex flex-col items-center justify-start min-h-screen bg-[#f8fafc] p-6 overflow-hidden pt-20">
+        <div className="flex min-h-screen flex-col items-center px-5 py-12 md:py-16">
             {onboardingState.phase === "biometrics" && <SubmitBiometricsPage />}
 
             {onboardingState.phase === "collect_screening_responses" && (
@@ -72,27 +87,32 @@ export default function OnboardingFlow() {
 
 function LoadingScreen({ message }: { message: string }) {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-            <h2 className="text-xl font-semibold">{message}</h2>
+        <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-5">
+            <span className="size-9 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+            <h2 className="text-[17px] font-medium text-ink-muted">
+                {message}
+            </h2>
         </div>
     );
 }
 
 function ScreeningBlockedScreen() {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-[#f8fafc] p-6 text-center">
+        <div className="flex min-h-screen flex-col items-center justify-center px-5 text-center">
             <div className="max-w-md space-y-4">
-                <h2 className="text-2xl font-bold text-slate-900">
+                <div className="mx-auto grid size-12 place-items-center rounded-full bg-attention-soft text-attention-ink">
+                    <Stethoscope size={24} strokeWidth={1.75} />
+                </div>
+                <h2 className="text-[24px] font-semibold text-ink">
                     Please check with your doctor first
                 </h2>
-                <p className="text-slate-600">
+                <p className="text-[15px] leading-relaxed text-ink-muted">
                     Based on your screening answers, you should be cleared by a
                     doctor before starting an unsupervised recovery programme.
                     Please consult your physician and have them certify that you
                     are in good condition to proceed.
                 </p>
-                <p className="text-sm text-slate-400">
+                <p className="text-[13px] text-ink-subtle">
                     If your doctor has already assessed you, ask them to assign
                     you within the app so you can continue.
                 </p>

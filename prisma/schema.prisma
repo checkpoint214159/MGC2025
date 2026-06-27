@@ -56,8 +56,9 @@ model User {
   biometric Biometrics?
   screening Screening?
 
-  profile String? // LLM generated profile (seeds PatientMemory.semantic)
-  memory  PatientMemory?
+  profile        String? // LLM generated profile (seeds PatientMemory.semantic)
+  memory         PatientMemory?
+  memoryVersions PatientMemoryVersion[] // append-only consolidation history
 
   account   Account?
   createdAt DateTime @default(now())
@@ -73,6 +74,8 @@ model User {
   managedByAdmin       AdminPatientRelation?  @relation("PatientToAdmin")
 
   flags Flag[] @relation("PatientFlags")
+
+  pushSubscriptions PushSubscription[]
 }
 
 // Long-running, consolidated PATIENT MEMORY (context-compaction layer for plan generation).
@@ -95,6 +98,26 @@ model PatientMemory {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Append-only audit trail of PatientMemory. Every consolidation pass inserts a new row here
+// (a single-statement INSERT — Neon HTTP can't do transactions), capturing the full memory
+// snapshot AFTER folding in the raw window. PatientMemory above always holds the latest; this
+// table holds every prior version for traceability ("how did this patient's memory evolve, and
+// why did the plan change?"). Query: WHERE userId ORDER BY createdAt.
+model PatientMemoryVersion {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  semantic            String   @default("")
+  episodic            Json     @default("[]")
+  consolidatedThrough DateTime
+  trigger             String? // what prompted this pass: "threshold" | "doctor_note"
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model AdminPatientRelation {
@@ -265,6 +288,22 @@ model ModuleComment {
   role      UserRole
   body      String
   createdAt DateTime @default(now())
+}
+
+// Browser Web Push subscription for a patient device.
+// One user can have many subscriptions (different browsers/devices).
+model PushSubscription {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  endpoint String @unique
+  p256dh   String
+  auth     String
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 // Human-in-the-loop flag raised when recovery stalls (S7), e.g. pain not decreasing

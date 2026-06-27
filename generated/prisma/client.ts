@@ -57,6 +57,11 @@ export type User = Prisma.UserModel;
  */
 export type PatientMemory = Prisma.PatientMemoryModel;
 /**
+ * Model PatientMemoryVersion
+ *
+ */
+export type PatientMemoryVersion = Prisma.PatientMemoryVersionModel;
+/**
  * Model AdminPatientRelation
  *
  */
@@ -111,6 +116,11 @@ export type GraphConfig = Prisma.GraphConfigModel;
  *
  */
 export type ModuleComment = Prisma.ModuleCommentModel;
+/**
+ * Model PushSubscription
+ *
+ */
+export type PushSubscription = Prisma.PushSubscriptionModel;
 /**
  * Model Flag
  *

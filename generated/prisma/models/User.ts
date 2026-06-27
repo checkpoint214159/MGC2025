@@ -205,6 +205,7 @@ export type UserWhereInput = {
         Prisma.PatientMemoryNullableScalarRelationFilter,
         Prisma.PatientMemoryWhereInput
     > | null;
+    memoryVersions?: Prisma.PatientMemoryVersionListRelationFilter;
     account?: Prisma.XOR<
         Prisma.AccountNullableScalarRelationFilter,
         Prisma.AccountWhereInput
@@ -218,6 +219,7 @@ export type UserWhereInput = {
         Prisma.AdminPatientRelationWhereInput
     > | null;
     flags?: Prisma.FlagListRelationFilter;
+    pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter;
 };
 
 export type UserOrderByWithRelationInput = {
@@ -230,6 +232,7 @@ export type UserOrderByWithRelationInput = {
     biometric?: Prisma.BiometricsOrderByWithRelationInput;
     screening?: Prisma.ScreeningOrderByWithRelationInput;
     memory?: Prisma.PatientMemoryOrderByWithRelationInput;
+    memoryVersions?: Prisma.PatientMemoryVersionOrderByRelationAggregateInput;
     account?: Prisma.AccountOrderByWithRelationInput;
     states?: Prisma.StateOrderByRelationAggregateInput;
     threads?: Prisma.ThreadOrderByRelationAggregateInput;
@@ -237,6 +240,7 @@ export type UserOrderByWithRelationInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationOrderByRelationAggregateInput;
     managedByAdmin?: Prisma.AdminPatientRelationOrderByWithRelationInput;
     flags?: Prisma.FlagOrderByRelationAggregateInput;
+    pushSubscriptions?: Prisma.PushSubscriptionOrderByRelationAggregateInput;
 };
 
 export type UserWhereUniqueInput = Prisma.AtLeast<
@@ -262,6 +266,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<
             Prisma.PatientMemoryNullableScalarRelationFilter,
             Prisma.PatientMemoryWhereInput
         > | null;
+        memoryVersions?: Prisma.PatientMemoryVersionListRelationFilter;
         account?: Prisma.XOR<
             Prisma.AccountNullableScalarRelationFilter,
             Prisma.AccountWhereInput
@@ -275,6 +280,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<
             Prisma.AdminPatientRelationWhereInput
         > | null;
         flags?: Prisma.FlagListRelationFilter;
+        pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter;
     },
     "id"
 >;
@@ -317,6 +323,7 @@ export type UserCreateInput = {
     biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountCreateNestedOneWithoutUserInput;
     states?: Prisma.StateCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadCreateNestedManyWithoutUserInput;
@@ -324,6 +331,7 @@ export type UserCreateInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateInput = {
@@ -336,6 +344,7 @@ export type UserUncheckedCreateInput = {
     biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningUncheckedCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryUncheckedCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput;
     states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput;
@@ -343,6 +352,7 @@ export type UserUncheckedCreateInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserUpdateInput = {
@@ -355,6 +365,7 @@ export type UserUpdateInput = {
     biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput;
@@ -362,6 +373,7 @@ export type UserUpdateInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateInput = {
@@ -374,6 +386,7 @@ export type UserUncheckedUpdateInput = {
     biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUncheckedUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput;
@@ -381,6 +394,7 @@ export type UserUncheckedUpdateInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateManyInput = {
@@ -503,6 +517,32 @@ export type UserUpdateOneRequiredWithoutMemoryNestedInput = {
             Prisma.UserUpdateWithoutMemoryInput
         >,
         Prisma.UserUncheckedUpdateWithoutMemoryInput
+    >;
+};
+
+export type UserCreateNestedOneWithoutMemoryVersionsInput = {
+    create?: Prisma.XOR<
+        Prisma.UserCreateWithoutMemoryVersionsInput,
+        Prisma.UserUncheckedCreateWithoutMemoryVersionsInput
+    >;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutMemoryVersionsInput;
+    connect?: Prisma.UserWhereUniqueInput;
+};
+
+export type UserUpdateOneRequiredWithoutMemoryVersionsNestedInput = {
+    create?: Prisma.XOR<
+        Prisma.UserCreateWithoutMemoryVersionsInput,
+        Prisma.UserUncheckedCreateWithoutMemoryVersionsInput
+    >;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutMemoryVersionsInput;
+    upsert?: Prisma.UserUpsertWithoutMemoryVersionsInput;
+    connect?: Prisma.UserWhereUniqueInput;
+    update?: Prisma.XOR<
+        Prisma.XOR<
+            Prisma.UserUpdateToOneWithWhereWithoutMemoryVersionsInput,
+            Prisma.UserUpdateWithoutMemoryVersionsInput
+        >,
+        Prisma.UserUncheckedUpdateWithoutMemoryVersionsInput
     >;
 };
 
@@ -688,6 +728,32 @@ export type UserUpdateOneRequiredWithoutThreadsNestedInput = {
     >;
 };
 
+export type UserCreateNestedOneWithoutPushSubscriptionsInput = {
+    create?: Prisma.XOR<
+        Prisma.UserCreateWithoutPushSubscriptionsInput,
+        Prisma.UserUncheckedCreateWithoutPushSubscriptionsInput
+    >;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutPushSubscriptionsInput;
+    connect?: Prisma.UserWhereUniqueInput;
+};
+
+export type UserUpdateOneRequiredWithoutPushSubscriptionsNestedInput = {
+    create?: Prisma.XOR<
+        Prisma.UserCreateWithoutPushSubscriptionsInput,
+        Prisma.UserUncheckedCreateWithoutPushSubscriptionsInput
+    >;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutPushSubscriptionsInput;
+    upsert?: Prisma.UserUpsertWithoutPushSubscriptionsInput;
+    connect?: Prisma.UserWhereUniqueInput;
+    update?: Prisma.XOR<
+        Prisma.XOR<
+            Prisma.UserUpdateToOneWithWhereWithoutPushSubscriptionsInput,
+            Prisma.UserUpdateWithoutPushSubscriptionsInput
+        >,
+        Prisma.UserUncheckedUpdateWithoutPushSubscriptionsInput
+    >;
+};
+
 export type UserCreateNestedOneWithoutFlagsInput = {
     create?: Prisma.XOR<
         Prisma.UserCreateWithoutFlagsInput,
@@ -724,12 +790,14 @@ export type UserCreateWithoutAccountInput = {
     biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionCreateNestedManyWithoutUserInput;
     states?: Prisma.StateCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadCreateNestedManyWithoutUserInput;
     externals?: Prisma.ExternalCreateNestedManyWithoutUserInput;
     adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutAccountInput = {
@@ -742,12 +810,14 @@ export type UserUncheckedCreateWithoutAccountInput = {
     biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningUncheckedCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryUncheckedCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedCreateNestedManyWithoutUserInput;
     states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput;
     externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutAccountInput = {
@@ -788,12 +858,14 @@ export type UserUpdateWithoutAccountInput = {
     biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUpdateManyWithoutUserNestedInput;
     states?: Prisma.StateUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput;
     externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutAccountInput = {
@@ -806,12 +878,14 @@ export type UserUncheckedUpdateWithoutAccountInput = {
     biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUncheckedUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedUpdateManyWithoutUserNestedInput;
     states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput;
     externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutMemoryInput = {
@@ -823,6 +897,7 @@ export type UserCreateWithoutMemoryInput = {
     updatedAt?: Date | string;
     biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountCreateNestedOneWithoutUserInput;
     states?: Prisma.StateCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadCreateNestedManyWithoutUserInput;
@@ -830,6 +905,7 @@ export type UserCreateWithoutMemoryInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutMemoryInput = {
@@ -841,6 +917,7 @@ export type UserUncheckedCreateWithoutMemoryInput = {
     updatedAt?: Date | string;
     biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningUncheckedCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput;
     states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput;
@@ -848,6 +925,7 @@ export type UserUncheckedCreateWithoutMemoryInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutMemoryInput = {
@@ -887,6 +965,7 @@ export type UserUpdateWithoutMemoryInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput;
@@ -894,6 +973,7 @@ export type UserUpdateWithoutMemoryInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutMemoryInput = {
@@ -905,6 +985,7 @@ export type UserUncheckedUpdateWithoutMemoryInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput;
@@ -912,9 +993,10 @@ export type UserUncheckedUpdateWithoutMemoryInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
 };
 
-export type UserCreateWithoutAdminManagedPatientsInput = {
+export type UserCreateWithoutMemoryVersionsInput = {
     id?: string;
     name: string;
     role?: $Enums.UserRole;
@@ -928,11 +1010,13 @@ export type UserCreateWithoutAdminManagedPatientsInput = {
     states?: Prisma.StateCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadCreateNestedManyWithoutUserInput;
     externals?: Prisma.ExternalCreateNestedManyWithoutUserInput;
+    adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
 };
 
-export type UserUncheckedCreateWithoutAdminManagedPatientsInput = {
+export type UserUncheckedCreateWithoutMemoryVersionsInput = {
     id?: string;
     name: string;
     role?: $Enums.UserRole;
@@ -946,8 +1030,118 @@ export type UserUncheckedCreateWithoutAdminManagedPatientsInput = {
     states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput;
     externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput;
+    adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+};
+
+export type UserCreateOrConnectWithoutMemoryVersionsInput = {
+    where: Prisma.UserWhereUniqueInput;
+    create: Prisma.XOR<
+        Prisma.UserCreateWithoutMemoryVersionsInput,
+        Prisma.UserUncheckedCreateWithoutMemoryVersionsInput
+    >;
+};
+
+export type UserUpsertWithoutMemoryVersionsInput = {
+    update: Prisma.XOR<
+        Prisma.UserUpdateWithoutMemoryVersionsInput,
+        Prisma.UserUncheckedUpdateWithoutMemoryVersionsInput
+    >;
+    create: Prisma.XOR<
+        Prisma.UserCreateWithoutMemoryVersionsInput,
+        Prisma.UserUncheckedCreateWithoutMemoryVersionsInput
+    >;
+    where?: Prisma.UserWhereInput;
+};
+
+export type UserUpdateToOneWithWhereWithoutMemoryVersionsInput = {
+    where?: Prisma.UserWhereInput;
+    data: Prisma.XOR<
+        Prisma.UserUpdateWithoutMemoryVersionsInput,
+        Prisma.UserUncheckedUpdateWithoutMemoryVersionsInput
+    >;
+};
+
+export type UserUpdateWithoutMemoryVersionsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput;
+    screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput;
+    memory?: Prisma.PatientMemoryUpdateOneWithoutUserNestedInput;
+    account?: Prisma.AccountUpdateOneWithoutUserNestedInput;
+    states?: Prisma.StateUpdateManyWithoutUserNestedInput;
+    threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput;
+    externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput;
+    adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
+    managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
+    flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+};
+
+export type UserUncheckedUpdateWithoutMemoryVersionsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput;
+    screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput;
+    memory?: Prisma.PatientMemoryUncheckedUpdateOneWithoutUserNestedInput;
+    account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput;
+    states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput;
+    threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput;
+    externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput;
+    adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
+    managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
+    flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+};
+
+export type UserCreateWithoutAdminManagedPatientsInput = {
+    id?: string;
+    name: string;
+    role?: $Enums.UserRole;
+    profile?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput;
+    screening?: Prisma.ScreeningCreateNestedOneWithoutUserInput;
+    memory?: Prisma.PatientMemoryCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionCreateNestedManyWithoutUserInput;
+    account?: Prisma.AccountCreateNestedOneWithoutUserInput;
+    states?: Prisma.StateCreateNestedManyWithoutUserInput;
+    threads?: Prisma.ThreadCreateNestedManyWithoutUserInput;
+    externals?: Prisma.ExternalCreateNestedManyWithoutUserInput;
+    managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
+    flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+};
+
+export type UserUncheckedCreateWithoutAdminManagedPatientsInput = {
+    id?: string;
+    name: string;
+    role?: $Enums.UserRole;
+    profile?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput;
+    screening?: Prisma.ScreeningUncheckedCreateNestedOneWithoutUserInput;
+    memory?: Prisma.PatientMemoryUncheckedCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedCreateNestedManyWithoutUserInput;
+    account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput;
+    states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput;
+    threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput;
+    externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput;
+    managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
+    flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutAdminManagedPatientsInput = {
@@ -968,12 +1162,14 @@ export type UserCreateWithoutManagedByAdminInput = {
     biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountCreateNestedOneWithoutUserInput;
     states?: Prisma.StateCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadCreateNestedManyWithoutUserInput;
     externals?: Prisma.ExternalCreateNestedManyWithoutUserInput;
     adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutManagedByAdminInput = {
@@ -986,12 +1182,14 @@ export type UserUncheckedCreateWithoutManagedByAdminInput = {
     biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningUncheckedCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryUncheckedCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput;
     states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput;
     externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutManagedByAdminInput = {
@@ -1032,12 +1230,14 @@ export type UserUpdateWithoutAdminManagedPatientsInput = {
     biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput;
     externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutAdminManagedPatientsInput = {
@@ -1050,12 +1250,14 @@ export type UserUncheckedUpdateWithoutAdminManagedPatientsInput = {
     biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUncheckedUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput;
     externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUpsertWithoutManagedByAdminInput = {
@@ -1088,12 +1290,14 @@ export type UserUpdateWithoutManagedByAdminInput = {
     biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput;
     externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutManagedByAdminInput = {
@@ -1106,12 +1310,14 @@ export type UserUncheckedUpdateWithoutManagedByAdminInput = {
     biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUncheckedUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput;
     externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutScreeningInput = {
@@ -1123,6 +1329,7 @@ export type UserCreateWithoutScreeningInput = {
     updatedAt?: Date | string;
     biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountCreateNestedOneWithoutUserInput;
     states?: Prisma.StateCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadCreateNestedManyWithoutUserInput;
@@ -1130,6 +1337,7 @@ export type UserCreateWithoutScreeningInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutScreeningInput = {
@@ -1141,6 +1349,7 @@ export type UserUncheckedCreateWithoutScreeningInput = {
     updatedAt?: Date | string;
     biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryUncheckedCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput;
     states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput;
@@ -1148,6 +1357,7 @@ export type UserUncheckedCreateWithoutScreeningInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutScreeningInput = {
@@ -1187,6 +1397,7 @@ export type UserUpdateWithoutScreeningInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput;
@@ -1194,6 +1405,7 @@ export type UserUpdateWithoutScreeningInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutScreeningInput = {
@@ -1205,6 +1417,7 @@ export type UserUncheckedUpdateWithoutScreeningInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUncheckedUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput;
@@ -1212,6 +1425,7 @@ export type UserUncheckedUpdateWithoutScreeningInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutBiometricInput = {
@@ -1223,6 +1437,7 @@ export type UserCreateWithoutBiometricInput = {
     updatedAt?: Date | string;
     screening?: Prisma.ScreeningCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountCreateNestedOneWithoutUserInput;
     states?: Prisma.StateCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadCreateNestedManyWithoutUserInput;
@@ -1230,6 +1445,7 @@ export type UserCreateWithoutBiometricInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutBiometricInput = {
@@ -1241,6 +1457,7 @@ export type UserUncheckedCreateWithoutBiometricInput = {
     updatedAt?: Date | string;
     screening?: Prisma.ScreeningUncheckedCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryUncheckedCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput;
     states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput;
@@ -1248,6 +1465,7 @@ export type UserUncheckedCreateWithoutBiometricInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutBiometricInput = {
@@ -1287,6 +1505,7 @@ export type UserUpdateWithoutBiometricInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput;
@@ -1294,6 +1513,7 @@ export type UserUpdateWithoutBiometricInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutBiometricInput = {
@@ -1305,6 +1525,7 @@ export type UserUncheckedUpdateWithoutBiometricInput = {
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUncheckedUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput;
@@ -1312,6 +1533,7 @@ export type UserUncheckedUpdateWithoutBiometricInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutStatesInput = {
@@ -1324,12 +1546,14 @@ export type UserCreateWithoutStatesInput = {
     biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountCreateNestedOneWithoutUserInput;
     threads?: Prisma.ThreadCreateNestedManyWithoutUserInput;
     externals?: Prisma.ExternalCreateNestedManyWithoutUserInput;
     adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutStatesInput = {
@@ -1342,12 +1566,14 @@ export type UserUncheckedCreateWithoutStatesInput = {
     biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningUncheckedCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryUncheckedCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput;
     threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput;
     externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutStatesInput = {
@@ -1388,12 +1614,14 @@ export type UserUpdateWithoutStatesInput = {
     biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUpdateOneWithoutUserNestedInput;
     threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput;
     externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutStatesInput = {
@@ -1406,12 +1634,14 @@ export type UserUncheckedUpdateWithoutStatesInput = {
     biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUncheckedUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput;
     threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput;
     externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutExternalsInput = {
@@ -1424,12 +1654,14 @@ export type UserCreateWithoutExternalsInput = {
     biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountCreateNestedOneWithoutUserInput;
     states?: Prisma.StateCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadCreateNestedManyWithoutUserInput;
     adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutExternalsInput = {
@@ -1442,12 +1674,14 @@ export type UserUncheckedCreateWithoutExternalsInput = {
     biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningUncheckedCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryUncheckedCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput;
     states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutExternalsInput = {
@@ -1488,12 +1722,14 @@ export type UserUpdateWithoutExternalsInput = {
     biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutExternalsInput = {
@@ -1506,12 +1742,14 @@ export type UserUncheckedUpdateWithoutExternalsInput = {
     biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUncheckedUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutThreadsInput = {
@@ -1524,12 +1762,14 @@ export type UserCreateWithoutThreadsInput = {
     biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountCreateNestedOneWithoutUserInput;
     states?: Prisma.StateCreateNestedManyWithoutUserInput;
     externals?: Prisma.ExternalCreateNestedManyWithoutUserInput;
     adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutThreadsInput = {
@@ -1542,12 +1782,14 @@ export type UserUncheckedCreateWithoutThreadsInput = {
     biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningUncheckedCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryUncheckedCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput;
     states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput;
     externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutThreadsInput = {
@@ -1588,12 +1830,14 @@ export type UserUpdateWithoutThreadsInput = {
     biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUpdateManyWithoutUserNestedInput;
     externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutThreadsInput = {
@@ -1606,8 +1850,118 @@ export type UserUncheckedUpdateWithoutThreadsInput = {
     biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUncheckedUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput;
+    externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput;
+    adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
+    managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
+    flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+};
+
+export type UserCreateWithoutPushSubscriptionsInput = {
+    id?: string;
+    name: string;
+    role?: $Enums.UserRole;
+    profile?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput;
+    screening?: Prisma.ScreeningCreateNestedOneWithoutUserInput;
+    memory?: Prisma.PatientMemoryCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionCreateNestedManyWithoutUserInput;
+    account?: Prisma.AccountCreateNestedOneWithoutUserInput;
+    states?: Prisma.StateCreateNestedManyWithoutUserInput;
+    threads?: Prisma.ThreadCreateNestedManyWithoutUserInput;
+    externals?: Prisma.ExternalCreateNestedManyWithoutUserInput;
+    adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
+    managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
+    flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+};
+
+export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
+    id?: string;
+    name: string;
+    role?: $Enums.UserRole;
+    profile?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput;
+    screening?: Prisma.ScreeningUncheckedCreateNestedOneWithoutUserInput;
+    memory?: Prisma.PatientMemoryUncheckedCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedCreateNestedManyWithoutUserInput;
+    account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput;
+    states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput;
+    threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput;
+    externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput;
+    adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
+    managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
+    flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+};
+
+export type UserCreateOrConnectWithoutPushSubscriptionsInput = {
+    where: Prisma.UserWhereUniqueInput;
+    create: Prisma.XOR<
+        Prisma.UserCreateWithoutPushSubscriptionsInput,
+        Prisma.UserUncheckedCreateWithoutPushSubscriptionsInput
+    >;
+};
+
+export type UserUpsertWithoutPushSubscriptionsInput = {
+    update: Prisma.XOR<
+        Prisma.UserUpdateWithoutPushSubscriptionsInput,
+        Prisma.UserUncheckedUpdateWithoutPushSubscriptionsInput
+    >;
+    create: Prisma.XOR<
+        Prisma.UserCreateWithoutPushSubscriptionsInput,
+        Prisma.UserUncheckedCreateWithoutPushSubscriptionsInput
+    >;
+    where?: Prisma.UserWhereInput;
+};
+
+export type UserUpdateToOneWithWhereWithoutPushSubscriptionsInput = {
+    where?: Prisma.UserWhereInput;
+    data: Prisma.XOR<
+        Prisma.UserUpdateWithoutPushSubscriptionsInput,
+        Prisma.UserUncheckedUpdateWithoutPushSubscriptionsInput
+    >;
+};
+
+export type UserUpdateWithoutPushSubscriptionsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput;
+    screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput;
+    memory?: Prisma.PatientMemoryUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUpdateManyWithoutUserNestedInput;
+    account?: Prisma.AccountUpdateOneWithoutUserNestedInput;
+    states?: Prisma.StateUpdateManyWithoutUserNestedInput;
+    threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput;
+    externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput;
+    adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
+    managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
+    flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+};
+
+export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput;
+    screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput;
+    memory?: Prisma.PatientMemoryUncheckedUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedUpdateManyWithoutUserNestedInput;
+    account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput;
+    states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput;
+    threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput;
     externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
@@ -1624,12 +1978,14 @@ export type UserCreateWithoutFlagsInput = {
     biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountCreateNestedOneWithoutUserInput;
     states?: Prisma.StateCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadCreateNestedManyWithoutUserInput;
     externals?: Prisma.ExternalCreateNestedManyWithoutUserInput;
     adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutFlagsInput = {
@@ -1642,12 +1998,14 @@ export type UserUncheckedCreateWithoutFlagsInput = {
     biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput;
     screening?: Prisma.ScreeningUncheckedCreateNestedOneWithoutUserInput;
     memory?: Prisma.PatientMemoryUncheckedCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedCreateNestedManyWithoutUserInput;
     account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput;
     states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput;
     threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput;
     externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutFlagsInput = {
@@ -1688,12 +2046,14 @@ export type UserUpdateWithoutFlagsInput = {
     biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput;
     externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutFlagsInput = {
@@ -1706,12 +2066,14 @@ export type UserUncheckedUpdateWithoutFlagsInput = {
     biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput;
     screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput;
     memory?: Prisma.PatientMemoryUncheckedUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedUpdateManyWithoutUserNestedInput;
     account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput;
     states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput;
     threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput;
     externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput;
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 /**
@@ -1719,17 +2081,20 @@ export type UserUncheckedUpdateWithoutFlagsInput = {
  */
 
 export type UserCountOutputType = {
+    memoryVersions: number;
     states: number;
     threads: number;
     externals: number;
     adminManagedPatients: number;
     flags: number;
+    pushSubscriptions: number;
 };
 
 export type UserCountOutputTypeSelect<
     ExtArgs extends
         runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
+    memoryVersions?: boolean | UserCountOutputTypeCountMemoryVersionsArgs;
     states?: boolean | UserCountOutputTypeCountStatesArgs;
     threads?: boolean | UserCountOutputTypeCountThreadsArgs;
     externals?: boolean | UserCountOutputTypeCountExternalsArgs;
@@ -1737,6 +2102,7 @@ export type UserCountOutputTypeSelect<
         | boolean
         | UserCountOutputTypeCountAdminManagedPatientsArgs;
     flags?: boolean | UserCountOutputTypeCountFlagsArgs;
+    pushSubscriptions?: boolean | UserCountOutputTypeCountPushSubscriptionsArgs;
 };
 
 /**
@@ -1750,6 +2116,16 @@ export type UserCountOutputTypeDefaultArgs<
      * Select specific fields to fetch from the UserCountOutputType
      */
     select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null;
+};
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountMemoryVersionsArgs<
+    ExtArgs extends
+        runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+    where?: Prisma.PatientMemoryVersionWhereInput;
 };
 
 /**
@@ -1802,6 +2178,16 @@ export type UserCountOutputTypeCountFlagsArgs<
     where?: Prisma.FlagWhereInput;
 };
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPushSubscriptionsArgs<
+    ExtArgs extends
+        runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+    where?: Prisma.PushSubscriptionWhereInput;
+};
+
 export type UserSelect<
     ExtArgs extends
         runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
@@ -1816,6 +2202,7 @@ export type UserSelect<
         biometric?: boolean | Prisma.User$biometricArgs<ExtArgs>;
         screening?: boolean | Prisma.User$screeningArgs<ExtArgs>;
         memory?: boolean | Prisma.User$memoryArgs<ExtArgs>;
+        memoryVersions?: boolean | Prisma.User$memoryVersionsArgs<ExtArgs>;
         account?: boolean | Prisma.User$accountArgs<ExtArgs>;
         states?: boolean | Prisma.User$statesArgs<ExtArgs>;
         threads?: boolean | Prisma.User$threadsArgs<ExtArgs>;
@@ -1825,6 +2212,9 @@ export type UserSelect<
             | Prisma.User$adminManagedPatientsArgs<ExtArgs>;
         managedByAdmin?: boolean | Prisma.User$managedByAdminArgs<ExtArgs>;
         flags?: boolean | Prisma.User$flagsArgs<ExtArgs>;
+        pushSubscriptions?:
+            | boolean
+            | Prisma.User$pushSubscriptionsArgs<ExtArgs>;
         _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
     },
     ExtArgs["result"]["user"]
@@ -1883,6 +2273,7 @@ export type UserInclude<
     biometric?: boolean | Prisma.User$biometricArgs<ExtArgs>;
     screening?: boolean | Prisma.User$screeningArgs<ExtArgs>;
     memory?: boolean | Prisma.User$memoryArgs<ExtArgs>;
+    memoryVersions?: boolean | Prisma.User$memoryVersionsArgs<ExtArgs>;
     account?: boolean | Prisma.User$accountArgs<ExtArgs>;
     states?: boolean | Prisma.User$statesArgs<ExtArgs>;
     threads?: boolean | Prisma.User$threadsArgs<ExtArgs>;
@@ -1892,6 +2283,7 @@ export type UserInclude<
         | Prisma.User$adminManagedPatientsArgs<ExtArgs>;
     managedByAdmin?: boolean | Prisma.User$managedByAdminArgs<ExtArgs>;
     flags?: boolean | Prisma.User$flagsArgs<ExtArgs>;
+    pushSubscriptions?: boolean | Prisma.User$pushSubscriptionsArgs<ExtArgs>;
     _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type UserIncludeCreateManyAndReturn<
@@ -1912,6 +2304,7 @@ export type $UserPayload<
         biometric: Prisma.$BiometricsPayload<ExtArgs> | null;
         screening: Prisma.$ScreeningPayload<ExtArgs> | null;
         memory: Prisma.$PatientMemoryPayload<ExtArgs> | null;
+        memoryVersions: Prisma.$PatientMemoryVersionPayload<ExtArgs>[];
         account: Prisma.$AccountPayload<ExtArgs> | null;
         states: Prisma.$StatePayload<ExtArgs>[];
         threads: Prisma.$ThreadPayload<ExtArgs>[];
@@ -1919,6 +2312,7 @@ export type $UserPayload<
         adminManagedPatients: Prisma.$AdminPatientRelationPayload<ExtArgs>[];
         managedByAdmin: Prisma.$AdminPatientRelationPayload<ExtArgs> | null;
         flags: Prisma.$FlagPayload<ExtArgs>[];
+        pushSubscriptions: Prisma.$PushSubscriptionPayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<
         {
@@ -2520,6 +2914,17 @@ export interface Prisma__UserClient<
         ExtArgs,
         GlobalOmitOptions
     >;
+    memoryVersions<T extends Prisma.User$memoryVersionsArgs<ExtArgs> = {}>(
+        args?: Prisma.Subset<T, Prisma.User$memoryVersionsArgs<ExtArgs>>,
+    ): Prisma.PrismaPromise<
+        | runtime.Types.Result.GetResult<
+              Prisma.$PatientMemoryVersionPayload<ExtArgs>,
+              T,
+              "findMany",
+              GlobalOmitOptions
+          >
+        | Null
+    >;
     account<T extends Prisma.User$accountArgs<ExtArgs> = {}>(
         args?: Prisma.Subset<T, Prisma.User$accountArgs<ExtArgs>>,
     ): Prisma.Prisma__AccountClient<
@@ -2597,6 +3002,19 @@ export interface Prisma__UserClient<
     ): Prisma.PrismaPromise<
         | runtime.Types.Result.GetResult<
               Prisma.$FlagPayload<ExtArgs>,
+              T,
+              "findMany",
+              GlobalOmitOptions
+          >
+        | Null
+    >;
+    pushSubscriptions<
+        T extends Prisma.User$pushSubscriptionsArgs<ExtArgs> = {},
+    >(
+        args?: Prisma.Subset<T, Prisma.User$pushSubscriptionsArgs<ExtArgs>>,
+    ): Prisma.PrismaPromise<
+        | runtime.Types.Result.GetResult<
+              Prisma.$PushSubscriptionPayload<ExtArgs>,
               T,
               "findMany",
               GlobalOmitOptions
@@ -3158,6 +3576,37 @@ export type User$memoryArgs<
 };
 
 /**
+ * User.memoryVersions
+ */
+export type User$memoryVersionsArgs<
+    ExtArgs extends
+        runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+    /**
+     * Select specific fields to fetch from the PatientMemoryVersion
+     */
+    select?: Prisma.PatientMemoryVersionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the PatientMemoryVersion
+     */
+    omit?: Prisma.PatientMemoryVersionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.PatientMemoryVersionInclude<ExtArgs> | null;
+    where?: Prisma.PatientMemoryVersionWhereInput;
+    orderBy?:
+        | Prisma.PatientMemoryVersionOrderByWithRelationInput
+        | Prisma.PatientMemoryVersionOrderByWithRelationInput[];
+    cursor?: Prisma.PatientMemoryVersionWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?:
+        | Prisma.PatientMemoryVersionScalarFieldEnum
+        | Prisma.PatientMemoryVersionScalarFieldEnum[];
+};
+
+/**
  * User.account
  */
 export type User$accountArgs<
@@ -3348,6 +3797,37 @@ export type User$flagsArgs<
     take?: number;
     skip?: number;
     distinct?: Prisma.FlagScalarFieldEnum | Prisma.FlagScalarFieldEnum[];
+};
+
+/**
+ * User.pushSubscriptions
+ */
+export type User$pushSubscriptionsArgs<
+    ExtArgs extends
+        runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+    /**
+     * Select specific fields to fetch from the PushSubscription
+     */
+    select?: Prisma.PushSubscriptionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the PushSubscription
+     */
+    omit?: Prisma.PushSubscriptionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.PushSubscriptionInclude<ExtArgs> | null;
+    where?: Prisma.PushSubscriptionWhereInput;
+    orderBy?:
+        | Prisma.PushSubscriptionOrderByWithRelationInput
+        | Prisma.PushSubscriptionOrderByWithRelationInput[];
+    cursor?: Prisma.PushSubscriptionWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?:
+        | Prisma.PushSubscriptionScalarFieldEnum
+        | Prisma.PushSubscriptionScalarFieldEnum[];
 };
 
 /**

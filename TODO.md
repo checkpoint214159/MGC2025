@@ -1,14 +1,2 @@
-1. cheaper calls to openrouter for caching
-2. create 'test cases' to show the ability of the model/system to intuit things that make it better than ahrdcoded heuristics
-3. deal with proper database migration practice soon
-4. better abstractions for printing/logging: different suits printing different things?
-
-Some current typechecking:
-✓ Trailing whitespace trimming
-✓ End-of-file fixing
-✓ YAML/JSON/TOML syntax checking
-✓ Merge conflict detection
-✓ Mixed line ending fixing
-✓ Prettier formatting
-✓ TypeScript type checking
-✓ Prisma schema formatting
+~~1. verify if caching for the onboarding step is required or not.~~ ✅ Explicit `cache_control: { type: "ephemeral" }` already in place in questioning.ts, consolidate.ts, modules.ts — correct implementation, no further work needed.
+~~1.5 aggregate overall costs, tokens, and other statistics into some records.~~ ✅ Usage tracking middleware added to getModel() — logs `[llm-usage] <JSON>` per call (model, in/out tokens, cache hit %, cost estimate, duration). Aggregate with `npm run usage`. ~~2. create 'test cases' to show the ability of the model/system to intuit things that make it better than hardcoded heuristics~~ ✅ digest.test.ts: 13 tests covering recovery day, adherence streak (forgive/reset), pain stagnation flag (key scenario: compliance OK but pain plateau → LLM must not progress the plan), delta vs baseline, and preamble grounding. 3. deal with proper database migration practice soon 4. better abstractions for printing/logging: different suits printing different things? 5. Regular notifications, both for normal updates like "hey! have you logged your progress today?" but also when things go wrong e.g patient not doing their compliance properly, and the system notices low compliance with their plan or higher pain scales being recorded across a few days. 6. "Press one button to generate report" feature. The intended goal here is so that a report can be generated based off all the information about a patient. generated not necessarily only using an LLM: e.g create some graphs and charts from values and heuristics like compliance, pain scale, etc etc. but also some insights that may be derived from memories
