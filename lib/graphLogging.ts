@@ -1,4 +1,7 @@
 import { isGraphBubbleUp } from "@langchain/langgraph";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("graph");
 
 /**
  * Wraps a LangGraph node so every entry, success, and failure is logged with the node
@@ -14,20 +17,18 @@ export function loggedNode<Input, Output>(
 ): (input: Input) => Promise<Output> {
     return async (input: Input) => {
         const startedAt = Date.now();
-        console.log(`[graph] ▶ ${name}`);
+        log.info(`▶ ${name}`);
         try {
             const result = await fn(input);
-            console.log(`[graph] ✓ ${name} (${Date.now() - startedAt}ms)`);
+            log.info(`✓ ${name} (${Date.now() - startedAt}ms)`);
             return result;
         } catch (err) {
             if (isGraphBubbleUp(err)) {
-                console.log(
-                    `[graph] ⏸ ${name} — paused (awaiting input / redirect)`,
-                );
+                log.info(`⏸ ${name} — paused (awaiting input / redirect)`);
             } else {
-                console.error(
-                    `[graph] ✗ ${name} FAILED (${Date.now() - startedAt}ms): ${
-                        (err as any)?.message ?? err
+                log.error(
+                    `✗ ${name} FAILED (${Date.now() - startedAt}ms): ${
+                        (err as Error)?.message ?? err
                     }`,
                 );
             }

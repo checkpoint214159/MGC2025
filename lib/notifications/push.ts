@@ -1,5 +1,8 @@
 import webpush from "web-push";
 import { prisma } from "@/lib/prisma";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("push");
 
 let configured = false;
 function ensureConfigured() {
@@ -46,8 +49,8 @@ export async function sendPush(
                 const status = (err as { statusCode?: number }).statusCode;
                 if (status === 410) stale.push(sub.id);
                 else
-                    console.error(
-                        `[push] ✗ ${sub.endpoint.slice(-20)}:`,
+                    log.error(
+                        `✗ ${sub.endpoint.slice(-20)}:`,
                         (err as Error).message,
                     );
             }

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getStateHistory } from "@/lib/state/service";
 import { getPainSeries } from "@/lib/engagement/arc";
 import { evaluateRecoveryFlags } from "@/lib/engagement/flags";
+import { createLogger } from "@/lib/logger";
 import {
     sendEmail,
     dailyNudgeEmail,
@@ -14,6 +15,8 @@ import {
     painAlertPush,
     lowCompliancePush,
 } from "./push";
+
+const log = createLogger("cron");
 
 // How many consecutive days without any state before "low compliance" fires.
 const LOW_COMPLIANCE_THRESHOLD_DAYS = 2;
@@ -177,8 +180,14 @@ export async function runNotificationCron(): Promise<{
     const results: NotificationResult[] = [];
     for (const { id } of patients) {
         try {
-            results.push(await processPatient(id));
+            const r = await processPatient(id);
+            results.push(r);
+            if (r.sent.length > 0)
+                log.info(`✓ ${id}: sent [${r.sent.join(", ")}]`);
+            if (r.errors.length > 0)
+                log.error(`✗ ${id}: errors [${r.errors.join(", ")}]`);
         } catch (e: unknown) {
+            log.error(`✗ ${id} unhandled:`, (e as Error).message);
             results.push({
                 userId: id,
                 email: "",
@@ -190,5 +199,6 @@ export async function runNotificationCron(): Promise<{
         }
     }
 
+    log.info(`processed ${patients.length} patient(s)`);
     return { processed: patients.length, results };
 }
