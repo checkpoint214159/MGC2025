@@ -19,7 +19,7 @@ import {
     deleteOnboardingThread,
 } from "@/lib/user/service";
 import { BaseMessage } from "./external/schemas/message";
-import { Thread, ThreadContext } from "@/lib/external/schemas/thread";
+import { ThreadContext } from "@/lib/external/schemas/thread";
 import { prisma } from "./prisma";
 import { compileExternal } from "./external/service";
 import { State } from "./state/schemas/state";
@@ -36,6 +36,13 @@ import {
     startOnboarding,
     resumeOnboarding,
 } from "@/lib/onboarding/service";
+import {
+    getPainSeries,
+    evaluateRecoveryFlags,
+    getTopPriorities,
+} from "@/lib/engagement";
+import { buildHeuristicDigest } from "@/lib/state/services/digest";
+import { getPatientMemory } from "@/lib/memory/service";
 
 // i love functors
 export async function authenticatedAction<T>(
@@ -53,11 +60,11 @@ export async function authenticatedAction<T>(
     try {
         const result = await callback(userId);
         return { success: true, data: result };
-    } catch (e: any) {
+    } catch (e: unknown) {
         console.error("Action Error:", e);
         return {
             success: false,
-            error: e.message || "An unexpected error occurred.",
+            error: (e as Error).message || "An unexpected error occurred.",
         };
     }
 }
@@ -108,7 +115,7 @@ export async function startOnboardingAction() {
     });
 }
 
-export async function resumeOnboardingAction(input: any) {
+export async function resumeOnboardingAction(input: unknown) {
     return authenticatedAction(async (userId) => {
         return await resumeOnboarding(userId, input);
     });
@@ -205,7 +212,7 @@ export async function fetchRecoveryHistoryAction() {
 
 export async function updateProgressAction(
     moduleId: string,
-    updates: { id: string; data: any }[],
+    updates: { id: string; data: unknown }[],
 ) {
     return authenticatedAction(async () => {
         // Note: If updateModuleProgress requires userId for security, add it here
@@ -429,5 +436,91 @@ export async function semanticSearchWithContextAction(
                 fallbackReason: queryResult.fallbackReason,
             },
         };
+    });
+}
+
+// ── Report generation ──────────────────────────────────────────────────────────
+
+export interface CompliancePoint {
+    date: string;
+    pct: number | null; // 0–100 or null when no priorities existed
+}
+
+export interface PatientReport {
+    patientName: string;
+    generatedAt: string;
+    digestText: string;
+    painSeries: { day: number; pain: number }[];
+    compliancePerDay: CompliancePoint[];
+    flags: { kind: string; title: string; detail: string }[];
+    memory: {
+        semantic: string;
+        episodic: { phase: string; narrative: string; closed: boolean }[];
+    } | null;
+}
+
+/**
+ * Build a complete patient report: heuristic signals + pain/compliance time-series +
+ * PatientMemory narrative. No LLM call — everything is derived from stored data.
+ */
+export async function generatePatientReportAction(patientId: string) {
+    return authenticatedAction(async (userId) => {
+        await requireRole("admin");
+        await requirePatientAccess(userId, patientId);
+
+        const [history, bio, memory, user] = await Promise.all([
+            getStateHistory(patientId),
+            prisma.biometrics.findUnique({
+                where: { userId: patientId },
+                select: { surgeryDate: true },
+            }),
+            getPatientMemory(patientId),
+            prisma.user.findUnique({
+                where: { id: patientId },
+                select: { name: true },
+            }),
+        ]);
+
+        const surgeryDate = bio?.surgeryDate ? new Date(bio.surgeryDate) : null;
+
+        const digestText = buildHeuristicDigest({
+            history,
+            surgeryDate,
+        });
+
+        const painSeries = surgeryDate
+            ? getPainSeries(history, surgeryDate)
+            : [];
+        const flags = evaluateRecoveryFlags({ pain: painSeries });
+
+        const compliancePerDay: CompliancePoint[] = history.map((s) => {
+            const ps = getTopPriorities(s, 10);
+            if (ps.length === 0)
+                return {
+                    date: new Date(s.dateCreated).toISOString().slice(0, 10),
+                    pct: null,
+                };
+            const done = ps.filter((p) => p.isComplete).length;
+            return {
+                date: new Date(s.dateCreated).toISOString().slice(0, 10),
+                pct: Math.round((done / ps.length) * 100),
+            };
+        });
+
+        return {
+            patientName: user?.name ?? "Patient",
+            generatedAt: new Date().toISOString(),
+            digestText,
+            painSeries,
+            compliancePerDay,
+            flags: flags.map((f) => ({
+                kind: f.kind,
+                title: f.title,
+                detail: f.detail,
+            })),
+            memory: memory
+                ? { semantic: memory.semantic, episodic: memory.episodic }
+                : null,
+        } satisfies PatientReport;
     });
 }
