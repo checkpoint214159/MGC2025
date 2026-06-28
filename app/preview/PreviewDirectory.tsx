@@ -20,6 +20,9 @@ import {
     MessageCircle,
     Users,
     HeartPulse,
+    FileText,
+    Upload,
+    ClipboardCheck,
     ArrowRight,
     Lock,
     type LucideIcon,
@@ -31,6 +34,20 @@ type Item = { href: string; tag?: string; icon: LucideIcon; title: string; desc:
 type Group = { label: string; hint: string; items: Item[] };
 
 const GROUPS: Group[] = [
+    {
+        label: "Wally journey (new)",
+        hint: "The team's Wally-branded patient journey — onboarding through the daily loop. Fully clickable, no backend.",
+        items: [
+            { href: "/preview/wally", icon: Compass, title: "Journey overview", desc: "The hub — every step of the Wally flow." },
+            { href: "/preview/wally/onboarding", tag: "P1", icon: ClipboardList, title: "General Onboarding", desc: "Age, gender, height, weight, conditions, surgery." },
+            { href: "/preview/wally/assessment", tag: "P2", icon: HeartPulse, title: "Initial Assessment", desc: "PAR-Q, SARC-F and MUST screening." },
+            { href: "/preview/wally/lifestyle", tag: "P3", icon: Sparkles, title: "Getting to Know You", desc: "Adaptive preference questions." },
+            { href: "/preview/wally/discharge", icon: Upload, title: "Discharge Care Plan", desc: "Upload the physio + dietitian discharge plans." },
+            { href: "/preview/wally/plan", icon: FileText, title: "Recovery Plan", desc: "Goals, physio + dietitian plan, red flags." },
+            { href: "/preview/wally/dashboard", icon: LayoutDashboard, title: "Patient Dashboard", desc: "Growing-plant tasks, hydration/sleep logging, feedback." },
+            { href: "/preview/wally/report", icon: ClipboardCheck, title: "Recovery Progress Report", desc: "Clinical summary, metrics, insights, actions." },
+        ],
+    },
     {
         label: "MGC mockup flow",
         hint: "The demo — onboarding through the daily recovery loop. Fully clickable, no backend.",
