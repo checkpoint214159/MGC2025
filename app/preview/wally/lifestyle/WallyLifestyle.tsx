@@ -54,8 +54,8 @@ export function WallyLifestyle() {
                 intro={intro}
                 introCta="Let's continue"
                 steps={steps}
-                finishLabel="Generate my plan"
-                finishHref="/preview/wally/plan"
+                finishLabel="Add my discharge plan"
+                finishHref="/preview/wally/discharge"
             />
         </PhaseScope>
     );

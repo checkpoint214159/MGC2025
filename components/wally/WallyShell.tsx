@@ -9,8 +9,10 @@ const STEPS = [
     { key: "onboarding", href: "/preview/wally/onboarding", label: "Onboard" },
     { key: "assessment", href: "/preview/wally/assessment", label: "Assess" },
     { key: "lifestyle", href: "/preview/wally/lifestyle", label: "Preferences" },
+    { key: "discharge", href: "/preview/wally/discharge", label: "Upload" },
     { key: "plan", href: "/preview/wally/plan", label: "Plan" },
     { key: "dashboard", href: "/preview/wally/dashboard", label: "Dashboard" },
+    { key: "report", href: "/preview/wally/report", label: "Report" },
 ];
 
 export function WallyShell({

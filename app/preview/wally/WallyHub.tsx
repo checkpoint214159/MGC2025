@@ -1,6 +1,6 @@
 "use client";
 
-import { ClipboardList, HeartPulse, Sparkles, FileText, LayoutDashboard, ArrowRight, type LucideIcon } from "lucide-react";
+import { ClipboardList, HeartPulse, Sparkles, Upload, FileText, LayoutDashboard, ClipboardCheck, ArrowRight, type LucideIcon } from "lucide-react";
 import { Card } from "@/components/ui/primitives";
 import { WallyMascot } from "@/components/wally/WallyMascot";
 
@@ -10,8 +10,10 @@ const SCREENS: Screen[] = [
     { href: "/preview/wally/onboarding", phase: "Phase 1", tone: "bg-accent-soft text-accent-ink", icon: ClipboardList, title: "General Onboarding", desc: "Biometrics — age, gender, height, weight, conditions and surgery." },
     { href: "/preview/wally/assessment", phase: "Phase 2", tone: "bg-progress-soft text-progress-ink", icon: HeartPulse, title: "Initial Assessment", desc: "PAR-Q, SARC-F and MUST — readiness, strength and nutrition screening." },
     { href: "/preview/wally/lifestyle", phase: "Phase 3", tone: "bg-attention-soft text-attention-ink", icon: Sparkles, title: "Getting to Know You", desc: "Adaptive questions about activities, goals and preferences." },
+    { href: "/preview/wally/discharge", phase: "Upload", tone: "bg-accent-soft text-accent-ink", icon: Upload, title: "Discharge Care Plan", desc: "Upload the physiotherapy + dietitian plans from discharge." },
     { href: "/preview/wally/plan", phase: "Output", tone: "bg-accent-soft text-accent-ink", icon: FileText, title: "Recovery Plan", desc: "Mr Tan's plan — goals, physiotherapy + dietitian columns, red flags." },
-    { href: "/preview/wally/dashboard", phase: "Daily", tone: "bg-progress-soft text-progress-ink", icon: LayoutDashboard, title: "Patient Dashboard", desc: "Daily progress, tasks, hydration, sleep — and the post-task feedback loop." },
+    { href: "/preview/wally/dashboard", phase: "Daily", tone: "bg-progress-soft text-progress-ink", icon: LayoutDashboard, title: "Patient Dashboard", desc: "Growing plant for today's tasks, hydration/sleep logging, feedback loop." },
+    { href: "/preview/wally/report", phase: "Report", tone: "bg-progress-soft text-progress-ink", icon: ClipboardCheck, title: "Recovery Progress Report", desc: "Clinical summary, key metrics, insights and recommended actions." },
 ];
 
 export function WallyHub() {

@@ -6,7 +6,7 @@ import {
     Check, Home, ClipboardList, BarChart3, User, ChevronRight, ChevronDown, Plus,
 } from "lucide-react";
 import { PhaseScope } from "@/components/wally/PhaseScope";
-import { CircularProgress } from "@/components/wally/CircularProgress";
+import { DailyPlant } from "@/components/recovery/DailyPlant";
 import { FeedbackModal } from "@/components/wally/FeedbackModal";
 import { Chip, Button } from "@/components/ui/primitives";
 import { cn } from "@/lib/utils";
@@ -71,6 +71,10 @@ export function WallyDashboard() {
     const [disruptions, setDisruptions] = useState<string[]>(["Pain"]);
     const toggleDisruption = (d: string) => setDisruptions((s) => (s.includes(d) ? s.filter((x) => x !== d) : [...s, d]));
 
+    // today's tasks → the growing plant (2 nutrition done + exercise + hydration goal + sleep logged)
+    const total = 6;
+    const done = 2 + (walkDone ? 1 : 0) + (sitUpsDone ? 1 : 0) + (glasses >= 8 ? 1 : 0) + 1;
+
     return (
         <div className="mx-auto max-w-md px-4 py-6">
             {/* header */}
@@ -95,17 +99,8 @@ export function WallyDashboard() {
             </div>
 
             <div className="mt-4 space-y-3.5">
-                {/* daily progress */}
-                <div className="flex items-center gap-4 rounded-2xl border border-border bg-surface p-4">
-                    <CircularProgress value={68} />
-                    <div className="flex-1">
-                        <div className="mb-1 flex items-center gap-2 text-accent-ink">
-                            <MessageCircle size={18} />
-                            <span className="text-[14px] font-semibold">Need help or have a question?</span>
-                        </div>
-                        <p className="text-[13px] text-ink-muted">Type anything to get personalised advice.</p>
-                    </div>
-                </div>
+                {/* daily progress — a growing plant for today's tasks */}
+                <DailyPlant done={done} total={total} />
 
                 {/* nutrition (green) */}
                 <SectionCard phase="assessment">
