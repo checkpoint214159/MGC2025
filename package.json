@@ -12,6 +12,7 @@
         "harness": "node scripts/harness/journey.mjs",
         "harness:onboarding": "node scripts/harness/e2e-onboarding.mjs",
         "harness:trajectory": "node scripts/harness/e2e-trajectory.mjs",
+        "harness:policies": "node scripts/harness/policy-suite.mjs",
         "harness:notifications": "node scripts/harness/e2e-notifications.mjs",
         "harness:scan": "node scripts/harness/scan-log.mjs",
         "usage": "node scripts/harness/usage-report.mjs",

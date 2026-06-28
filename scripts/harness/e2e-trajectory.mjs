@@ -363,6 +363,22 @@ async function main() {
         );
     }
 
+    // Machine-readable summary for the policy suite (scripts/harness/policy-suite.mjs).
+    const failedCount = results.filter((r) => !r.ok).length;
+    console.log(
+        `[[RESULT]] ${JSON.stringify({
+            name: NAME,
+            days: DAYS,
+            green: results.length - failedCount,
+            total: results.length,
+            flags: [...firedKinds],
+            meanCompliance,
+            lastPain: flagData?.painSeries?.slice(-1)[0]?.pain ?? null,
+            compaction: obs?.compactionRatio ?? null,
+            sent: mine?.sent ?? [],
+        })}`,
+    );
+
     finish(session);
 }
 

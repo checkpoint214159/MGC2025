@@ -189,3 +189,20 @@ bounded.
 window never crosses `CONSOLIDATION_CHAR_THRESHOLD` (4000c) and consolidation doesn't fire during
 a run. To exercise consolidation/compaction growth, feed daily chat/doctor-note prose (or lower
 `MEMORY_CONSOLIDATION_CHAR_THRESHOLD`); the instrumentation is ready to measure it.
+
+## 10.1 — Multi-policy suite + graded compliance
+
+`scripts/harness/policy-suite.mjs` (`npm run harness:policies`) runs the trajectory across three
+contrasting Claude-agent patient policies and prints a comparison: **reluctant** (does ~30%),
+**standard** (does ~80%, pain improves), **worsening** (does ~90% but pain stays high). The
+trajectory emits a machine-readable `[[RESULT]]` line the suite parses. Args: `days=`, `only=`,
+`complianceThreshold=`.
+
+**Finding that forced a fix (the suite earning its keep):** with the original _binary_ compliance
+(`value >= goal` per task), the diligent "standard" patient scored ~4% — indistinguishable from
+the reluctant one — because doing 8/10 reps counts as 0 for that task. Compliance is now **graded**
+(`getDayCompliance.pct` = mean of `min(value/goal, 1)`), so 80%-effort reads as ~80%. The strict
+`completedTasks`/`totalTasks` count is retained for the "fully finished" view. This flows through
+`DailyMetric.compliancePct`, the `low_compliance` flag, the rolling trends, and the report — all
+consistent. Net clinical contrast the suite now demonstrates: reluctant → `low_compliance`;
+standard → (typically) no flag; worsening → `pain_stagnation` (compliant, so no compliance flag).

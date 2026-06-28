@@ -67,24 +67,52 @@ describe("getDayCompliance", () => {
         });
     });
 
-    it("reports 75% when 3 of 4 tasks are met (the spec example)", () => {
+    it("grades partial tasks (3 fully met + one at 25% → 81%)", () => {
         const s = stateWith([
             {
                 type: "exercise",
                 metrics: [
-                    [10, 10],
-                    [20, 5],
+                    [10, 10], // 100%
+                    [20, 5], // 25%
                 ],
-            }, // 1/2
+            },
             {
                 type: "nutrition",
                 metrics: [
-                    [2000, 2000],
-                    [100, 100],
+                    [2000, 2000], // 100%
+                    [100, 100], // 100%
                 ],
-            }, // 2/2
+            },
         ]);
-        expect(getDayCompliance(s).pct).toBe(75);
+        // graded = (1 + 0.25 + 1 + 1) / 4 = 0.8125 → 81% (binary would have said 75%)
+        expect(getDayCompliance(s).pct).toBe(81);
+        expect(getDayCompliance(s).completedTasks).toBe(3); // strict count unchanged
+    });
+
+    it("distinguishes a diligent 80% patient from a reluctant 30% one (graded)", () => {
+        const diligent = stateWith([
+            {
+                type: "exercise",
+                metrics: [
+                    [10, 8],
+                    [20, 16],
+                ],
+            }, // both at 80%
+        ]);
+        const reluctant = stateWith([
+            {
+                type: "exercise",
+                metrics: [
+                    [10, 3],
+                    [20, 6],
+                ],
+            }, // both at 30%
+        ]);
+        expect(getDayCompliance(diligent).pct).toBe(80);
+        expect(getDayCompliance(reluctant).pct).toBe(30);
+        // …yet both have 0 tasks fully met — the binary view can't tell them apart.
+        expect(getDayCompliance(diligent).completedTasks).toBe(0);
+        expect(getDayCompliance(reluctant).completedTasks).toBe(0);
     });
 
     it("counts value >= goal as complete (overshoot still completes)", () => {
@@ -116,15 +144,15 @@ describe("getDayCompliance", () => {
 
     it("spans all modules (exercise + nutrition + sleep) for one combined percent", () => {
         const s = stateWith([
-            { type: "exercise", metrics: [[10, 10]] },
-            { type: "nutrition", metrics: [[100, 50]] },
-            { type: "sleep", metrics: [[8, 8]] },
+            { type: "exercise", metrics: [[10, 10]] }, // 100%
+            { type: "nutrition", metrics: [[100, 50]] }, // 50%
+            { type: "sleep", metrics: [[8, 8]] }, // 100%
         ]);
-        // 2 of 3 done → 67%
+        // graded = (1 + 0.5 + 1) / 3 = 0.833 → 83%; 2 of 3 tasks fully met
         expect(getDayCompliance(s)).toEqual({
             completedTasks: 2,
             totalTasks: 3,
-            pct: 67,
+            pct: 83,
         });
     });
 });
@@ -138,12 +166,12 @@ describe("getComplianceSeries", () => {
                 "2026-06-02",
             ), // day 2, 100%
             stateWith([{ type: "symptoms", metrics: [[0, 5]] }], "2026-06-03"), // no tasks → skipped
-            stateWith([{ type: "exercise", metrics: [[10, 4]] }], "2026-06-04"), // day 4, 0%
+            stateWith([{ type: "exercise", metrics: [[10, 4]] }], "2026-06-04"), // day 4, 40%
         ];
         const series = getComplianceSeries(states, surgery);
         expect(series).toEqual([
             { day: 2, progress: 100 },
-            { day: 4, progress: 0 },
+            { day: 4, progress: 40 },
         ]);
     });
 });

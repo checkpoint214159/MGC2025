@@ -1,22 +1,25 @@
 import type { State } from "@/lib/state/schemas/state";
 
 /**
- * Daily COMPLIANCE: the fraction of goal-bearing tasks the patient completed that day,
- * summed across every module (exercise, nutrition, sleep, symptoms).
+ * Daily COMPLIANCE across every module (exercise, nutrition, sleep, symptoms).
  *
- * A "task" is any tracked metric with a positive goal (`goal > 0`). A task counts as
- * complete when its logged `value >= goal`. Symptom metrics have `goal: 0` (you don't
- * "aim" for a pain level), so they contribute zero tasks and drop out naturally — yet we
- * still iterate them, so the definition is genuinely "across all modules" as specced.
+ * A "task" is any tracked metric with a positive goal (`goal > 0`); symptom metrics have
+ * `goal: 0` (you don't "aim" for a pain level) so they drop out naturally.
  *
- * No per-module weighting yet: every task counts equally (4 goals, 3 done → 75%).
- * Pure and dependency-free, unit-testable like the rest of lib/engagement.
+ * `pct` is GRADED: the mean of each task's fraction toward its goal, capped at 100% per task
+ * (`min(value/goal, 1)`). This is what distinguishes a diligent patient who does ~80% of
+ * everything (80%) from a reluctant one who does ~30% (30%) — a purely binary "did you hit the
+ * goal exactly?" rule collapses both toward 0% and makes them look identical (a real finding
+ * from the multi-policy suite, item 10.1). `completedTasks`/`totalTasks` still report the strict
+ * count of tasks fully met, for the "how many did you finish outright" view.
+ *
+ * No per-module weighting yet — every task counts equally. Pure + unit-testable.
  */
 
 export type DayCompliance = {
-    completedTasks: number;
+    completedTasks: number; // tasks where value >= goal (strict/binary)
     totalTasks: number;
-    /** 0–100, or null when the day had no goal-bearing tasks at all. */
+    /** GRADED 0–100 (mean of per-task min(value/goal,1)), or null when no goal-bearing tasks. */
     pct: number | null;
 };
 
@@ -36,6 +39,7 @@ export function getDayCompliance(
 ): DayCompliance {
     let completedTasks = 0;
     let totalTasks = 0;
+    let gradedSum = 0;
 
     for (const mod of state?.modules ?? []) {
         const trackables = mod.progress?.trackables ?? [];
@@ -45,7 +49,9 @@ export function getDayCompliance(
                 const goal = metric.goal ?? 0;
                 if (goal <= 0) continue; // symptoms (goal 0) and untracked metrics excluded
                 totalTasks++;
-                if ((metric.value ?? 0) >= goal) completedTasks++;
+                const value = metric.value ?? 0;
+                gradedSum += Math.min(value / goal, 1); // cap overshoot at 100% per task
+                if (value >= goal) completedTasks++;
             }
         }
     }
@@ -53,10 +59,7 @@ export function getDayCompliance(
     return {
         completedTasks,
         totalTasks,
-        pct:
-            totalTasks > 0
-                ? Math.round((completedTasks / totalTasks) * 100)
-                : null,
+        pct: totalTasks > 0 ? Math.round((gradedSum / totalTasks) * 100) : null,
     };
 }
 
