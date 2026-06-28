@@ -17,6 +17,7 @@ import {
     ACL_PROFILE,
     HIP_PROFILE,
 } from "./templates/profile";
+import { seedPatientMemory } from "@/lib/memory/service";
 
 /**
  * Preset patient archetypes bundling all template data
@@ -199,6 +200,11 @@ export async function seedPatient(
                 profile: config.profile,
             },
         });
+
+        // 6.5. Seed PatientMemory from the profile — exactly what onboarding's save_profile does
+        // in production. The harness patient skips real onboarding, so without this it would have
+        // no memory and the consolidation/compaction path would never be exercised by the e2e.
+        await seedPatientMemory(user.id, config.profile);
 
         // 7. Auto-assign to dev admin if in development mode and flag is true
         if (assignToDevAdmin && process.env.NODE_ENV === "development") {

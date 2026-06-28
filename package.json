@@ -15,6 +15,7 @@
         "harness:notifications": "node scripts/harness/e2e-notifications.mjs",
         "harness:scan": "node scripts/harness/scan-log.mjs",
         "usage": "node scripts/harness/usage-report.mjs",
+        "memory": "node scripts/harness/memory-report.mjs",
         "seed": "npx tsx scripts/seed-patients.ts",
         "seed:help": "npx tsx scripts/seed-patients.ts --help",
         "cf:build": "prisma generate && opennextjs-cloudflare build",

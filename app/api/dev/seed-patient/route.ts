@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { seedPatient } from "@/lib/dev/seed-patient";
+import { seedPatientMemory } from "@/lib/memory/service";
 
 /**
  * Dev-only: ensure a fixed "harness" patient exists (fully onboarded, so it lands
@@ -28,6 +29,9 @@ export async function POST() {
                 select: { profile: true },
             });
             if (user?.profile) {
+                // Backfill PatientMemory for harness patients created before memory seeding
+                // existed (idempotent — no-op if already present).
+                await seedPatientMemory(existing.user_id, user.profile);
                 return NextResponse.json({
                     email: HARNESS_EMAIL,
                     password: HARNESS_PASSWORD,

@@ -249,6 +249,38 @@ async function main() {
         `${metricRows.length} rows, ${withCompliance} w/ compliance, ${withPain} w/ pain`,
     );
 
+    // 4b. Context observability (TODO item 10): inspect the compacted plan-gen context for the
+    // final day — memory content + the compaction ratio (transcript vs what we actually send).
+    const lastDate = dateStr(stateIds.length - 1);
+    const { body: obs } = await c.postJson("/api/dev/state", {
+        op: "context",
+        date: lastDate,
+    });
+    if (obs && typeof obs.compactionRatio === "number") {
+        const ep = (obs.memory?.episodic ?? [])
+            .map((s) => `${s.phase}:${s.chars}c${s.closed ? "(closed)" : ""}`)
+            .join(" ");
+        console.log(
+            `   context@day${obs.recoveryDay ?? "?"}: memory ${obs.memory?.totalChars ?? 0}c ` +
+                `(semantic ${obs.memory?.semanticChars ?? 0}c, episodic[${ep || "none"}]) · ` +
+                `digest ${obs.digestChars}c (rolling ${obs.rollingTrendChars}c) · raw ${obs.rawWindow?.chars ?? 0}c/${obs.rawWindow?.messages ?? 0}msg`,
+        );
+        console.log(
+            `   compaction: transcript ${obs.fullTranscriptChars}c vs conversational context ${obs.conversationalContextChars}c = ${obs.compactionRatio}× ` +
+                `(+ digest ${obs.digestChars}c overhead) · profileInSemantic=${obs.memory?.profileInSemantic}`,
+        );
+        // Observability is reported, not gated on a magic ratio (the ratio is a trend metric —
+        // it climbs as memory absorbs conversation). Assert only that the snapshot is well-formed.
+        record(
+            "context observability returned",
+            obs.compactedContextChars > 0 &&
+                typeof obs.compactionRatio === "number",
+            `context ${obs.compactedContextChars}c, ${obs.compactionRatio}×`,
+        );
+    } else {
+        record("context observability", false, "no observability returned");
+    }
+
     // 5. Flags produced by THIS policy (no prior on which fire).
     const { body: flagData } = await c.postJson("/api/dev/state", {
         op: "flags",

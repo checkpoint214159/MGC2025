@@ -149,3 +149,43 @@ asOf)` aggregates the persisted `DailyMetric` rows over sliding windows (7d, pri
 Net effect on the plan-gen prompt: same three cached layers, but the digest layer now carries
 week-over-week + monthly trend direction, and the graph stopped computing two large unused
 artifacts per generation.
+
+## 10 — Observability + compression heuristics
+
+Instrumentation added to _measure_ the memory system (and to "observe the logs, loop until the
+compression is satisfactory"):
+
+-   **Structured logs** (`[memory]` per generation, `[memory-consolidation]` per consolidation,
+    via `createLogger("state-gen")`) carry layer sizes, the actual memory content (semantic chars
+    -   per-phase episodic chars/closed), provenance (raw-window source msgs, `hasDoctorNote`,
+        watermark, `profileInSemantic`), and the **compaction ratio**.
+-   **`lib/state/services/generation-context.ts`** `assembleGenerationContext()` is now the single
+    source of truth for the context (used by both `load_context` and the dev op) and computes the
+    `MemoryObservability` snapshot.
+-   **Dev `context` op** (`/api/dev/state` `{op:"context",date}`) returns that snapshot over HTTP
+    with no generation — so the harness/operator can inspect compaction without server-log access.
+-   **`npm run memory`** aggregates the `[memory]`/`[memory-consolidation]` lines from
+    `.dev/server.log` into a per-day compaction table + consolidation summary.
+-   The **e2e trajectory** prints the final-day context snapshot and asserts the snapshot is
+    well-formed.
+
+**Compaction metric (corrected).** First cut wrongly put the digest (computed signals, not from
+the transcript) in the denominator, so a short-history context read as 0.64×. Fixed:
+`compactionRatio = fullTranscriptChars / (memoryChars + rawWindowChars)` — memory + the raw
+window are what _replace_ the verbatim transcript; the digest is common overhead reported
+separately. Near 1 early; climbs as memory absorbs more conversation while the raw window stays
+bounded.
+
+**Observed (and looped on).** The first run surfaced two real issues, both fixed:
+
+1. the harness patient had **no PatientMemory** (it skips real onboarding) → seeded it in
+   `seedPatient` + backfilled on the seed route's reuse path, matching production's onboarding
+   `seedPatientMemory`. 2. the metric bug above. After the fixes a `days=3` standard-policy run
+   shows: `memory 1335c (semantic) · raw 0c · digest 648c · compaction 1.06×` — the conversational
+   context is **bounded** (~1.3KB) and does not grow with the number of logged days, which is the
+   satisfactory compression property.
+
+**Follow-up to see the ratio _climb_:** the trajectory adds no new conversation, so the raw
+window never crosses `CONSOLIDATION_CHAR_THRESHOLD` (4000c) and consolidation doesn't fire during
+a run. To exercise consolidation/compaction growth, feed daily chat/doctor-note prose (or lower
+`MEMORY_CONSOLIDATION_CHAR_THRESHOLD`); the instrumentation is ready to measure it.

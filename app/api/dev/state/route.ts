@@ -10,6 +10,7 @@ import { getPainSeries } from "@/lib/engagement/arc";
 import { evaluateRecoveryFlags } from "@/lib/engagement/flags";
 import { getComplianceSeries } from "@/lib/engagement/compliance";
 import { getDailyMetrics } from "@/lib/metrics/service";
+import { assembleGenerationContext } from "@/lib/state/services/generation-context";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -23,6 +24,7 @@ import { prisma } from "@/lib/prisma";
  *   history: {}                                       — full ordered state chain
  *   flags:   { complianceThreshold?: number }         — pain + compliance flags over history
  *   metrics: {}                                       — persisted DailyMetric rows (asc by date)
+ *   context: { date? }                                — assembled context observability (no gen)
  *   profile: {}                                       — name + onboarding profile/semantic memory
  *   reset:   {}                                       — delete this patient's states + metrics
  */
@@ -90,6 +92,14 @@ export async function POST(req: Request) {
             case "metrics": {
                 const metrics = await getDailyMetrics(userId);
                 return NextResponse.json(metrics);
+            }
+            case "context": {
+                // Inspect the assembled plan-gen context + observability for a date WITHOUT
+                // generating (no LLM). Returns layer sizes, memory content/provenance, and the
+                // compaction ratio (TODO item 10).
+                const date = body.date ? new Date(body.date) : new Date();
+                const ctx = await assembleGenerationContext(userId, date);
+                return NextResponse.json(ctx.observability);
             }
             case "reset": {
                 // Clean slate for a deterministic trajectory run: drop this patient's

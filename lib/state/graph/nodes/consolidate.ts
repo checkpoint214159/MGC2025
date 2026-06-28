@@ -1,6 +1,18 @@
 import { consolidateMemory } from "@/lib/memory/consolidate";
 import { applyConsolidation, persistPatientMemory } from "@/lib/memory/service";
 import { StateGenerationLangGraphState } from "@/lib/state/graph/annotation";
+import type { PatientMemory } from "@/lib/memory/schema";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("state-gen");
+
+/** Total prose chars held in a memory (semantic facts + every phase narrative). */
+function memoryChars(m: PatientMemory): number {
+    return (
+        m.semantic.length +
+        m.episodic.reduce((n, s) => n + s.narrative.length, 0)
+    );
+}
 
 /**
  * Node: consolidate_memory (conditional)
@@ -42,9 +54,36 @@ export async function consolidateMemoryNode(
                 ? "doctor_note"
                 : "threshold",
         });
-        console.log(
-            `[state-gen] ✓ consolidated memory | +${output.newSemanticFacts.length} fact(s) | ` +
-                `phase=${state.recoveryPhase} | window folded (${state.rawWindow.messageCount} msg)`,
+
+        // Compression heuristic (TODO item 10): how many raw prose chars were folded into each
+        // new char of long-running memory. High ratio = the consolidation is genuinely compacting.
+        const rawFolded = state.rawWindow.text.length;
+        const before = memoryChars(state.patientMemory);
+        const after = memoryChars(updated);
+        const memoryDelta = after - before;
+        const compression = Number(
+            (rawFolded / Math.max(1, memoryDelta)).toFixed(2),
+        );
+        log.info(
+            `[memory-consolidation] ${JSON.stringify({
+                userId: state.userId,
+                phase: state.recoveryPhase,
+                recoveryDay: state.recoveryDay,
+                trigger: state.rawWindow.hasDoctorNote
+                    ? "doctor_note"
+                    : "threshold",
+                rawFoldedChars: rawFolded,
+                rawMsgs: state.rawWindow.messageCount,
+                newFacts: output.newSemanticFacts.length,
+                memoryBeforeChars: before,
+                memoryAfterChars: after,
+                memoryDeltaChars: memoryDelta,
+                compressionRatio: compression,
+            })}`,
+        );
+        log.info(
+            `✓ consolidated memory | +${output.newSemanticFacts.length} fact(s) | phase=${state.recoveryPhase} | ` +
+                `folded ${rawFolded}c/${state.rawWindow.messageCount}msg → +${memoryDelta}c memory (${compression}× compression)`,
         );
 
         return {
