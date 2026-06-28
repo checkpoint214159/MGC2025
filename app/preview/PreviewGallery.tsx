@@ -65,10 +65,10 @@ export function PreviewGallery() {
                     Engagement revamp — component preview
                 </h1>
                 <a
-                    href="/preview/mgc"
+                    href="/preview"
                     className="inline-flex items-center gap-1.5 text-[14px] font-medium text-accent-ink hover:underline"
                 >
-                    → MGC mockup: patient dashboard (S4) with the recovery arc
+                    ← All pages
                 </a>
             </header>
 

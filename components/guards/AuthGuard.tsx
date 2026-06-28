@@ -10,7 +10,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
 
     const publicRoutes = ["/login", "/signup"];
-    const isPublicRoute = publicRoutes.includes(pathname);
+    // /preview/* are dev-only mockups (proxy.ts 404s them in production); let them
+    // render without auth so the demo flow is reachable straight from `npm run dev`.
+    const isPublicRoute =
+        publicRoutes.includes(pathname) || pathname.startsWith("/preview");
 
     useEffect(() => {
         if (status === "loading") return;
@@ -20,7 +23,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         }
     }, [status, router, pathname]);
 
-    if (status === "loading") return <div>Loading...</div>;
+    // Public routes (login, signup, /preview/* mockups) need no session — render them
+    // immediately so they SSR and don't flash a loading gate.
+    if (status === "loading" && !isPublicRoute) return <div>Loading...</div>;
 
     return <>{children}</>;
 }

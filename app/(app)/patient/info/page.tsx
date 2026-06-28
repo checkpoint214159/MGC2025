@@ -67,7 +67,7 @@ export default function OnboardingFlow() {
     }
 
     return (
-        <div className="flex min-h-screen flex-col items-center px-5 py-12 md:py-16">
+        <div className="flex flex-col items-center justify-start min-h-screen bg-bg p-6 overflow-hidden pt-20">
             {onboardingState.phase === "biometrics" && <SubmitBiometricsPage />}
 
             {onboardingState.phase === "collect_screening_responses" && (
@@ -98,7 +98,7 @@ function LoadingScreen({ message }: { message: string }) {
 
 function ScreeningBlockedScreen() {
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center px-5 text-center">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-bg p-6 text-center">
             <div className="max-w-md space-y-4">
                 <div className="mx-auto grid size-12 place-items-center rounded-full bg-attention-soft text-attention-ink">
                     <Stethoscope size={24} strokeWidth={1.75} />

@@ -63,17 +63,18 @@ export function QuestionPage({
     const visibleHistory = previousQuestions.slice(-2);
 
     return (
-        <div className="w-full max-w-xl flex flex-col gap-6">
-            {/* Progress pips — one per question answered so far */}
-            <div className="flex gap-2 justify-center px-10 mb-4">
-                {Array.from({ length: questionCount }).map((_, i) => (
-                    <motion.div
-                        key={i}
-                        layoutId={`pip-${i}`}
-                        className="h-1.5 flex-1 rounded-full bg-accent"
-                    />
-                ))}
-            </div>
+        <div className="flex flex-col items-center justify-start min-h-screen bg-bg p-6 overflow-hidden pt-20">
+            <div className="w-full max-w-xl flex flex-col gap-6">
+                {/* Progress pips — one per question answered so far */}
+                <div className="flex gap-2 justify-center px-10 mb-4">
+                    {Array.from({ length: questionCount }).map((_, i) => (
+                        <motion.div
+                            key={i}
+                            layoutId={`pip-${i}`}
+                            className="h-1.5 flex-1 rounded-full bg-blue-600"
+                        />
+                    ))}
+                </div>
 
             {/* Scroll stack of previous questions (faded) */}
             <div className="flex flex-col gap-6 transition-all duration-700">
