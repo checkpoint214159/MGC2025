@@ -3,7 +3,7 @@
 import { ReactNode, useState } from "react";
 import {
     Bell, Search, MessageCircle, Salad, Activity, Droplets, Moon, Star, CalendarDays,
-    Check, Home, ClipboardList, BarChart3, User, ChevronRight,
+    Check, Home, ClipboardList, BarChart3, User, ChevronRight, ChevronDown, Plus,
 } from "lucide-react";
 import { PhaseScope } from "@/components/wally/PhaseScope";
 import { CircularProgress } from "@/components/wally/CircularProgress";
@@ -36,10 +36,40 @@ const MEALS = [
     { emoji: "🥛", label: "Snacks", kcal: 100 },
 ];
 
+const URINE = [
+    { label: "Pale", color: "oklch(0.95 0.05 100)" },
+    { label: "Normal", color: "oklch(0.86 0.13 92)" },
+    { label: "Dark", color: "oklch(0.6 0.13 70)" },
+];
+const DISRUPTIONS = ["Pain", "Bathroom trips", "Discomfort", "Anxiety"];
+
+function Pill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className={cn(
+                "rounded-full border px-3 py-1.5 text-[13px] font-medium transition-colors",
+                active ? "border-accent bg-accent-soft text-accent-ink" : "border-border text-ink-muted hover:bg-surface-sunken",
+            )}
+        >
+            {label}
+        </button>
+    );
+}
+
 export function WallyDashboard() {
     const [walkDone, setWalkDone] = useState(true);
     const [sitUpsDone, setSitUpsDone] = useState(false);
     const [feedback, setFeedback] = useState<string | null>(null);
+    // light tap-to-log state
+    const [hydrationOpen, setHydrationOpen] = useState(false);
+    const [glasses, setGlasses] = useState(5);
+    const [urine, setUrine] = useState("Normal");
+    const [sleepOpen, setSleepOpen] = useState(false);
+    const [quality, setQuality] = useState("Good");
+    const [disruptions, setDisruptions] = useState<string[]>(["Pain"]);
+    const toggleDisruption = (d: string) => setDisruptions((s) => (s.includes(d) ? s.filter((x) => x !== d) : [...s, d]));
 
     return (
         <div className="mx-auto max-w-md px-4 py-6">
@@ -130,30 +160,85 @@ export function WallyDashboard() {
                     <p className="mt-2 text-[12px] text-ink-subtle">Tip: tap a completed task to log how it went.</p>
                 </SectionCard>
 
-                {/* hydration */}
+                {/* hydration — tap to log */}
                 <div className="rounded-2xl border border-border bg-surface p-4">
-                    <div className="mb-3 flex items-center gap-2">
+                    <button type="button" onClick={() => setHydrationOpen((o) => !o)} className="flex w-full items-center gap-2">
                         <Droplets size={18} className="text-accent-ink" />
-                        <h3 className="flex-1 text-[16px] font-semibold text-accent-ink">Hydration</h3>
-                        <Chip tone="accent">5 / 8 Glasses</Chip>
-                    </div>
-                    <div className="flex gap-1.5">
+                        <h3 className="flex-1 text-left text-[16px] font-semibold text-accent-ink">Hydration</h3>
+                        <Chip tone="accent">{glasses} / 8 Glasses</Chip>
+                        <ChevronDown size={18} className={cn("text-ink-subtle transition-transform", hydrationOpen && "rotate-180")} />
+                    </button>
+                    <div className="mt-3 flex gap-1.5">
                         {Array.from({ length: 8 }).map((_, i) => (
-                            <Droplets key={i} size={22} className={i < 5 ? "fill-accent text-accent" : "text-border-strong"} />
+                            <Droplets key={i} size={22} className={i < glasses ? "fill-accent text-accent" : "text-border-strong"} />
                         ))}
                     </div>
+                    {hydrationOpen && (
+                        <div className="mt-4 space-y-4 border-t border-border pt-4">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[14px] text-ink">Just drank a glass?</span>
+                                <Button size="sm" variant="secondary" onClick={() => setGlasses((g) => Math.min(8, g + 1))}>
+                                    <Plus size={15} strokeWidth={2} /> Add a glass
+                                </Button>
+                            </div>
+                            <div>
+                                <p className="mb-1.5 text-[13px] font-medium text-ink">
+                                    Urine colour <span className="font-normal text-ink-subtle">— a quick hydration check</span>
+                                </p>
+                                <div className="flex gap-2">
+                                    {URINE.map((u) => (
+                                        <button
+                                            key={u.label}
+                                            type="button"
+                                            onClick={() => setUrine(u.label)}
+                                            className={cn(
+                                                "flex flex-1 flex-col items-center gap-1 rounded-lg border px-2 py-2 text-[12px] font-medium transition-colors",
+                                                urine === u.label ? "border-accent bg-accent-soft/40 text-accent-ink" : "border-border text-ink-muted hover:bg-surface-sunken",
+                                            )}
+                                        >
+                                            <span className="size-6 rounded-full border border-border-strong" style={{ background: u.color }} />
+                                            {u.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                {/* sleep */}
+                {/* sleep — tap to log */}
                 <div className="rounded-2xl border border-border bg-surface p-4">
-                    <div className="mb-3 flex items-center gap-2">
+                    <button type="button" onClick={() => setSleepOpen((o) => !o)} className="flex w-full items-center gap-2">
                         <Moon size={18} className="text-accent-ink" />
-                        <h3 className="flex-1 text-[16px] font-semibold text-accent-ink">Sleep</h3>
+                        <h3 className="flex-1 text-left text-[16px] font-semibold text-accent-ink">Sleep</h3>
                         <Chip tone="accent">7.4 / 8 Hours</Chip>
-                    </div>
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-surface-sunken">
+                        <ChevronDown size={18} className={cn("text-ink-subtle transition-transform", sleepOpen && "rotate-180")} />
+                    </button>
+                    <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-surface-sunken">
                         <div className="h-full rounded-full bg-accent" style={{ width: "92%" }} />
                     </div>
+                    {sleepOpen && (
+                        <div className="mt-4 space-y-4 border-t border-border pt-4">
+                            <div>
+                                <p className="mb-1.5 text-[13px] font-medium text-ink">How was your sleep?</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {["Poor", "Fair", "Good", "Excellent"].map((q) => (
+                                        <Pill key={q} label={q} active={quality === q} onClick={() => setQuality(q)} />
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <p className="mb-1.5 text-[13px] font-medium text-ink">
+                                    Anything wake you? <span className="font-normal text-ink-subtle">(optional)</span>
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {DISRUPTIONS.map((d) => (
+                                        <Pill key={d} label={d} active={disruptions.includes(d)} onClick={() => toggleDisruption(d)} />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* tip (amber) */}
