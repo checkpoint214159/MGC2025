@@ -76,6 +76,7 @@ model User {
   flags Flag[] @relation("PatientFlags")
 
   pushSubscriptions PushSubscription[]
+  dailyMetrics      DailyMetric[]
 }
 
 // Long-running, consolidated PATIENT MEMORY (context-compaction layer for plan generation).
@@ -304,6 +305,29 @@ model PushSubscription {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+// One row per patient per day: the persisted daily COMPLIANCE (% of goal-bearing tasks
+// completed across all modules) and PAIN score. Derived from the day's State whenever
+// progress is logged, so flags/notifications/report read a stable series instead of
+// recomputing from module JSON each time. Upserted on (userId, date) — Neon HTTP has no
+// transactions, so writes go findUnique→update/create.
+model DailyMetric {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  date           DateTime @db.Date
+  compliancePct  Int? // 0–100, null when the day had no goal-bearing tasks
+  completedTasks Int      @default(0)
+  totalTasks     Int      @default(0)
+  painScore      Int? // 0–10, null when no pain logged that day
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId, date])
 }
 
 // Human-in-the-loop flag raised when recovery stalls (S7), e.g. pain not decreasing

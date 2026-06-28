@@ -15,7 +15,8 @@ export type FlagKind =
     | "nearing_completion"
     | "progress_stalled"
     | "progress_dropping"
-    | "pain_stagnation";
+    | "pain_stagnation"
+    | "low_compliance";
 export type RecoveryFlag = {
     kind: FlagKind;
     severity: FlagSeverity;
@@ -28,6 +29,8 @@ const NEAR_COMPLETE_PCT = 90; // at/above this (but < 100) → ready for the fin
 const STALL_WINDOW = 7; // days
 const MIN_WEEKLY_GAIN = 3; // percentage points; less than this over the window = stalled
 const DROP_DAYS = 2; // consecutive day-over-day declines
+const LOW_COMPLIANCE_PCT = 50; // mean daily compliance under this over the window = flag
+const LOW_COMPLIANCE_WINDOW = 3; // days of trailing compliance to average
 
 const SEVERITY_RANK: Record<FlagSeverity, number> = {
     critical: 3,
@@ -85,13 +88,36 @@ export function getProgressRegression(
 }
 
 /**
+ * Mean daily COMPLIANCE over the trailing `window` days is under `threshold`. Distinct from
+ * `progress_*` (which read cumulative recovery progress); this reads how much of each day's
+ * plan the patient actually completed. Needs the full window of days before it can fire.
+ */
+export function getLowComplianceSignal(
+    series: DayProgress[],
+    threshold = LOW_COMPLIANCE_PCT,
+    window = LOW_COMPLIANCE_WINDOW,
+): { low: boolean; mean: number | null; window: number; threshold: number } {
+    if (series.length < window)
+        return { low: false, mean: null, window, threshold };
+    const recent = series.slice(-window);
+    const mean = Math.round(
+        recent.reduce((s, d) => s + d.progress, 0) / recent.length,
+    );
+    return { low: mean < threshold, mean, window, threshold };
+}
+
+/**
  * Evaluate every flag rule and return matching flags, most severe first. A 2-day drop
  * supersedes the gentler "stalled"/"nearing completion" framings (a falling patient is
  * not "nearly done").
+ *
+ * `complianceThreshold` overrides the low-compliance cutoff (e.g. from a test harness).
  */
 export function evaluateRecoveryFlags(input: {
     progress?: DayProgress[];
     pain?: DayPain[];
+    compliance?: DayProgress[];
+    complianceThreshold?: number;
 }): RecoveryFlag[] {
     const progress = input.progress ?? [];
     const flags: RecoveryFlag[] = [];
@@ -137,6 +163,22 @@ export function evaluateRecoveryFlags(input: {
                 title: "Pain not decreasing",
                 detail: `Pain held at ${pain.to}/10 over the last ${pain.window} days, above the expected curve.`,
                 action: "Escalate to the surgeon",
+            });
+        }
+    }
+
+    if (input.compliance) {
+        const comp = getLowComplianceSignal(
+            input.compliance,
+            input.complianceThreshold,
+        );
+        if (comp.low) {
+            flags.push({
+                kind: "low_compliance",
+                severity: "attention",
+                title: "Low plan compliance",
+                detail: `Completed an average of ${comp.mean}% of the daily plan over the last ${comp.window} days (under the ${comp.threshold}% threshold).`,
+                action: "Check in on barriers to following the plan",
             });
         }
     }

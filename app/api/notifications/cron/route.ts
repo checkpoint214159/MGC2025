@@ -28,7 +28,19 @@ export async function POST(req: Request) {
     }
 
     try {
-        const summary = await runNotificationCron();
+        // Optional override so a test harness can keep the cron's low-compliance cutoff in
+        // lockstep with its own flag evaluation. Body is optional; ignore parse failures.
+        const body = await req.json().catch(() => ({}));
+        const complianceThreshold =
+            typeof body?.complianceThreshold === "number"
+                ? body.complianceThreshold
+                : undefined;
+        const userId =
+            typeof body?.userId === "string" ? body.userId : undefined;
+        const summary = await runNotificationCron({
+            complianceThreshold,
+            userId,
+        });
         console.log(
             `[cron] notifications: ${summary.processed} patient(s) processed, ` +
                 `${summary.results.reduce(

@@ -52,6 +52,27 @@ export function painAlertEmail(name: string, detail: string): EmailPayload {
     };
 }
 
+/** Driven by the low_compliance flag: the patient is logging but completing too little of the plan. */
+export function complianceAlertEmail(
+    name: string,
+    meanPct: number,
+    threshold: number,
+): EmailPayload {
+    return {
+        to: "",
+        subject: "Let's get your recovery plan back on track",
+        html: `
+<p>Hi ${name},</p>
+<p>We've noticed you've been completing around ${meanPct}% of your daily recovery plan over the last few days — below the ${threshold}% we'd like to see. That's completely okay, recovery has ups and downs.</p>
+<p>If something is making the plan hard to follow (pain, time, motivation), your care team can help adjust it. Even partial progress today keeps you moving forward.</p>
+<p><a href="${
+            process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+        }/patient/dashboard">Open your dashboard →</a></p>
+<p>Take care,<br/>Your recovery team</p>
+`,
+    };
+}
+
 export function lowComplianceEmail(
     name: string,
     missedDays: number,

@@ -68,6 +68,7 @@ export const ModelName = {
     GraphConfig: "GraphConfig",
     ModuleComment: "ModuleComment",
     PushSubscription: "PushSubscription",
+    DailyMetric: "DailyMetric",
     Flag: "Flag",
 } as const;
 
@@ -284,6 +285,21 @@ export const PushSubscriptionScalarFieldEnum = {
 
 export type PushSubscriptionScalarFieldEnum =
     (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum];
+
+export const DailyMetricScalarFieldEnum = {
+    id: "id",
+    userId: "userId",
+    date: "date",
+    compliancePct: "compliancePct",
+    completedTasks: "completedTasks",
+    totalTasks: "totalTasks",
+    painScore: "painScore",
+    createdAt: "createdAt",
+    updatedAt: "updatedAt",
+} as const;
+
+export type DailyMetricScalarFieldEnum =
+    (typeof DailyMetricScalarFieldEnum)[keyof typeof DailyMetricScalarFieldEnum];
 
 export const FlagScalarFieldEnum = {
     id: "id",

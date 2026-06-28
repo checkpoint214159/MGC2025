@@ -1,20 +1,55 @@
-// E2E state-trajectory journey: seeds an onboarded patient then simulates N recovery
-// days — generate state → log progress → advance date → repeat.  Asserts per step:
-// state generates, modules present, progress logging succeeds, no server-log errors.
-// After the run: verifies the causal chain, the pain series, and that the pain-stagnation
-// flag fires when pain plateaus for ≥3 days.
+// Policy-driven E2E trajectory (TODO items 7 + 8).
 //
-//   npm run dev:logged         # one terminal
-//   npm run harness:trajectory
+// Simulates a multi-day patient↔app interaction. A natural-language POLICY conditions an
+// LLM "patient" (scripts/harness/_simulator.mjs) that responds to each day's generated plan —
+// deciding how much of each task to complete and what pain to report. The harness logs each
+// interaction task-wise, persists a running markdown memory per session, then verifies that
+// whatever flags the policy produced (pain_stagnation / low_compliance) are matched by a
+// corresponding notification from the cron. There is NO prior about which flags trip — the
+// test asserts FLAG ⟺ NOTIFICATION consistency, whatever the policy yields.
 //
-// Exit 0 = all green, 1 = a step failed.
+//   npm run dev:logged
+//   npm run harness:trajectory -- policy="only do about 30% of each task; pain stays around 6"
+//   (also: days=14  complianceThreshold=50  name=reluctant  model=deepseek/deepseek-chat)
+//
+// Exit 0 = all assertions green, 1 = a failure.
+
+import { config } from "dotenv";
+config({ path: ".env.local" });
 
 import { createClient, sleep } from "./_http.mjs";
 import { scanLog, logSize } from "./_shared.mjs";
+import { decidePatientActions, SIM_MODEL } from "./_simulator.mjs";
+import { extractTasks, buildUpdates, formatTaskLog } from "./_plan.mjs";
+import {
+    createSession,
+    appendDay,
+    appendBlock,
+    readDigest,
+} from "./_policy-memory.mjs";
 
-const N_DAYS = 4;
-// Pain series: starts at 6, drops to 5, then plateaus → triggers pain_stagnation on day 4
-const PAIN_BY_DAY = [6, 5, 5, 5];
+// ── args ──────────────────────────────────────────────────────────────────────
+function parseArgs(argv) {
+    const out = {};
+    for (const tok of argv) {
+        const m = tok.match(/^(\w+)=([\s\S]*)$/);
+        if (m) out[m[1]] = m[2];
+    }
+    return out;
+}
+const args = parseArgs(process.argv.slice(2));
+
+const DEFAULT_POLICY =
+    "You are a reluctant patient. Complete only about 30% of each prescribed task most days " +
+    "(occasionally a bit more or less). Your pain hovers around 6/10 and does not really improve.";
+
+const POLICY = args.policy ?? process.env.POLICY ?? DEFAULT_POLICY;
+const DAYS = Number(args.days ?? 14);
+const COMPLIANCE_THRESHOLD = Number(args.complianceThreshold ?? 50);
+const NAME = args.name ?? "trajectory";
+if (args.model) process.env.SIM_MODEL = args.model;
+
+const CRON_SECRET = process.env.CRON_SECRET ?? "";
 
 const c = createClient();
 const results = [];
@@ -26,48 +61,17 @@ function record(name, ok, detail) {
 async function stateOp(payload) {
     const before = logSize();
     const { res, body } = await c.postJson("/api/dev/state", payload);
-    await sleep(400);
+    await sleep(300);
     return { res, body, findings: scanLog(before).findings };
 }
 
-// Given a state's symptoms module, build updateModuleProgress updates that set
-// all pain metrics to painValue, preserving every other field.
-function buildPainUpdates(symModule, painValue) {
-    const trackables = symModule?.progress?.trackables ?? [];
-    return trackables.map((t) => {
-        const data = { ...t.data };
-        // Primary key is data.pain; fallback: any entry with .type === "pain"
-        if (data.pain && typeof data.pain === "object") {
-            data.pain = { ...data.pain, value: painValue };
-        } else {
-            for (const key of Object.keys(data)) {
-                if (data[key]?.type === "pain") {
-                    data[key] = { ...data[key], value: painValue };
-                }
-            }
-        }
-        return { id: t.id, data };
-    });
-}
+const dateStr = (offset) =>
+    new Date(Date.now() + offset * 86400000).toISOString().slice(0, 10);
 
-// Given any module, build updates that set every metric value to its goal
-// (simulating full completion for that module's trackables).
-function buildCompletionUpdates(mod) {
-    const trackables = mod?.progress?.trackables ?? [];
-    return trackables.map((t) => {
-        const data = { ...t.data };
-        for (const key of Object.keys(data)) {
-            if (data[key] && typeof data[key] === "object" && "goal" in data[key]) {
-                data[key] = { ...data[key], value: data[key].goal };
-            }
-        }
-        return { id: t.id, data };
-    });
-}
-
-// ISO date string (midnight UTC) for today + offsetDays
-function dateStr(offsetDays) {
-    return new Date(Date.now() + offsetDays * 86400000).toISOString().slice(0, 10);
+function recoveryDayOf(dateISO, surgeryDate) {
+    if (!surgeryDate) return null;
+    const ms = new Date(dateISO).getTime() - new Date(surgeryDate).getTime();
+    return Math.max(1, Math.floor(ms / 86400000) + 1);
 }
 
 async function main() {
@@ -75,148 +79,197 @@ async function main() {
         console.error(`✖ dev server not reachable at ${c.base}. Run \`npm run dev:logged\`.`);
         process.exit(1);
     }
-    if (logSize() === 0) {
-        console.log("⚠️  no .dev/server.log — runtime log scanning is OFF (run `npm run dev:logged`).\n");
+    if (!process.env.OPENROUTER_API_KEY) {
+        console.error("✖ OPENROUTER_API_KEY missing from .env.local — simulator can't run.");
+        process.exit(1);
     }
+    if (logSize() === 0)
+        console.log("⚠️  no .dev/server.log — log scanning OFF (run `npm run dev:logged`).\n");
 
-    // 1. Seed + login the standard harness patient (fully onboarded, no LLM calls).
-    const { res: seedRes, body: seedBody } = await c.postJson("/api/dev/seed-patient", {});
-    record("seed harness patient", seedRes.ok && seedBody?.email, seedBody?.error);
+    console.log(`\n━━ Policy trajectory: "${NAME}" ━━`);
+    console.log(`   days=${DAYS}  complianceThreshold=${COMPLIANCE_THRESHOLD}%  sim=${SIM_MODEL}`);
+    console.log(`   policy: ${POLICY}\n`);
+
+    // 1. Seed + login the standard harness patient (fully onboarded, no LLM onboarding).
+    const { res: seedRes, body: seed } = await c.postJson("/api/dev/seed-patient", {});
+    record("seed harness patient", seedRes.ok && !!seed?.email, seed?.error);
     if (!seedRes.ok) process.exit(1);
-
-    record("login", await c.login(seedBody.email, seedBody.password));
+    record("login", await c.login(seed.email, seed.password));
     const sess = await c.session();
     record("session valid", !!sess?.user?.id, sess?.user?.email);
     if (!sess?.user?.id) process.exit(1);
+    const userId = sess.user.id;
 
-    // 2. Drive N recovery days.
-    const generatedStateIds = [];
-    for (let i = 0; i < N_DAYS; i++) {
+    // 2. Patient conditioning: onboarding profile + surgery date.
+    const { body: prof } = await c.postJson("/api/dev/state", { op: "profile" });
+    const profileText = [prof?.profile, prof?.semantic].filter(Boolean).join("\n\n");
+    const surgeryDate = prof?.surgeryDate ?? null;
+    record("loaded patient profile", !!prof, prof?.treatment ?? "");
+
+    const session = createSession({
+        name: NAME,
+        policy: POLICY,
+        days: DAYS,
+        complianceThreshold: COMPLIANCE_THRESHOLD,
+        simModel: SIM_MODEL,
+    });
+    console.log(`   session memory → ${session}\n`);
+
+    // 3. Drive DAYS simulated days.
+    const stateIds = [];
+    let simFailures = 0;
+    for (let i = 0; i < DAYS; i++) {
         const day = i + 1;
         const date = dateStr(i);
-        const painValue = PAIN_BY_DAY[i];
-        console.log(`\n── Day ${day} (${date}, pain target=${painValue}) ──`);
+        const recoveryDay = recoveryDayOf(date, surgeryDate);
 
-        // Generate state for this day.
-        const { res, body: state, findings } = await stateOp({ op: "fetch", date, force: true });
+        const { res, body: state, findings } = await stateOp({
+            op: "fetch",
+            date,
+            force: true,
+        });
         const modules = state?.modules ?? [];
-        const hasModules = modules.length >= 3;
-        record(
-            `day ${day}: state generated`,
-            res.ok && !state?.error && hasModules && !findings.length,
-            state?.error ?? `${modules.length} modules${findings.length ? `, ${findings.length} log error(s)` : ""}`,
-        );
-        if (!res.ok || state?.error) continue;
-        generatedStateIds.push(state.id);
-
-        // Log pain on the symptoms module.
-        const symMod = modules.find((m) => m.type === "symptoms");
-        if (symMod) {
-            const painUpdates = buildPainUpdates(symMod, painValue);
-            if (painUpdates.length > 0) {
-                const { res: lr, body: lb, findings: lf } = await stateOp({
-                    op: "log",
-                    moduleId: symMod.id,
-                    updates: painUpdates,
-                });
-                record(
-                    `day ${day}: pain=${painValue} logged`,
-                    lr.ok && !lb?.error && !lf.length,
-                    lb?.error ?? (lf.length ? `${lf.length} log error(s)` : undefined),
-                );
-            } else {
-                record(`day ${day}: pain logged`, false, "no trackables in symptoms module");
+        if (!res.ok || state?.error || modules.length < 3) {
+            record(`day ${day}: state generated`, false, state?.error ?? `${modules.length} modules`);
+            simFailures++;
+            if (simFailures >= 3) {
+                record("aborting — 3 day failures", false);
+                return finish(session);
             }
-        } else {
-            record(`day ${day}: pain logged`, false, "no symptoms module in state");
+            continue;
+        }
+        stateIds.push(state.id);
+
+        // Patient (LLM) decides actions for today's tasks.
+        const { tasks, index } = extractTasks(state);
+        let decision;
+        try {
+            decision = await decidePatientActions({
+                policy: POLICY,
+                profile: profileText,
+                memoryDigest: readDigest(session),
+                day,
+                recoveryDay,
+                tasks,
+            });
+        } catch (e) {
+            record(`day ${day}: simulator`, false, e.message);
+            simFailures++;
+            if (simFailures >= 3) return finish(session);
+            continue;
         }
 
-        // Log completion on exercise module to build progress history.
-        const exMod = modules.find((m) => m.type === "exercise");
-        if (exMod) {
-            const exUpdates = buildCompletionUpdates(exMod);
-            if (exUpdates.length > 0) {
-                const { res: er, body: eb } = await stateOp({
-                    op: "log",
-                    moduleId: exMod.id,
-                    updates: exUpdates,
-                });
-                record(
-                    `day ${day}: exercise progress logged`,
-                    er.ok && !eb?.error,
-                    eb?.error,
-                );
-            }
+        // Apply the decision via per-module log ops.
+        const updates = buildUpdates(state, decision.actions, { tasks, index }, decision.pain);
+        let logErr = null;
+        for (const u of updates) {
+            const { body: lb, findings: lf } = await stateOp({
+                op: "log",
+                moduleId: u.moduleId,
+                updates: u.updates,
+            });
+            if (lb?.error) logErr = lb.error;
+            if (lf.length) logErr = `${lf.length} log error(s)`;
         }
 
-        // Throttle between days so state-gen LLM calls don't overlap.
-        if (i < N_DAYS - 1) await sleep(1000);
+        const taskLog = formatTaskLog(tasks, decision.actions);
+        const line = `Day ${day} (rec ${recoveryDay ?? "?"}) · ${taskLog} · pain ${decision.pain}/10 · "${decision.note}"`;
+        appendDay(session, line);
+        console.log(`   ${line}`);
+        record(`day ${day}: logged ${tasks.length} task(s)`, !logErr && !findings.length, logErr ?? undefined);
+
+        if (i < DAYS - 1) await sleep(800);
     }
 
-    // 3. History + causal chain.
-    console.log("\n── Post-run assertions ──");
-    const { res: hr, body: history } = await c.postJson("/api/dev/state", { op: "history" });
-    const trajectoryStates = (Array.isArray(history) ? history : []).filter((s) =>
-        generatedStateIds.includes(s.id),
-    );
+    // 4. Post-run: history + persisted metrics (verifies 7.5 end-to-end).
+    console.log("\n── assertions ──");
+    const { body: history } = await c.postJson("/api/dev/state", { op: "history" });
+    const traj = (Array.isArray(history) ? history : []).filter((s) => stateIds.includes(s.id));
+    record(`history has ${stateIds.length} trajectory states`, traj.length === stateIds.length, `found ${traj.length}`);
 
+    const { body: metrics } = await c.postJson("/api/dev/state", { op: "metrics" });
+    const metricRows = Array.isArray(metrics) ? metrics : [];
+    const withCompliance = metricRows.filter((m) => m.compliancePct !== null).length;
+    const withPain = metricRows.filter((m) => m.painScore !== null).length;
     record(
-        `history: ${N_DAYS} trajectory states`,
-        hr.ok && trajectoryStates.length === N_DAYS,
-        `found ${trajectoryStates.length}/${N_DAYS}`,
+        "DailyMetric rows persisted (compliance + pain)",
+        metricRows.length >= stateIds.length && withCompliance > 0 && withPain > 0,
+        `${metricRows.length} rows, ${withCompliance} w/ compliance, ${withPain} w/ pain`,
     );
 
-    // Verify causal chain: each state[i].causalStateId should equal state[i-1].id.
-    // States come from getStateHistory ordered oldest→newest.
-    const orderedIds = trajectoryStates
-        .sort((a, b) => new Date(a.dateCreated).getTime() - new Date(b.dateCreated).getTime())
-        .map((s) => s.id);
+    // 5. Flags produced by THIS policy (no prior on which fire).
+    const { body: flagData } = await c.postJson("/api/dev/state", {
+        op: "flags",
+        complianceThreshold: COMPLIANCE_THRESHOLD,
+    });
+    const firedKinds = new Set((flagData?.flags ?? []).map((f) => f.kind));
+    const painFired = firedKinds.has("pain_stagnation");
+    const compFired = firedKinds.has("low_compliance");
+    const meanCompliance =
+        metricRows.length > 0
+            ? Math.round(
+                  metricRows
+                      .filter((m) => m.compliancePct !== null)
+                      .reduce((s, m) => s + m.compliancePct, 0) /
+                      Math.max(1, withCompliance),
+              )
+            : null;
+    console.log(
+        `   flags fired: [${[...firedKinds].join(", ") || "none"}]` +
+            ` · mean compliance ${meanCompliance}% · last pain ${flagData?.painSeries?.slice(-1)[0]?.pain ?? "?"}`,
+    );
 
-    let chainOk = true;
-    for (let i = 1; i < trajectoryStates.length; i++) {
-        const s = trajectoryStates.find((x) => x.id === orderedIds[i]);
-        if (s?.causalStateId !== orderedIds[i - 1]) {
-            chainOk = false;
-            break;
-        }
+    // 6. Trigger the cron scoped to this patient and verify FLAG ⟺ NOTIFICATION consistency.
+    if (!CRON_SECRET) {
+        record("cron notifications", false, "CRON_SECRET missing from .env.local");
+        return finish(session);
     }
-    record("causal chain links day→day", chainOk || trajectoryStates.length < 2);
+    const cronCall = await fetch(`${c.base}/api/notifications/cron`, {
+        method: "POST",
+        headers: { authorization: `Bearer ${CRON_SECRET}`, "content-type": "application/json" },
+        body: JSON.stringify({ complianceThreshold: COMPLIANCE_THRESHOLD, userId }),
+    });
+    const cronBody = await cronCall.json().catch(() => ({}));
+    const mine = (cronBody?.results ?? []).find((r) => r.userId === userId);
+    record("cron ran for patient", cronCall.ok && !!mine, mine ? `sent [${mine.sent.join(", ")}]` : `status ${cronCall.status}`);
 
-    // 4. Flags: pain [6,5,5,5] → last 3 days flat at 5 → pain_stagnation expected.
-    const { res: fr, body: flagData } = await c.postJson("/api/dev/state", { op: "flags" });
-    if (fr.ok && flagData?.painSeries) {
-        const series = flagData.painSeries;
+    if (mine) {
+        const attempted = (label) =>
+            [...mine.sent, ...mine.errors].some((s) => s.includes(label));
+
+        // pain_stagnation flag ⟺ "pain-stagnation" notification
         record(
-            `pain series has ${N_DAYS} entries`,
-            series.length >= N_DAYS,
-            `got ${series.length}`,
+            `pain flag ⟺ notification (flag=${painFired})`,
+            painFired === attempted("pain-stagnation"),
+            painFired ? "expected pain alert" : "expected no pain alert",
+        );
+        // low_compliance flag ⟺ "low-compliance" notification
+        record(
+            `compliance flag ⟺ notification (flag=${compFired})`,
+            compFired === attempted("low-compliance"),
+            compFired ? "expected compliance alert" : "expected no compliance alert",
         );
 
-        // Verify the logged pain values match our targets (by day order).
-        const loggedPains = series.slice(-N_DAYS).map((d) => d.pain);
-        const painMatchesTarget = loggedPains.length > 0 &&
-            loggedPains[0] === PAIN_BY_DAY[0];
-        record(
-            "pain series reflects logged values",
-            painMatchesTarget,
-            `first logged pain = ${loggedPains[0]}, expected ${PAIN_BY_DAY[0]}`,
+        appendBlock(
+            session,
+            [
+                "## Result",
+                "",
+                `- Flags fired: ${[...firedKinds].join(", ") || "none"}`,
+                `- Mean compliance: ${meanCompliance}%`,
+                `- Cron sent: ${mine.sent.join(", ") || "none"}`,
+                `- Cron errors: ${mine.errors.join(", ") || "none"}`,
+            ].join("\n"),
         );
-
-        // Pain [5,5,5] in last 3 days → pain_stagnation flag expected.
-        const painStagnationFired = flagData.flags?.some((f) => f.kind === "pain_stagnation");
-        record(
-            "pain_stagnation flag fires for 3-day plateau",
-            painStagnationFired,
-            painStagnationFired
-                ? `flags: ${flagData.flags.map((f) => f.kind).join(", ")}`
-                : `no pain_stagnation in [${flagData.flags?.map((f) => f.kind).join(", ") ?? "none"}]`,
-        );
-    } else {
-        record("flags endpoint reachable", fr.ok, flagData?.error ?? `status ${fr.status}`);
     }
 
+    finish(session);
+}
+
+function finish(session) {
     const failed = results.filter((r) => !r.ok).length;
-    console.log(`\n── trajectory E2E: ${results.length - failed}/${results.length} green ──`);
+    console.log(`\n── policy trajectory: ${results.length - failed}/${results.length} green ──`);
+    if (session) console.log(`   full session log: ${session}`);
     process.exit(failed ? 1 : 0);
 }
 

@@ -220,6 +220,7 @@ export type UserWhereInput = {
     > | null;
     flags?: Prisma.FlagListRelationFilter;
     pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter;
+    dailyMetrics?: Prisma.DailyMetricListRelationFilter;
 };
 
 export type UserOrderByWithRelationInput = {
@@ -241,6 +242,7 @@ export type UserOrderByWithRelationInput = {
     managedByAdmin?: Prisma.AdminPatientRelationOrderByWithRelationInput;
     flags?: Prisma.FlagOrderByRelationAggregateInput;
     pushSubscriptions?: Prisma.PushSubscriptionOrderByRelationAggregateInput;
+    dailyMetrics?: Prisma.DailyMetricOrderByRelationAggregateInput;
 };
 
 export type UserWhereUniqueInput = Prisma.AtLeast<
@@ -281,6 +283,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<
         > | null;
         flags?: Prisma.FlagListRelationFilter;
         pushSubscriptions?: Prisma.PushSubscriptionListRelationFilter;
+        dailyMetrics?: Prisma.DailyMetricListRelationFilter;
     },
     "id"
 >;
@@ -332,6 +335,7 @@ export type UserCreateInput = {
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateInput = {
@@ -353,6 +357,7 @@ export type UserUncheckedCreateInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserUpdateInput = {
@@ -374,6 +379,7 @@ export type UserUpdateInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateInput = {
@@ -395,6 +401,7 @@ export type UserUncheckedUpdateInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateManyInput = {
@@ -754,6 +761,32 @@ export type UserUpdateOneRequiredWithoutPushSubscriptionsNestedInput = {
     >;
 };
 
+export type UserCreateNestedOneWithoutDailyMetricsInput = {
+    create?: Prisma.XOR<
+        Prisma.UserCreateWithoutDailyMetricsInput,
+        Prisma.UserUncheckedCreateWithoutDailyMetricsInput
+    >;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutDailyMetricsInput;
+    connect?: Prisma.UserWhereUniqueInput;
+};
+
+export type UserUpdateOneRequiredWithoutDailyMetricsNestedInput = {
+    create?: Prisma.XOR<
+        Prisma.UserCreateWithoutDailyMetricsInput,
+        Prisma.UserUncheckedCreateWithoutDailyMetricsInput
+    >;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutDailyMetricsInput;
+    upsert?: Prisma.UserUpsertWithoutDailyMetricsInput;
+    connect?: Prisma.UserWhereUniqueInput;
+    update?: Prisma.XOR<
+        Prisma.XOR<
+            Prisma.UserUpdateToOneWithWhereWithoutDailyMetricsInput,
+            Prisma.UserUpdateWithoutDailyMetricsInput
+        >,
+        Prisma.UserUncheckedUpdateWithoutDailyMetricsInput
+    >;
+};
+
 export type UserCreateNestedOneWithoutFlagsInput = {
     create?: Prisma.XOR<
         Prisma.UserCreateWithoutFlagsInput,
@@ -798,6 +831,7 @@ export type UserCreateWithoutAccountInput = {
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutAccountInput = {
@@ -818,6 +852,7 @@ export type UserUncheckedCreateWithoutAccountInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutAccountInput = {
@@ -866,6 +901,7 @@ export type UserUpdateWithoutAccountInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutAccountInput = {
@@ -886,6 +922,7 @@ export type UserUncheckedUpdateWithoutAccountInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutMemoryInput = {
@@ -906,6 +943,7 @@ export type UserCreateWithoutMemoryInput = {
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutMemoryInput = {
@@ -926,6 +964,7 @@ export type UserUncheckedCreateWithoutMemoryInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutMemoryInput = {
@@ -974,6 +1013,7 @@ export type UserUpdateWithoutMemoryInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutMemoryInput = {
@@ -994,6 +1034,7 @@ export type UserUncheckedUpdateWithoutMemoryInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutMemoryVersionsInput = {
@@ -1014,6 +1055,7 @@ export type UserCreateWithoutMemoryVersionsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutMemoryVersionsInput = {
@@ -1034,6 +1076,7 @@ export type UserUncheckedCreateWithoutMemoryVersionsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutMemoryVersionsInput = {
@@ -1082,6 +1125,7 @@ export type UserUpdateWithoutMemoryVersionsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutMemoryVersionsInput = {
@@ -1102,6 +1146,7 @@ export type UserUncheckedUpdateWithoutMemoryVersionsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutAdminManagedPatientsInput = {
@@ -1122,6 +1167,7 @@ export type UserCreateWithoutAdminManagedPatientsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutAdminManagedPatientsInput = {
@@ -1142,6 +1188,7 @@ export type UserUncheckedCreateWithoutAdminManagedPatientsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutAdminManagedPatientsInput = {
@@ -1170,6 +1217,7 @@ export type UserCreateWithoutManagedByAdminInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutManagedByAdminInput = {
@@ -1190,6 +1238,7 @@ export type UserUncheckedCreateWithoutManagedByAdminInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutManagedByAdminInput = {
@@ -1238,6 +1287,7 @@ export type UserUpdateWithoutAdminManagedPatientsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutAdminManagedPatientsInput = {
@@ -1258,6 +1308,7 @@ export type UserUncheckedUpdateWithoutAdminManagedPatientsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUpsertWithoutManagedByAdminInput = {
@@ -1298,6 +1349,7 @@ export type UserUpdateWithoutManagedByAdminInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutManagedByAdminInput = {
@@ -1318,6 +1370,7 @@ export type UserUncheckedUpdateWithoutManagedByAdminInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutScreeningInput = {
@@ -1338,6 +1391,7 @@ export type UserCreateWithoutScreeningInput = {
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutScreeningInput = {
@@ -1358,6 +1412,7 @@ export type UserUncheckedCreateWithoutScreeningInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutScreeningInput = {
@@ -1406,6 +1461,7 @@ export type UserUpdateWithoutScreeningInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutScreeningInput = {
@@ -1426,6 +1482,7 @@ export type UserUncheckedUpdateWithoutScreeningInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutBiometricInput = {
@@ -1446,6 +1503,7 @@ export type UserCreateWithoutBiometricInput = {
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutBiometricInput = {
@@ -1466,6 +1524,7 @@ export type UserUncheckedCreateWithoutBiometricInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutBiometricInput = {
@@ -1514,6 +1573,7 @@ export type UserUpdateWithoutBiometricInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutBiometricInput = {
@@ -1534,6 +1594,7 @@ export type UserUncheckedUpdateWithoutBiometricInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutStatesInput = {
@@ -1554,6 +1615,7 @@ export type UserCreateWithoutStatesInput = {
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutStatesInput = {
@@ -1574,6 +1636,7 @@ export type UserUncheckedCreateWithoutStatesInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutStatesInput = {
@@ -1622,6 +1685,7 @@ export type UserUpdateWithoutStatesInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutStatesInput = {
@@ -1642,6 +1706,7 @@ export type UserUncheckedUpdateWithoutStatesInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutExternalsInput = {
@@ -1662,6 +1727,7 @@ export type UserCreateWithoutExternalsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutExternalsInput = {
@@ -1682,6 +1748,7 @@ export type UserUncheckedCreateWithoutExternalsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutExternalsInput = {
@@ -1730,6 +1797,7 @@ export type UserUpdateWithoutExternalsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutExternalsInput = {
@@ -1750,6 +1818,7 @@ export type UserUncheckedUpdateWithoutExternalsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutThreadsInput = {
@@ -1770,6 +1839,7 @@ export type UserCreateWithoutThreadsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutThreadsInput = {
@@ -1790,6 +1860,7 @@ export type UserUncheckedCreateWithoutThreadsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutThreadsInput = {
@@ -1838,6 +1909,7 @@ export type UserUpdateWithoutThreadsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutThreadsInput = {
@@ -1858,6 +1930,7 @@ export type UserUncheckedUpdateWithoutThreadsInput = {
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutPushSubscriptionsInput = {
@@ -1878,6 +1951,7 @@ export type UserCreateWithoutPushSubscriptionsInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+    dailyMetrics?: Prisma.DailyMetricCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
@@ -1898,6 +1972,7 @@ export type UserUncheckedCreateWithoutPushSubscriptionsInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutPushSubscriptionsInput = {
@@ -1946,6 +2021,7 @@ export type UserUpdateWithoutPushSubscriptionsInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
@@ -1966,6 +2042,119 @@ export type UserUncheckedUpdateWithoutPushSubscriptionsInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutUserNestedInput;
+};
+
+export type UserCreateWithoutDailyMetricsInput = {
+    id?: string;
+    name: string;
+    role?: $Enums.UserRole;
+    profile?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    biometric?: Prisma.BiometricsCreateNestedOneWithoutUserInput;
+    screening?: Prisma.ScreeningCreateNestedOneWithoutUserInput;
+    memory?: Prisma.PatientMemoryCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionCreateNestedManyWithoutUserInput;
+    account?: Prisma.AccountCreateNestedOneWithoutUserInput;
+    states?: Prisma.StateCreateNestedManyWithoutUserInput;
+    threads?: Prisma.ThreadCreateNestedManyWithoutUserInput;
+    externals?: Prisma.ExternalCreateNestedManyWithoutUserInput;
+    adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
+    managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
+    flags?: Prisma.FlagCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+};
+
+export type UserUncheckedCreateWithoutDailyMetricsInput = {
+    id?: string;
+    name: string;
+    role?: $Enums.UserRole;
+    profile?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    biometric?: Prisma.BiometricsUncheckedCreateNestedOneWithoutUserInput;
+    screening?: Prisma.ScreeningUncheckedCreateNestedOneWithoutUserInput;
+    memory?: Prisma.PatientMemoryUncheckedCreateNestedOneWithoutUserInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedCreateNestedManyWithoutUserInput;
+    account?: Prisma.AccountUncheckedCreateNestedOneWithoutUserInput;
+    states?: Prisma.StateUncheckedCreateNestedManyWithoutUserInput;
+    threads?: Prisma.ThreadUncheckedCreateNestedManyWithoutUserInput;
+    externals?: Prisma.ExternalUncheckedCreateNestedManyWithoutUserInput;
+    adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
+    managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
+    flags?: Prisma.FlagUncheckedCreateNestedManyWithoutPatientInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+};
+
+export type UserCreateOrConnectWithoutDailyMetricsInput = {
+    where: Prisma.UserWhereUniqueInput;
+    create: Prisma.XOR<
+        Prisma.UserCreateWithoutDailyMetricsInput,
+        Prisma.UserUncheckedCreateWithoutDailyMetricsInput
+    >;
+};
+
+export type UserUpsertWithoutDailyMetricsInput = {
+    update: Prisma.XOR<
+        Prisma.UserUpdateWithoutDailyMetricsInput,
+        Prisma.UserUncheckedUpdateWithoutDailyMetricsInput
+    >;
+    create: Prisma.XOR<
+        Prisma.UserCreateWithoutDailyMetricsInput,
+        Prisma.UserUncheckedCreateWithoutDailyMetricsInput
+    >;
+    where?: Prisma.UserWhereInput;
+};
+
+export type UserUpdateToOneWithWhereWithoutDailyMetricsInput = {
+    where?: Prisma.UserWhereInput;
+    data: Prisma.XOR<
+        Prisma.UserUpdateWithoutDailyMetricsInput,
+        Prisma.UserUncheckedUpdateWithoutDailyMetricsInput
+    >;
+};
+
+export type UserUpdateWithoutDailyMetricsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    biometric?: Prisma.BiometricsUpdateOneWithoutUserNestedInput;
+    screening?: Prisma.ScreeningUpdateOneWithoutUserNestedInput;
+    memory?: Prisma.PatientMemoryUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUpdateManyWithoutUserNestedInput;
+    account?: Prisma.AccountUpdateOneWithoutUserNestedInput;
+    states?: Prisma.StateUpdateManyWithoutUserNestedInput;
+    threads?: Prisma.ThreadUpdateManyWithoutUserNestedInput;
+    externals?: Prisma.ExternalUpdateManyWithoutUserNestedInput;
+    adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
+    managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
+    flags?: Prisma.FlagUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+};
+
+export type UserUncheckedUpdateWithoutDailyMetricsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    profile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    biometric?: Prisma.BiometricsUncheckedUpdateOneWithoutUserNestedInput;
+    screening?: Prisma.ScreeningUncheckedUpdateOneWithoutUserNestedInput;
+    memory?: Prisma.PatientMemoryUncheckedUpdateOneWithoutUserNestedInput;
+    memoryVersions?: Prisma.PatientMemoryVersionUncheckedUpdateManyWithoutUserNestedInput;
+    account?: Prisma.AccountUncheckedUpdateOneWithoutUserNestedInput;
+    states?: Prisma.StateUncheckedUpdateManyWithoutUserNestedInput;
+    threads?: Prisma.ThreadUncheckedUpdateManyWithoutUserNestedInput;
+    externals?: Prisma.ExternalUncheckedUpdateManyWithoutUserNestedInput;
+    adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
+    managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
+    flags?: Prisma.FlagUncheckedUpdateManyWithoutPatientNestedInput;
+    pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 export type UserCreateWithoutFlagsInput = {
@@ -1986,6 +2175,7 @@ export type UserCreateWithoutFlagsInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationCreateNestedOneWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricCreateNestedManyWithoutUserInput;
 };
 
 export type UserUncheckedCreateWithoutFlagsInput = {
@@ -2006,6 +2196,7 @@ export type UserUncheckedCreateWithoutFlagsInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedCreateNestedManyWithoutAdminInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedCreateNestedOneWithoutPatientInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedCreateNestedManyWithoutUserInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedCreateNestedManyWithoutUserInput;
 };
 
 export type UserCreateOrConnectWithoutFlagsInput = {
@@ -2054,6 +2245,7 @@ export type UserUpdateWithoutFlagsInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUpdateOneWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUpdateManyWithoutUserNestedInput;
 };
 
 export type UserUncheckedUpdateWithoutFlagsInput = {
@@ -2074,6 +2266,7 @@ export type UserUncheckedUpdateWithoutFlagsInput = {
     adminManagedPatients?: Prisma.AdminPatientRelationUncheckedUpdateManyWithoutAdminNestedInput;
     managedByAdmin?: Prisma.AdminPatientRelationUncheckedUpdateOneWithoutPatientNestedInput;
     pushSubscriptions?: Prisma.PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput;
+    dailyMetrics?: Prisma.DailyMetricUncheckedUpdateManyWithoutUserNestedInput;
 };
 
 /**
@@ -2088,6 +2281,7 @@ export type UserCountOutputType = {
     adminManagedPatients: number;
     flags: number;
     pushSubscriptions: number;
+    dailyMetrics: number;
 };
 
 export type UserCountOutputTypeSelect<
@@ -2103,6 +2297,7 @@ export type UserCountOutputTypeSelect<
         | UserCountOutputTypeCountAdminManagedPatientsArgs;
     flags?: boolean | UserCountOutputTypeCountFlagsArgs;
     pushSubscriptions?: boolean | UserCountOutputTypeCountPushSubscriptionsArgs;
+    dailyMetrics?: boolean | UserCountOutputTypeCountDailyMetricsArgs;
 };
 
 /**
@@ -2188,6 +2383,16 @@ export type UserCountOutputTypeCountPushSubscriptionsArgs<
     where?: Prisma.PushSubscriptionWhereInput;
 };
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDailyMetricsArgs<
+    ExtArgs extends
+        runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+    where?: Prisma.DailyMetricWhereInput;
+};
+
 export type UserSelect<
     ExtArgs extends
         runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
@@ -2215,6 +2420,7 @@ export type UserSelect<
         pushSubscriptions?:
             | boolean
             | Prisma.User$pushSubscriptionsArgs<ExtArgs>;
+        dailyMetrics?: boolean | Prisma.User$dailyMetricsArgs<ExtArgs>;
         _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
     },
     ExtArgs["result"]["user"]
@@ -2284,6 +2490,7 @@ export type UserInclude<
     managedByAdmin?: boolean | Prisma.User$managedByAdminArgs<ExtArgs>;
     flags?: boolean | Prisma.User$flagsArgs<ExtArgs>;
     pushSubscriptions?: boolean | Prisma.User$pushSubscriptionsArgs<ExtArgs>;
+    dailyMetrics?: boolean | Prisma.User$dailyMetricsArgs<ExtArgs>;
     _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type UserIncludeCreateManyAndReturn<
@@ -2313,6 +2520,7 @@ export type $UserPayload<
         managedByAdmin: Prisma.$AdminPatientRelationPayload<ExtArgs> | null;
         flags: Prisma.$FlagPayload<ExtArgs>[];
         pushSubscriptions: Prisma.$PushSubscriptionPayload<ExtArgs>[];
+        dailyMetrics: Prisma.$DailyMetricPayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<
         {
@@ -3015,6 +3223,17 @@ export interface Prisma__UserClient<
     ): Prisma.PrismaPromise<
         | runtime.Types.Result.GetResult<
               Prisma.$PushSubscriptionPayload<ExtArgs>,
+              T,
+              "findMany",
+              GlobalOmitOptions
+          >
+        | Null
+    >;
+    dailyMetrics<T extends Prisma.User$dailyMetricsArgs<ExtArgs> = {}>(
+        args?: Prisma.Subset<T, Prisma.User$dailyMetricsArgs<ExtArgs>>,
+    ): Prisma.PrismaPromise<
+        | runtime.Types.Result.GetResult<
+              Prisma.$DailyMetricPayload<ExtArgs>,
               T,
               "findMany",
               GlobalOmitOptions
@@ -3828,6 +4047,37 @@ export type User$pushSubscriptionsArgs<
     distinct?:
         | Prisma.PushSubscriptionScalarFieldEnum
         | Prisma.PushSubscriptionScalarFieldEnum[];
+};
+
+/**
+ * User.dailyMetrics
+ */
+export type User$dailyMetricsArgs<
+    ExtArgs extends
+        runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+    /**
+     * Select specific fields to fetch from the DailyMetric
+     */
+    select?: Prisma.DailyMetricSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the DailyMetric
+     */
+    omit?: Prisma.DailyMetricOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.DailyMetricInclude<ExtArgs> | null;
+    where?: Prisma.DailyMetricWhereInput;
+    orderBy?:
+        | Prisma.DailyMetricOrderByWithRelationInput
+        | Prisma.DailyMetricOrderByWithRelationInput[];
+    cursor?: Prisma.DailyMetricWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?:
+        | Prisma.DailyMetricScalarFieldEnum
+        | Prisma.DailyMetricScalarFieldEnum[];
 };
 
 /**

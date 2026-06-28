@@ -23,5 +23,6 @@ export type * from "./models/Message";
 export type * from "./models/GraphConfig";
 export type * from "./models/ModuleComment";
 export type * from "./models/PushSubscription";
+export type * from "./models/DailyMetric";
 export type * from "./models/Flag";
 export type * from "./commonInputTypes";

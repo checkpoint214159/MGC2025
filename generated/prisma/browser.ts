@@ -97,6 +97,11 @@ export type ModuleComment = Prisma.ModuleCommentModel;
  */
 export type PushSubscription = Prisma.PushSubscriptionModel;
 /**
+ * Model DailyMetric
+ *
+ */
+export type DailyMetric = Prisma.DailyMetricModel;
+/**
  * Model Flag
  *
  */

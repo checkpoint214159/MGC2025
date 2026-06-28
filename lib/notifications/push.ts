@@ -87,3 +87,12 @@ export function lowCompliancePush(missedDays: number): PushPayload {
         url: "/patient/dashboard",
     };
 }
+
+/** Driven by the low_compliance flag: completing too little of the daily plan (not inactivity). */
+export function complianceAlertPush(meanPct: number): PushPayload {
+    return {
+        title: "Let's get your recovery back on track",
+        body: `You've been completing about ${meanPct}% of your daily plan. Small steps add up — let's close the gap today.`,
+        url: "/patient/dashboard",
+    };
+}

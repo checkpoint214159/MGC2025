@@ -8,6 +8,8 @@ import {
 } from "@/lib/state/service";
 import { getPainSeries } from "@/lib/engagement/arc";
 import { evaluateRecoveryFlags } from "@/lib/engagement/flags";
+import { getComplianceSeries } from "@/lib/engagement/compliance";
+import { getDailyMetrics } from "@/lib/metrics/service";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -15,11 +17,13 @@ import { prisma } from "@/lib/prisma";
  * The real UI goes through React Server Actions (not curl-able); these ops call
  * the same service functions with the authenticated user. Gated to development.
  *
- * POST body: { op: "fetch" | "log" | "history" | "flags", ... }
+ * POST body: { op: "fetch" | "log" | "history" | "flags" | "metrics" | "profile", ... }
  *   fetch:   { date: ISO string, force?: boolean }   — get or generate state for date
  *   log:     { moduleId: string, updates: { id, data }[] } — log progress on a module
  *   history: {}                                       — full ordered state chain
- *   flags:   {}                                       — pain stagnation flags over history
+ *   flags:   { complianceThreshold?: number }         — pain + compliance flags over history
+ *   metrics: {}                                       — persisted DailyMetric rows (asc by date)
+ *   profile: {}                                       — name + onboarding profile/semantic memory
  */
 export async function POST(req: Request) {
     if (process.env.NODE_ENV === "production") {
@@ -61,16 +65,50 @@ export async function POST(req: Request) {
                     where: { userId },
                     select: { surgeryDate: true },
                 });
-                const surgeryDate = bio?.surgeryDate ?? new Date();
-                const painSeries = getPainSeries(
+                const surgeryDate = new Date(bio?.surgeryDate ?? new Date());
+                const painSeries = getPainSeries(history, surgeryDate);
+                const complianceSeries = getComplianceSeries(
                     history,
-                    new Date(surgeryDate),
+                    surgeryDate,
                 );
-                const flags = evaluateRecoveryFlags({ pain: painSeries });
+                const flags = evaluateRecoveryFlags({
+                    pain: painSeries,
+                    compliance: complianceSeries,
+                    complianceThreshold:
+                        typeof body.complianceThreshold === "number"
+                            ? body.complianceThreshold
+                            : undefined,
+                });
                 return NextResponse.json({
                     flags,
                     painSeries,
+                    complianceSeries,
                     stateCount: history.length,
+                });
+            }
+            case "metrics": {
+                const metrics = await getDailyMetrics(userId);
+                return NextResponse.json(metrics);
+            }
+            case "profile": {
+                const user = await prisma.user.findUnique({
+                    where: { id: userId },
+                    select: { name: true, profile: true },
+                });
+                const memory = await prisma.patientMemory.findUnique({
+                    where: { userId },
+                    select: { semantic: true },
+                });
+                const bio = await prisma.biometrics.findUnique({
+                    where: { userId },
+                    select: { surgeryDate: true, treatment: true },
+                });
+                return NextResponse.json({
+                    name: user?.name ?? null,
+                    profile: user?.profile ?? "",
+                    semantic: memory?.semantic ?? "",
+                    surgeryDate: bio?.surgeryDate ?? null,
+                    treatment: bio?.treatment ?? null,
                 });
             }
             default:

@@ -437,6 +437,7 @@ export const ModelName = {
     GraphConfig: "GraphConfig",
     ModuleComment: "ModuleComment",
     PushSubscription: "PushSubscription",
+    DailyMetric: "DailyMetric",
     Flag: "Flag",
 } as const;
 
@@ -476,6 +477,7 @@ export type TypeMap<
             | "graphConfig"
             | "moduleComment"
             | "pushSubscription"
+            | "dailyMetric"
             | "flag";
         txIsolationLevel: TransactionIsolationLevel;
     };
@@ -1696,6 +1698,82 @@ export type TypeMap<
                 };
             };
         };
+        DailyMetric: {
+            payload: Prisma.$DailyMetricPayload<ExtArgs>;
+            fields: Prisma.DailyMetricFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.DailyMetricFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.DailyMetricFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>;
+                };
+                findFirst: {
+                    args: Prisma.DailyMetricFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.DailyMetricFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>;
+                };
+                findMany: {
+                    args: Prisma.DailyMetricFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>[];
+                };
+                create: {
+                    args: Prisma.DailyMetricCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>;
+                };
+                createMany: {
+                    args: Prisma.DailyMetricCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.DailyMetricCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>[];
+                };
+                delete: {
+                    args: Prisma.DailyMetricDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>;
+                };
+                update: {
+                    args: Prisma.DailyMetricUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.DailyMetricDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.DailyMetricUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.DailyMetricUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>[];
+                };
+                upsert: {
+                    args: Prisma.DailyMetricUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>;
+                };
+                aggregate: {
+                    args: Prisma.DailyMetricAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateDailyMetric>;
+                };
+                groupBy: {
+                    args: Prisma.DailyMetricGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.DailyMetricGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.DailyMetricCountArgs<ExtArgs>;
+                    result:
+                        | runtime.Types.Utils.Optional<Prisma.DailyMetricCountAggregateOutputType>
+                        | number;
+                };
+            };
+        };
         Flag: {
             payload: Prisma.$FlagPayload<ExtArgs>;
             fields: Prisma.FlagFieldRefs;
@@ -2008,6 +2086,21 @@ export const PushSubscriptionScalarFieldEnum = {
 
 export type PushSubscriptionScalarFieldEnum =
     (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum];
+
+export const DailyMetricScalarFieldEnum = {
+    id: "id",
+    userId: "userId",
+    date: "date",
+    compliancePct: "compliancePct",
+    completedTasks: "completedTasks",
+    totalTasks: "totalTasks",
+    painScore: "painScore",
+    createdAt: "createdAt",
+    updatedAt: "updatedAt",
+} as const;
+
+export type DailyMetricScalarFieldEnum =
+    (typeof DailyMetricScalarFieldEnum)[keyof typeof DailyMetricScalarFieldEnum];
 
 export const FlagScalarFieldEnum = {
     id: "id",
@@ -2333,6 +2426,7 @@ export type GlobalOmitConfig = {
     graphConfig?: Prisma.GraphConfigOmit;
     moduleComment?: Prisma.ModuleCommentOmit;
     pushSubscription?: Prisma.PushSubscriptionOmit;
+    dailyMetric?: Prisma.DailyMetricOmit;
     flag?: Prisma.FlagOmit;
 };
 

@@ -1,19 +1,25 @@
 import { prisma } from "@/lib/prisma";
 import { getStateHistory } from "@/lib/state/service";
 import { getPainSeries } from "@/lib/engagement/arc";
-import { evaluateRecoveryFlags } from "@/lib/engagement/flags";
+import { getComplianceSeries } from "@/lib/engagement/compliance";
+import {
+    evaluateRecoveryFlags,
+    getLowComplianceSignal,
+} from "@/lib/engagement/flags";
 import { createLogger } from "@/lib/logger";
 import {
     sendEmail,
     dailyNudgeEmail,
     painAlertEmail,
     lowComplianceEmail,
+    complianceAlertEmail,
 } from "./email";
 import {
     sendPush,
     dailyNudgePush,
     painAlertPush,
     lowCompliancePush,
+    complianceAlertPush,
 } from "./push";
 
 const log = createLogger("cron");
@@ -60,9 +66,13 @@ async function notify(
 
 /**
  * Run all notification checks for a single patient and fire the relevant channels.
- * Returns a summary of what was sent.
+ * Returns a summary of what was sent. `complianceThreshold` overrides the low-compliance
+ * cutoff so a test harness can keep the cron in lockstep with its flag evaluation.
  */
-async function processPatient(userId: string): Promise<NotificationResult> {
+async function processPatient(
+    userId: string,
+    complianceThreshold?: number,
+): Promise<NotificationResult> {
     const account = await prisma.account.findUnique({
         where: { user_id: userId },
         select: { email: true },
@@ -114,7 +124,7 @@ async function processPatient(userId: string): Promise<NotificationResult> {
         result.skipped.push("daily-nudge (already logged)");
     }
 
-    // ── 2. Low compliance: no state for N consecutive days ──
+    // ── 2. Inactivity: no state logged for N consecutive days (distinct from low % below) ──
     const sortedDates = history
         .map((s) => new Date(s.dateCreated).toISOString().slice(0, 10))
         .sort();
@@ -130,21 +140,27 @@ async function processPatient(userId: string): Promise<NotificationResult> {
                 name,
                 lowComplianceEmail(name, daysSinceLast),
                 lowCompliancePush(daysSinceLast),
-                "low-compliance",
+                "inactivity",
             );
             result.sent.push(...r.sent);
             result.errors.push(...r.errors);
         } else {
-            result.skipped.push("low-compliance (within threshold)");
+            result.skipped.push("inactivity (within threshold)");
         }
     }
 
-    // ── 3. Pain stagnation flag ──
+    // ── 3. Pain stagnation + low compliance flags (computed from the recovery series) ──
     if (bio?.surgeryDate && history.length > 0) {
-        const painSeries = getPainSeries(history, new Date(bio.surgeryDate));
-        const flags = evaluateRecoveryFlags({ pain: painSeries });
-        const painFlag = flags.find((f) => f.kind === "pain_stagnation");
+        const surgeryDate = new Date(bio.surgeryDate);
+        const painSeries = getPainSeries(history, surgeryDate);
+        const complianceSeries = getComplianceSeries(history, surgeryDate);
+        const flags = evaluateRecoveryFlags({
+            pain: painSeries,
+            compliance: complianceSeries,
+            complianceThreshold,
+        });
 
+        const painFlag = flags.find((f) => f.kind === "pain_stagnation");
         if (painFlag) {
             const r = await notify(
                 userId,
@@ -159,6 +175,27 @@ async function processPatient(userId: string): Promise<NotificationResult> {
         } else {
             result.skipped.push("pain-stagnation (not flagged)");
         }
+
+        const complianceFlag = flags.find((f) => f.kind === "low_compliance");
+        if (complianceFlag) {
+            const signal = getLowComplianceSignal(
+                complianceSeries,
+                complianceThreshold,
+            );
+            const mean = signal.mean ?? 0;
+            const r = await notify(
+                userId,
+                email,
+                name,
+                complianceAlertEmail(name, mean, signal.threshold),
+                complianceAlertPush(mean),
+                "low-compliance",
+            );
+            result.sent.push(...r.sent);
+            result.errors.push(...r.errors);
+        } else {
+            result.skipped.push("low-compliance (not flagged)");
+        }
     }
 
     return result;
@@ -168,19 +205,24 @@ async function processPatient(userId: string): Promise<NotificationResult> {
  * Main cron entry point. Iterates all active patients and fires notifications.
  * Returns a summary log for the cron response body.
  */
-export async function runNotificationCron(): Promise<{
+export async function runNotificationCron(opts?: {
+    complianceThreshold?: number;
+    userId?: string; // scope to a single patient (used by the test harness)
+}): Promise<{
     processed: number;
     results: NotificationResult[];
 }> {
     const patients = await prisma.user.findMany({
-        where: { role: "patient" },
+        where: opts?.userId
+            ? { role: "patient", id: opts.userId }
+            : { role: "patient" },
         select: { id: true },
     });
 
     const results: NotificationResult[] = [];
     for (const { id } of patients) {
         try {
-            const r = await processPatient(id);
+            const r = await processPatient(id, opts?.complianceThreshold);
             results.push(r);
             if (r.sent.length > 0)
                 log.info(`✓ ${id}: sent [${r.sent.join(", ")}]`);
