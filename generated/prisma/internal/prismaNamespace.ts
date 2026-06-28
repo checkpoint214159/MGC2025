@@ -424,6 +424,7 @@ export const ModelName = {
     Account: "Account",
     User: "User",
     PatientMemory: "PatientMemory",
+    PatientMemoryVersion: "PatientMemoryVersion",
     AdminPatientRelation: "AdminPatientRelation",
     Screening: "Screening",
     Biometrics: "Biometrics",
@@ -435,6 +436,8 @@ export const ModelName = {
     Message: "Message",
     GraphConfig: "GraphConfig",
     ModuleComment: "ModuleComment",
+    PushSubscription: "PushSubscription",
+    DailyMetric: "DailyMetric",
     Flag: "Flag",
 } as const;
 
@@ -461,6 +464,7 @@ export type TypeMap<
             | "account"
             | "user"
             | "patientMemory"
+            | "patientMemoryVersion"
             | "adminPatientRelation"
             | "screening"
             | "biometrics"
@@ -472,6 +476,8 @@ export type TypeMap<
             | "message"
             | "graphConfig"
             | "moduleComment"
+            | "pushSubscription"
+            | "dailyMetric"
             | "flag";
         txIsolationLevel: TransactionIsolationLevel;
     };
@@ -700,6 +706,82 @@ export type TypeMap<
                     args: Prisma.PatientMemoryCountArgs<ExtArgs>;
                     result:
                         | runtime.Types.Utils.Optional<Prisma.PatientMemoryCountAggregateOutputType>
+                        | number;
+                };
+            };
+        };
+        PatientMemoryVersion: {
+            payload: Prisma.$PatientMemoryVersionPayload<ExtArgs>;
+            fields: Prisma.PatientMemoryVersionFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.PatientMemoryVersionFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientMemoryVersionPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.PatientMemoryVersionFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientMemoryVersionPayload>;
+                };
+                findFirst: {
+                    args: Prisma.PatientMemoryVersionFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientMemoryVersionPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.PatientMemoryVersionFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientMemoryVersionPayload>;
+                };
+                findMany: {
+                    args: Prisma.PatientMemoryVersionFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientMemoryVersionPayload>[];
+                };
+                create: {
+                    args: Prisma.PatientMemoryVersionCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientMemoryVersionPayload>;
+                };
+                createMany: {
+                    args: Prisma.PatientMemoryVersionCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.PatientMemoryVersionCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientMemoryVersionPayload>[];
+                };
+                delete: {
+                    args: Prisma.PatientMemoryVersionDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientMemoryVersionPayload>;
+                };
+                update: {
+                    args: Prisma.PatientMemoryVersionUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientMemoryVersionPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.PatientMemoryVersionDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.PatientMemoryVersionUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.PatientMemoryVersionUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientMemoryVersionPayload>[];
+                };
+                upsert: {
+                    args: Prisma.PatientMemoryVersionUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PatientMemoryVersionPayload>;
+                };
+                aggregate: {
+                    args: Prisma.PatientMemoryVersionAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregatePatientMemoryVersion>;
+                };
+                groupBy: {
+                    args: Prisma.PatientMemoryVersionGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.PatientMemoryVersionGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.PatientMemoryVersionCountArgs<ExtArgs>;
+                    result:
+                        | runtime.Types.Utils.Optional<Prisma.PatientMemoryVersionCountAggregateOutputType>
                         | number;
                 };
             };
@@ -1540,6 +1622,158 @@ export type TypeMap<
                 };
             };
         };
+        PushSubscription: {
+            payload: Prisma.$PushSubscriptionPayload<ExtArgs>;
+            fields: Prisma.PushSubscriptionFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.PushSubscriptionFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.PushSubscriptionFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>;
+                };
+                findFirst: {
+                    args: Prisma.PushSubscriptionFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.PushSubscriptionFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>;
+                };
+                findMany: {
+                    args: Prisma.PushSubscriptionFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>[];
+                };
+                create: {
+                    args: Prisma.PushSubscriptionCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>;
+                };
+                createMany: {
+                    args: Prisma.PushSubscriptionCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.PushSubscriptionCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>[];
+                };
+                delete: {
+                    args: Prisma.PushSubscriptionDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>;
+                };
+                update: {
+                    args: Prisma.PushSubscriptionUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.PushSubscriptionDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.PushSubscriptionUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.PushSubscriptionUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>[];
+                };
+                upsert: {
+                    args: Prisma.PushSubscriptionUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$PushSubscriptionPayload>;
+                };
+                aggregate: {
+                    args: Prisma.PushSubscriptionAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregatePushSubscription>;
+                };
+                groupBy: {
+                    args: Prisma.PushSubscriptionGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.PushSubscriptionGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.PushSubscriptionCountArgs<ExtArgs>;
+                    result:
+                        | runtime.Types.Utils.Optional<Prisma.PushSubscriptionCountAggregateOutputType>
+                        | number;
+                };
+            };
+        };
+        DailyMetric: {
+            payload: Prisma.$DailyMetricPayload<ExtArgs>;
+            fields: Prisma.DailyMetricFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.DailyMetricFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.DailyMetricFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>;
+                };
+                findFirst: {
+                    args: Prisma.DailyMetricFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.DailyMetricFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>;
+                };
+                findMany: {
+                    args: Prisma.DailyMetricFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>[];
+                };
+                create: {
+                    args: Prisma.DailyMetricCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>;
+                };
+                createMany: {
+                    args: Prisma.DailyMetricCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.DailyMetricCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>[];
+                };
+                delete: {
+                    args: Prisma.DailyMetricDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>;
+                };
+                update: {
+                    args: Prisma.DailyMetricUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.DailyMetricDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.DailyMetricUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.DailyMetricUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>[];
+                };
+                upsert: {
+                    args: Prisma.DailyMetricUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$DailyMetricPayload>;
+                };
+                aggregate: {
+                    args: Prisma.DailyMetricAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateDailyMetric>;
+                };
+                groupBy: {
+                    args: Prisma.DailyMetricGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.DailyMetricGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.DailyMetricCountArgs<ExtArgs>;
+                    result:
+                        | runtime.Types.Utils.Optional<Prisma.DailyMetricCountAggregateOutputType>
+                        | number;
+                };
+            };
+        };
         Flag: {
             payload: Prisma.$FlagPayload<ExtArgs>;
             fields: Prisma.FlagFieldRefs;
@@ -1690,6 +1924,19 @@ export const PatientMemoryScalarFieldEnum = {
 export type PatientMemoryScalarFieldEnum =
     (typeof PatientMemoryScalarFieldEnum)[keyof typeof PatientMemoryScalarFieldEnum];
 
+export const PatientMemoryVersionScalarFieldEnum = {
+    id: "id",
+    userId: "userId",
+    semantic: "semantic",
+    episodic: "episodic",
+    consolidatedThrough: "consolidatedThrough",
+    trigger: "trigger",
+    createdAt: "createdAt",
+} as const;
+
+export type PatientMemoryVersionScalarFieldEnum =
+    (typeof PatientMemoryVersionScalarFieldEnum)[keyof typeof PatientMemoryVersionScalarFieldEnum];
+
 export const AdminPatientRelationScalarFieldEnum = {
     id: "id",
     adminId: "adminId",
@@ -1827,6 +2074,33 @@ export const ModuleCommentScalarFieldEnum = {
 
 export type ModuleCommentScalarFieldEnum =
     (typeof ModuleCommentScalarFieldEnum)[keyof typeof ModuleCommentScalarFieldEnum];
+
+export const PushSubscriptionScalarFieldEnum = {
+    id: "id",
+    userId: "userId",
+    endpoint: "endpoint",
+    p256dh: "p256dh",
+    auth: "auth",
+    createdAt: "createdAt",
+} as const;
+
+export type PushSubscriptionScalarFieldEnum =
+    (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum];
+
+export const DailyMetricScalarFieldEnum = {
+    id: "id",
+    userId: "userId",
+    date: "date",
+    compliancePct: "compliancePct",
+    completedTasks: "completedTasks",
+    totalTasks: "totalTasks",
+    painScore: "painScore",
+    createdAt: "createdAt",
+    updatedAt: "updatedAt",
+} as const;
+
+export type DailyMetricScalarFieldEnum =
+    (typeof DailyMetricScalarFieldEnum)[keyof typeof DailyMetricScalarFieldEnum];
 
 export const FlagScalarFieldEnum = {
     id: "id",
@@ -2139,6 +2413,7 @@ export type GlobalOmitConfig = {
     account?: Prisma.AccountOmit;
     user?: Prisma.UserOmit;
     patientMemory?: Prisma.PatientMemoryOmit;
+    patientMemoryVersion?: Prisma.PatientMemoryVersionOmit;
     adminPatientRelation?: Prisma.AdminPatientRelationOmit;
     screening?: Prisma.ScreeningOmit;
     biometrics?: Prisma.BiometricsOmit;
@@ -2150,6 +2425,8 @@ export type GlobalOmitConfig = {
     message?: Prisma.MessageOmit;
     graphConfig?: Prisma.GraphConfigOmit;
     moduleComment?: Prisma.ModuleCommentOmit;
+    pushSubscription?: Prisma.PushSubscriptionOmit;
+    dailyMetric?: Prisma.DailyMetricOmit;
     flag?: Prisma.FlagOmit;
 };
 

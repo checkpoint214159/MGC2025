@@ -55,6 +55,7 @@ export const ModelName = {
     Account: "Account",
     User: "User",
     PatientMemory: "PatientMemory",
+    PatientMemoryVersion: "PatientMemoryVersion",
     AdminPatientRelation: "AdminPatientRelation",
     Screening: "Screening",
     Biometrics: "Biometrics",
@@ -66,6 +67,8 @@ export const ModelName = {
     Message: "Message",
     GraphConfig: "GraphConfig",
     ModuleComment: "ModuleComment",
+    PushSubscription: "PushSubscription",
+    DailyMetric: "DailyMetric",
     Flag: "Flag",
 } as const;
 
@@ -119,6 +122,19 @@ export const PatientMemoryScalarFieldEnum = {
 
 export type PatientMemoryScalarFieldEnum =
     (typeof PatientMemoryScalarFieldEnum)[keyof typeof PatientMemoryScalarFieldEnum];
+
+export const PatientMemoryVersionScalarFieldEnum = {
+    id: "id",
+    userId: "userId",
+    semantic: "semantic",
+    episodic: "episodic",
+    consolidatedThrough: "consolidatedThrough",
+    trigger: "trigger",
+    createdAt: "createdAt",
+} as const;
+
+export type PatientMemoryVersionScalarFieldEnum =
+    (typeof PatientMemoryVersionScalarFieldEnum)[keyof typeof PatientMemoryVersionScalarFieldEnum];
 
 export const AdminPatientRelationScalarFieldEnum = {
     id: "id",
@@ -257,6 +273,33 @@ export const ModuleCommentScalarFieldEnum = {
 
 export type ModuleCommentScalarFieldEnum =
     (typeof ModuleCommentScalarFieldEnum)[keyof typeof ModuleCommentScalarFieldEnum];
+
+export const PushSubscriptionScalarFieldEnum = {
+    id: "id",
+    userId: "userId",
+    endpoint: "endpoint",
+    p256dh: "p256dh",
+    auth: "auth",
+    createdAt: "createdAt",
+} as const;
+
+export type PushSubscriptionScalarFieldEnum =
+    (typeof PushSubscriptionScalarFieldEnum)[keyof typeof PushSubscriptionScalarFieldEnum];
+
+export const DailyMetricScalarFieldEnum = {
+    id: "id",
+    userId: "userId",
+    date: "date",
+    compliancePct: "compliancePct",
+    completedTasks: "completedTasks",
+    totalTasks: "totalTasks",
+    painScore: "painScore",
+    createdAt: "createdAt",
+    updatedAt: "updatedAt",
+} as const;
+
+export type DailyMetricScalarFieldEnum =
+    (typeof DailyMetricScalarFieldEnum)[keyof typeof DailyMetricScalarFieldEnum];
 
 export const FlagScalarFieldEnum = {
     id: "id",

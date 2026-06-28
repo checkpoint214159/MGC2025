@@ -24,21 +24,11 @@ export const StateGenerationAnnotation = Annotation.Root({
     date: Annotation<Date>(),
 
     // --- Loaded from database ---
+    // The most recent prior active state (yesterday, or the latest before a logging gap). Used
+    // for structural carry-forward (dispatch reads its modules; save links causalStateId).
     previousState: Annotation<State | null>({
         default: () => null,
         reducer: (_, incoming) => incoming, // last-write-wins
-    }),
-
-    // Built by load_context node: concatenated transcript string
-    transcripts: Annotation<string>({
-        default: () => "",
-        reducer: (_, incoming) => incoming,
-    }),
-
-    // All historical states loaded by load_context (configurable window)
-    stateHistory: Annotation<State[]>({
-        default: () => [],
-        reducer: (_, incoming) => incoming,
     }),
 
     // --- Compaction layer (built by load_context) ---
@@ -79,7 +69,7 @@ export const StateGenerationAnnotation = Annotation.Root({
     }),
 
     // Metadata about context selection for audit trail
-    contextMetadata: Annotation<Record<string, any>>({
+    contextMetadata: Annotation<Record<string, unknown>>({
         default: () => ({}),
         reducer: (_, incoming) => incoming,
     }),
@@ -99,7 +89,7 @@ export const StateGenerationAnnotation = Annotation.Root({
     //   nutrition → { generatedModules: { nutrition: {...} } }
     // etc etc...
     //   Final → { generatedModules: { exercise: {...}, nutrition: {...} } }
-    generatedModules: Annotation<Record<string, any>>({
+    generatedModules: Annotation<Record<string, unknown>>({
         default: () => ({}),
         reducer: (existing, incoming) => ({ ...existing, ...incoming }),
     }),

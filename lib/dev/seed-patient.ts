@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
 import { getDevAdminId } from "./init";
-import { BiometricsSchema, Biometrics } from "@/lib/user/schema";
+import { Biometrics } from "@/lib/user/schema";
 import { PARQ_QUESTIONS, ScreeningResult } from "@/lib/onboarding/screening";
 import { BaseMessage } from "@/lib/external/schemas/message";
 import { Prisma } from "@/generated/prisma/client";
@@ -17,6 +17,7 @@ import {
     ACL_PROFILE,
     HIP_PROFILE,
 } from "./templates/profile";
+import { seedPatientMemory } from "@/lib/memory/service";
 
 /**
  * Preset patient archetypes bundling all template data
@@ -141,19 +142,14 @@ export async function seedPatient(
     const hashedPassword = await hash(password, 10);
 
     try {
-        // 1. Create User + Account
+        // 1. Create User, then Account. Neon HTTP has no transactions, and a nested
+        // create + include transacts (write-then-readback), so split into two single
+        // writes linked by the FK scalar.
         const user = await prisma.user.create({
-            data: {
-                name,
-                role: "patient",
-                account: {
-                    create: {
-                        email,
-                        password: hashedPassword,
-                    },
-                },
-            },
-            include: { account: true },
+            data: { name, role: "patient" },
+        });
+        await prisma.account.create({
+            data: { user_id: user.id, email, password: hashedPassword },
         });
 
         // 2. Create Biometrics
@@ -181,16 +177,21 @@ export async function seedPatient(
             reasoning: msg.reasoning || null,
         }));
 
+        // Neon HTTP has no transactions, so a nested create of a message ARRAY
+        // (multiple INSERTs) is rejected. Create the thread, then insert each message
+        // as its own single-row write — same pattern as updateThread().
         const thread = await prisma.thread.create({
             data: {
                 userId: user.id,
                 type: "onboarding",
                 title: "New Assessment",
-                messages: {
-                    create: messageData,
-                },
             },
         });
+        for (const m of messageData) {
+            await prisma.message.create({
+                data: { ...m, threadId: thread.id },
+            });
+        }
 
         // 6. Set Profile on User
         await prisma.user.update({
@@ -199,6 +200,11 @@ export async function seedPatient(
                 profile: config.profile,
             },
         });
+
+        // 6.5. Seed PatientMemory from the profile — exactly what onboarding's save_profile does
+        // in production. The harness patient skips real onboarding, so without this it would have
+        // no memory and the consolidation/compaction path would never be exercised by the e2e.
+        await seedPatientMemory(user.id, config.profile);
 
         // 7. Auto-assign to dev admin if in development mode and flag is true
         if (assignToDevAdmin && process.env.NODE_ENV === "development") {
@@ -214,9 +220,9 @@ export async function seedPatient(
                     console.log(
                         `[DEV] ✓ Auto-assigned patient "${email}" to dev admin`,
                     );
-                } catch (error: any) {
+                } catch (error: unknown) {
                     // Silently ignore if relation already exists
-                    if (error.code !== "P2002") {
+                    if ((error as { code?: string }).code !== "P2002") {
                         console.error(
                             "[DEV] Failed to auto-assign patient to dev admin:",
                             error,
@@ -238,8 +244,11 @@ export async function seedPatient(
             password,
             preset,
         };
-    } catch (error: any) {
-        console.error("[SEEDING] ✗ Failed to seed patient:", error.message);
+    } catch (error: unknown) {
+        console.error(
+            "[SEEDING] ✗ Failed to seed patient:",
+            (error as Error).message,
+        );
         throw error;
     }
 }
@@ -256,10 +265,10 @@ export async function seedPatients(
         try {
             const result = await seedPatient(patientOpts);
             results.push(result);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(
                 `[SEEDING] Failed to seed patient ${patientOpts.email}:`,
-                error.message,
+                (error as Error).message,
             );
         }
     }

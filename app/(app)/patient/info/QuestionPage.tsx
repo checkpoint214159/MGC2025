@@ -60,9 +60,7 @@ export function QuestionPage({
     // so the last assistant message IS the active `question` prop. Drop it from history,
     // otherwise it renders twice (and collides on the questionText React key).
     const previousQuestions = history.slice(0, -1);
-    console.log("previousqns?", previousQuestions);
     const visibleHistory = previousQuestions.slice(-2);
-    console.log("visibleHistory?", visibleHistory);
 
     return (
         <div className="flex flex-col items-center justify-start min-h-screen bg-bg p-6 overflow-hidden pt-20">
@@ -78,67 +76,66 @@ export function QuestionPage({
                     ))}
                 </div>
 
-                {/* Scroll stack of previous questions (faded) */}
-                <div className="flex flex-col gap-6 transition-all duration-700">
-                    {visibleHistory.map((q) => (
-                        // Previously-answered questions are always faded and read-only.
-                        // DynamicQuestionCard renders its inputs only when fade is false, so the
-                        // single interactive card is the current `question` prop rendered below.
-                        <motion.div
-                            key={q.questionText}
-                            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                            animate={{
-                                opacity: 0.4,
-                                y: 0,
-                                scale: 0.95,
-                                marginTop: "-20px",
-                            }}
-                            transition={{
-                                type: "spring",
-                                stiffness: 300,
-                                damping: 30,
-                            }}
-                        >
-                            <DynamicQuestionCard
-                                question={q}
-                                onAnswer={handleAnswer}
-                                loading={isLoading}
-                                fade={true}
-                            />
-                        </motion.div>
-                    ))}
+            {/* Scroll stack of previous questions (faded) */}
+            <div className="flex flex-col gap-6 transition-all duration-700">
+                {visibleHistory.map((q) => (
+                    // Previously-answered questions are always faded and read-only.
+                    // DynamicQuestionCard renders its inputs only when fade is false, so the
+                    // single interactive card is the current `question` prop rendered below.
+                    <motion.div
+                        key={q.questionText}
+                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                        animate={{
+                            opacity: 0.4,
+                            y: 0,
+                            scale: 0.95,
+                            marginTop: "-20px",
+                        }}
+                        transition={{
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 30,
+                        }}
+                    >
+                        <DynamicQuestionCard
+                            question={q}
+                            onAnswer={handleAnswer}
+                            loading={isLoading}
+                            fade={true}
+                        />
+                    </motion.div>
+                ))}
 
-                    {/* Current active question card */}
-                    {!isLoading && (
-                        <motion.div
-                            key={question.questionText}
-                            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            transition={{
-                                type: "spring",
-                                stiffness: 300,
-                                damping: 30,
-                            }}
-                        >
-                            <DynamicQuestionCard
-                                question={question}
-                                onAnswer={handleAnswer}
-                                loading={false}
-                                fade={false}
-                            />
-                        </motion.div>
-                    )}
+                {/* Current active question card */}
+                {!isLoading && (
+                    <motion.div
+                        key={question.questionText}
+                        initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 30,
+                        }}
+                    >
+                        <DynamicQuestionCard
+                            question={question}
+                            onAnswer={handleAnswer}
+                            loading={false}
+                            fade={false}
+                        />
+                    </motion.div>
+                )}
 
-                    {isLoading && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="w-full"
-                        >
-                            <ThinkingCard />
-                        </motion.div>
-                    )}
-                </div>
+                {isLoading && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="w-full"
+                    >
+                        <ThinkingCard />
+                    </motion.div>
+                )}
             </div>
         </div>
     );

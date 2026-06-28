@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-const bcrypt = require("bcryptjs");
+import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { getDevAdminId } from "@/lib/dev/init";
 
@@ -52,21 +52,30 @@ export async function POST(request: Request) {
         // Determine role based on email
         const role = isAdminEmail(email) ? "admin" : "patient";
 
+        // Neon HTTP has no transactions — even a `create` with a nested relation `create`
+        // is rejected (it's two INSERTs across tables). Create the rows separately; if the
+        // second fails, compensate by deleting the orphaned user (no transaction to roll back).
         const newUser = await prisma.user.create({
             data: {
                 name: username,
                 role: role,
-                account: {
-                    create: {
-                        email: email,
-                        password: hashedPassword,
-                    },
-                },
-            },
-            include: {
-                account: true,
             },
         });
+
+        try {
+            await prisma.account.create({
+                data: {
+                    email: email,
+                    password: hashedPassword,
+                    user_id: newUser.id,
+                },
+            });
+        } catch (e) {
+            await prisma.user
+                .delete({ where: { id: newUser.id } })
+                .catch(() => {});
+            throw e;
+        }
 
         // Auto-assign patient to dev admin in development mode
         if (process.env.NODE_ENV === "development" && role === "patient") {
@@ -82,9 +91,9 @@ export async function POST(request: Request) {
                     console.warn(
                         `[DEV] ⚠️  Auto-assigned patient "${email}" to dev admin`,
                     );
-                } catch (error: any) {
+                } catch (error: unknown) {
                     // Silently ignore if relation already exists
-                    if (error.code !== "P2002") {
+                    if ((error as { code?: string }).code !== "P2002") {
                         console.error(
                             "[DEV] Failed to auto-assign patient to dev admin:",
                             error,

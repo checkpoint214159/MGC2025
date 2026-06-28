@@ -1,5 +1,6 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { wrapLanguageModel } from "ai";
+import { recordLLMUsage } from "./usage";
 
 // Single OpenRouter provider for all LLM calls (replaces the Vercel AI Gateway).
 // Reads OPENROUTER_API_KEY from the environment.
@@ -28,12 +29,29 @@ export function getModel(modelId?: string) {
     return wrapLanguageModel({
         model: openrouter(id),
         middleware: {
-            // Apply the cap only when a call hasn't set its own maxOutputTokens.
             transformParams: async ({ params }) => ({
                 ...params,
                 maxOutputTokens:
                     params.maxOutputTokens ?? DEFAULT_MAX_OUTPUT_TOKENS,
             }),
+            wrapGenerate: async ({ doGenerate }) => {
+                const startedAt = Date.now();
+                const result = await doGenerate();
+                recordLLMUsage({
+                    model: id,
+                    promptTokens: result.usage?.inputTokens ?? 0,
+                    completionTokens: result.usage?.outputTokens ?? 0,
+                    cacheReadTokens:
+                        ((
+                            result.providerMetadata?.openrouter as Record<
+                                string,
+                                unknown
+                            >
+                        )?.cacheReadInputTokens as number | undefined) ?? 0,
+                    durationMs: Date.now() - startedAt,
+                });
+                return result;
+            },
         },
     });
 }

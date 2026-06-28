@@ -7,8 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { isDeepStrictEqual } from "util";
 import { getNormalizedAppDate } from "@/lib/date-utils";
 import { stateGenerationGraph } from "./graph/graph";
-
-const schema = StateSchema;
+import { recomputeDailyMetricForModule } from "@/lib/metrics/service";
 
 export async function getActiveState(
     userId: string,
@@ -132,7 +131,7 @@ export async function getModule(userId: string, type: ModuleType) {
 
 export async function updateModuleProgress(
     moduleId: string,
-    updates: { id: string; data: any }[],
+    updates: { id: string; data: unknown }[],
 ) {
     const currentRecord = await prisma.progress.findUnique({
         where: { moduleId },
@@ -143,7 +142,10 @@ export async function updateModuleProgress(
     }
 
     // Cast trackables for logic, though Zod will handle the final safety
-    const currentTrackables = currentRecord.trackables as any[];
+    const currentTrackables = currentRecord.trackables as {
+        id: string;
+        data: unknown;
+    }[];
 
     // 2. Map and Merge
     const updatedTrackables = currentTrackables.map((existing) => {
@@ -166,8 +168,13 @@ export async function updateModuleProgress(
     }
 
     // 5. Save the JSON back to the unified Progress table
-    return await prisma.progress.update({
+    const saved = await prisma.progress.update({
         where: { moduleId },
-        data: { trackables: updatedTrackables },
+        data: { trackables: updatedTrackables as unknown as object },
     });
+
+    // 6. Recompute the day's persisted compliance + pain (DailyMetric). Non-fatal.
+    await recomputeDailyMetricForModule(moduleId);
+
+    return saved;
 }

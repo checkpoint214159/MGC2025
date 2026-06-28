@@ -66,19 +66,6 @@ export async function generateUserProfile({
                     ),
             }),
         });
-        console.log(
-            "PROFILE GEN PROMTP??",
-            `
-        CONVERSATION HISTORY:
-        ${history}
-
-        BIOMETRICS:
-        You MUST abide by these biometrics fully.
-        Do NOT change ANY biometric data, especially age, sex and treatment type
-        ${JSON.stringify(biometrics, null, 2)}
-      `,
-        );
-        console.log("profile?", object);
         return object.summary;
     } catch (error) {
         console.error("LLM Profile Generation Failed:", error);

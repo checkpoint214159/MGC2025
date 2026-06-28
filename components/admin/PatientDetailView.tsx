@@ -10,6 +10,8 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ensureAction } from "@/lib/utils";
 import DashboardRenderer from "@/app/(app)/patient/dashboard/DashboardRenderer";
+import { ReportTab } from "@/components/admin/ReportTab";
+import type { State } from "@/lib/state/schemas/state";
 
 interface PatientDetailViewProps {
     patientId: string;
@@ -23,7 +25,7 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
     const router = useRouter();
     const { data: session } = useSession();
     const [activeTab, setActiveTab] = useState<
-        "overview" | "progress" | "threads" | "screening"
+        "overview" | "progress" | "threads" | "screening" | "report"
     >("overview");
 
     // Fetch patient details
@@ -53,7 +55,26 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
     if (patientLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <svg
+                    className="animate-spin h-10 w-10 text-blue-600"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                    />
+                    <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                </svg>
             </div>
         );
     }
@@ -76,12 +97,9 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
         );
     }
 
-    const tabs: Array<"overview" | "progress" | "threads" | "screening"> = [
-        "overview",
-        "progress",
-        "threads",
-        "screening",
-    ];
+    const tabs: Array<
+        "overview" | "progress" | "threads" | "screening" | "report"
+    > = ["overview", "progress", "threads", "screening", "report"];
 
     return (
         <div className="p-8 max-w-6xl mx-auto">
@@ -186,7 +204,7 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
                         </h2>
                         {patient.states && patient.states.length > 0 ? (
                             <DashboardRenderer
-                                config={patient.states[0] as any}
+                                config={patient.states[0] as unknown as State}
                             />
                         ) : (
                             <p className="text-gray-500">
@@ -204,14 +222,33 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
                         </h2>
                         {threadsLoading ? (
                             <div className="text-center py-8">
-                                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                <svg
+                                    className="animate-spin h-8 w-8 text-blue-600"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    />
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    />
+                                </svg>
                             </div>
                         ) : threads && threads.length > 0 ? (
                             <div className="space-y-4">
                                 {threads.map((thread) => (
                                     <div
                                         key={thread.id}
-                                        className="border-l-4 border-blue-600 pl-4 py-2"
+                                        className="rounded-lg bg-gray-50 px-4 py-3"
                                     >
                                         <h3 className="font-semibold text-gray-900 mb-3">
                                             {thread.title}
@@ -220,11 +257,11 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
                                             {thread.messages?.map((message) => (
                                                 <div
                                                     key={message.id}
-                                                    className={`p-3 rounded ${
+                                                    className={`p-3 rounded-md ${
                                                         message.role ===
                                                         "assistant"
-                                                            ? "bg-blue-50 border-l-2 border-blue-400"
-                                                            : "bg-gray-50 border-l-2 border-gray-400"
+                                                            ? "bg-blue-50"
+                                                            : "bg-white"
                                                     }`}
                                                 >
                                                     <p className="text-sm font-semibold text-gray-700 mb-1">
@@ -263,11 +300,15 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
                             PAR-Q Activity Readiness Screening
                         </h2>
                         {patient.screening &&
-                        (patient.screening as any).data ? (
+                        (patient.screening as { data?: unknown }).data ? (
                             <div className="space-y-6">
                                 <pre className="text-gray-600 whitespace-pre-wrap text-sm">
                                     {JSON.stringify(
-                                        (patient.screening as any).data,
+                                        (
+                                            patient.screening as {
+                                                data?: unknown;
+                                            }
+                                        ).data,
                                         null,
                                         2,
                                     )}
@@ -280,6 +321,9 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
                         )}
                     </Card>
                 )}
+
+                {/* Report Tab */}
+                {activeTab === "report" && <ReportTab patientId={patientId} />}
             </div>
         </div>
     );

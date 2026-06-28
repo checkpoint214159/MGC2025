@@ -167,46 +167,71 @@ export function DynamicInputs({
                 </div>
             )}
 
-            {question.inputType === "slider" && (
-                <div className="space-y-6 py-2">
-                    <div className="text-center">
-                        <span className="text-[32px] font-semibold tabular-nums text-accent-ink">
-                            {sliderValue}
-                        </span>
-                    </div>
-                    <input
-                        type="range"
-                        min={question.metadata.sliderMin ?? 0}
-                        max={question.metadata.sliderMax ?? 10}
-                        value={sliderValue}
-                        onChange={(e) =>
-                            setSliderValue(parseInt(e.target.value))
-                        }
-                        aria-label={question.questionText}
-                        aria-valuetext={String(sliderValue)}
-                        className="h-2 w-full cursor-pointer appearance-none rounded-full bg-surface-sunken accent-[var(--accent)]"
-                    />
-                    <div className="flex justify-between text-[12px] font-medium text-ink-subtle">
-                        <span>
-                            {question.metadata.sliderLabels?.[0] ?? "Low"}
-                        </span>
-                        <span>
-                            {question.metadata.sliderLabels?.[1] ?? "Moderate"}
-                        </span>
-                        <span>
-                            {question.metadata.sliderLabels?.[2] ?? "High"}
-                        </span>
-                    </div>
-                    <Button
-                        variant="primary"
-                        size="lg"
-                        className="w-full"
-                        onClick={() => onAnswer(sliderValue.toString())}
-                    >
-                        Confirm
-                    </Button>
-                </div>
-            )}
+            {question.inputType === "slider" &&
+                (() => {
+                    const min = question.metadata.sliderMin ?? 0;
+                    const max = question.metadata.sliderMax ?? 10;
+                    // Honour whatever the model actually gave us, ordered low→high.
+                    // Fall back to the numeric endpoints so words always match numbers.
+                    const labels = question.metadata.sliderLabels?.length
+                        ? question.metadata.sliderLabels
+                        : [String(min), String(max)];
+                    const activeLabel =
+                        labels.length > 0
+                            ? labels[
+                                  Math.min(
+                                      labels.length - 1,
+                                      Math.round(
+                                          ((sliderValue - min) /
+                                              Math.max(max - min, 1)) *
+                                              (labels.length - 1),
+                                      ),
+                                  )
+                              ]
+                            : null;
+
+                    return (
+                        <div className="space-y-6 py-2">
+                            <div className="text-center">
+                                <div className="text-[32px] font-semibold leading-none tabular-nums text-accent-ink">
+                                    {sliderValue}
+                                </div>
+                                {activeLabel && (
+                                    <div className="mt-1 text-[14px] text-ink-muted">
+                                        {activeLabel}
+                                    </div>
+                                )}
+                            </div>
+                            <input
+                                type="range"
+                                min={min}
+                                max={max}
+                                value={sliderValue}
+                                onChange={(e) =>
+                                    setSliderValue(parseInt(e.target.value))
+                                }
+                                aria-label={question.questionText}
+                                aria-valuetext={
+                                    activeLabel ?? String(sliderValue)
+                                }
+                                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-surface-sunken accent-[var(--accent)]"
+                            />
+                            <div className="flex justify-between text-[12px] font-medium text-ink-subtle">
+                                {labels.map((label, i) => (
+                                    <span key={`${label}-${i}`}>{label}</span>
+                                ))}
+                            </div>
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                className="w-full"
+                                onClick={() => onAnswer(sliderValue.toString())}
+                            >
+                                Confirm
+                            </Button>
+                        </div>
+                    );
+                })()}
         </div>
     );
 }

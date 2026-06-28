@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { ParqQuestion } from "@/lib/onboarding/screening";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { Button, Chip, ProgressBar } from "@/components/ui/primitives";
 import { resumeOnboardingAction } from "@/lib/actions";
+import { cn } from "@/lib/utils";
 
 interface ScreeningPageProps {
     questions: ParqQuestion[];
@@ -22,18 +22,18 @@ export function ScreeningPage({ questions }: ScreeningPageProps) {
 
     if (questions.length === 0) {
         return (
-            <Card className="max-w-xl w-full mx-auto m-6 p-8 text-center">
-                <p className="text-slate-500">
+            <div className="mx-auto w-full max-w-xl rounded-xl border border-border bg-surface p-8 text-center">
+                <p className="text-[15px] text-ink-muted">
                     No screening questions available. Please contact your
                     clinical lead.
                 </p>
-            </Card>
+            </div>
         );
     }
 
     const currentQuestion = questions[currentIndex];
     const currentAnswer = responses[currentQuestion.id];
-    const progress = ((currentIndex + 1) / questions.length) * 100;
+    const isLast = currentIndex === questions.length - 1;
 
     const answer = (value: boolean) => {
         setResponses((prev) => ({ ...prev, [currentQuestion.id]: value }));
@@ -58,34 +58,32 @@ export function ScreeningPage({ questions }: ScreeningPageProps) {
     };
 
     return (
-        <div className="max-w-xl w-full mx-auto p-6 flex flex-col gap-8">
-            {/* Header & Progress */}
-            <div className="space-y-4 text-center">
-                <div className="flex justify-between items-end">
-                    <div className="text-left">
-                        <h2 className="text-2xl font-bold text-slate-900">
-                            Activity Readiness
+        <div className="flex w-full max-w-xl flex-col gap-8">
+            {/* Header & progress */}
+            <div className="space-y-3">
+                <div className="flex items-end justify-between gap-3">
+                    <div>
+                        <h2 className="text-[22px] font-semibold text-ink">
+                            Activity readiness
                         </h2>
-                        <p className="text-slate-500 text-sm italic">
+                        <p className="mt-0.5 text-[14px] text-ink-muted">
                             Question {currentIndex + 1} of {questions.length}
                         </p>
                     </div>
-                    <div className="text-right text-[10px] font-mono text-slate-400">
-                        SCREENING: PAR-Q
-                    </div>
+                    <Chip tone="neutral" size="md">
+                        Readiness check
+                    </Chip>
                 </div>
 
-                <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                    <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        className="h-full bg-blue-600"
-                    />
-                </div>
+                <ProgressBar
+                    value={currentIndex + 1}
+                    max={questions.length}
+                    tone="accent"
+                    size="md"
+                />
 
-                <p className="text-xs text-slate-400 text-left">
-                    Please answer each question honestly. Answer
-                    &ldquo;Yes&rdquo; or &ldquo;No&rdquo;.
+                <p className="text-[13px] text-ink-subtle">
+                    Please answer each question honestly.
                 </p>
             </div>
 
@@ -95,50 +93,49 @@ export function ScreeningPage({ questions }: ScreeningPageProps) {
                     initial={{ opacity: 0, x: 10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
+                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                 >
-                    <Card className="p-8 space-y-8 shadow-xl border-slate-200">
-                        <h3 className="text-xl font-semibold text-slate-800 leading-snug min-h-[5rem]">
+                    <div className="space-y-8 rounded-xl border border-border bg-surface p-7 md:p-8">
+                        <h3 className="min-h-[4.5rem] text-[19px] font-semibold leading-snug text-ink">
                             {currentQuestion.text}
                         </h3>
 
                         <div className="grid grid-cols-2 gap-3">
-                            <Button
-                                variant={
-                                    currentAnswer === false
-                                        ? "default"
-                                        : "ghost"
-                                }
+                            <button
+                                type="button"
                                 onClick={() => answer(false)}
                                 disabled={isSubmitting}
-                                className={
+                                aria-pressed={currentAnswer === false}
+                                className={cn(
+                                    "min-h-14 rounded-md border text-[16px] font-medium transition-colors disabled:opacity-50",
                                     currentAnswer === false
-                                        ? "py-6 text-lg bg-blue-600 hover:bg-blue-700"
-                                        : "py-6 text-lg border border-slate-200"
-                                }
+                                        ? "border-accent bg-accent-soft text-accent-ink"
+                                        : "border-border bg-surface text-ink-muted hover:bg-surface-sunken hover:text-ink",
+                                )}
                             >
                                 No
-                            </Button>
-                            <Button
-                                variant={
-                                    currentAnswer === true ? "default" : "ghost"
-                                }
+                            </button>
+                            <button
+                                type="button"
                                 onClick={() => answer(true)}
                                 disabled={isSubmitting}
-                                className={
+                                aria-pressed={currentAnswer === true}
+                                className={cn(
+                                    "min-h-14 rounded-md border text-[16px] font-medium transition-colors disabled:opacity-50",
                                     currentAnswer === true
-                                        ? "py-6 text-lg bg-amber-500 hover:bg-amber-600"
-                                        : "py-6 text-lg border border-slate-200"
-                                }
+                                        ? "border-attention bg-attention-soft text-attention-ink"
+                                        : "border-border bg-surface text-ink-muted hover:bg-surface-sunken hover:text-ink",
+                                )}
                             >
                                 Yes
-                            </Button>
+                            </button>
                         </div>
 
-                        <div className="flex gap-3 pt-2">
+                        <div className="flex gap-3 pt-1">
                             {currentIndex > 0 && (
                                 <Button
                                     variant="ghost"
+                                    size="lg"
                                     onClick={() =>
                                         setCurrentIndex((prev) => prev - 1)
                                     }
@@ -148,20 +145,17 @@ export function ScreeningPage({ questions }: ScreeningPageProps) {
                                 </Button>
                             )}
                             <Button
+                                variant="primary"
+                                size="lg"
                                 onClick={handleNext}
-                                disabled={
-                                    isSubmitting || currentAnswer === undefined
-                                }
-                                className="flex-1 bg-blue-600 hover:bg-blue-700 py-6 text-lg"
+                                loading={isSubmitting}
+                                disabled={currentAnswer === undefined}
+                                className="flex-1"
                             >
-                                {isSubmitting
-                                    ? "Processing..."
-                                    : currentIndex === questions.length - 1
-                                      ? "Complete Screening"
-                                      : "Next"}
+                                {isLast ? "Complete screening" : "Next"}
                             </Button>
                         </div>
-                    </Card>
+                    </div>
                 </motion.div>
             </AnimatePresence>
         </div>
