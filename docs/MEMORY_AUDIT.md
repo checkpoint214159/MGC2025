@@ -126,3 +126,26 @@ plan quality, looped over the multi-policy e2e tests (10.1).
 -   State-gen graph: `lib/state/graph/{graph,config,annotation}.ts`,
     `lib/state/graph/nodes/{context,consolidate,dispatch,external,module,save}.ts`
 -   Prompt assembly: `lib/state/services/modules.ts`; digest: `lib/state/services/digest.ts`
+
+## 9.2 — Implemented
+
+-   **A. Removed dead context** ✅ — `state.transcripts` and `state.stateHistory` annotation
+    fields deleted; `load_context` no longer builds the unused full-transcript string, does the
+    N-day `getActiveState` loop, or runs `smartFiltering`/`filterSignificantStates`/
+    `computeStateChangeScore`/`loadAllStateHistory` (all dead). `previousState` is now the most
+    recent prior active state (derived from the history already fetched for the digest), which is
+    robust to logging gaps — instead of strictly yesterday's exact date. Logging switched to
+    `createLogger("state-gen")` and now reports context sizes (history/metrics/rolling/raw/memory
+    chars) for item-10 observability.
+-   **B. Rolling multi-window trends** ✅ — `lib/memory/rolling.ts` `buildRollingTrends(metrics,
+asOf)` aggregates the persisted `DailyMetric` rows over sliding windows (7d, prior-7d for
+    week-over-week direction, and 30d) into a compact labelled block, appended to the heuristic
+    digest in `load_context`. Deterministic, 7 unit tests (`rolling.test.ts`). This is the mid-tier
+    timespan the audit found missing — "across the sliding window / across the month."
+-   **C. plan→outcome trace** — deferred (bigger: new persistence + design). Documented above.
+-   **D. bound raw window + de-dupe thread fetch** — deferred; the `load_context`/`compile_external`
+    double thread fetch remains. Documented above.
+
+Net effect on the plan-gen prompt: same three cached layers, but the digest layer now carries
+week-over-week + monthly trend direction, and the graph stopped computing two large unused
+artifacts per generation.
