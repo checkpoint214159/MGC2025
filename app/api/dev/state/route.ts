@@ -24,6 +24,7 @@ import { prisma } from "@/lib/prisma";
  *   flags:   { complianceThreshold?: number }         — pain + compliance flags over history
  *   metrics: {}                                       — persisted DailyMetric rows (asc by date)
  *   profile: {}                                       — name + onboarding profile/semantic memory
+ *   reset:   {}                                       — delete this patient's states + metrics
  */
 export async function POST(req: Request) {
     if (process.env.NODE_ENV === "production") {
@@ -89,6 +90,21 @@ export async function POST(req: Request) {
             case "metrics": {
                 const metrics = await getDailyMetrics(userId);
                 return NextResponse.json(metrics);
+            }
+            case "reset": {
+                // Clean slate for a deterministic trajectory run: drop this patient's
+                // persisted metrics and state chain so force-regen can't collide on the
+                // self-referential causalStateId unique key. Order matters (metrics first;
+                // modules/progress cascade on state delete). Neon HTTP: each deleteMany is
+                // one statement, so self-referential states delete together fine.
+                await prisma.dailyMetric.deleteMany({ where: { userId } });
+                const deleted = await prisma.state.deleteMany({
+                    where: { userId },
+                });
+                return NextResponse.json({
+                    ok: true,
+                    deletedStates: deleted.count,
+                });
             }
             case "profile": {
                 const user = await prisma.user.findUnique({

@@ -15,12 +15,18 @@ Invocation target: `npm run harness:trajectory policy="LENGTHY_POLICY_STRING"`
 
 ## Architecture decisions (made by main agent; revisit only if blocked)
 
--   **The "subagent" patient-simulator is an OpenRouter LLM call from the `.mjs` harness**,
-    not a Claude Code Agent-tool spawn. Reason: the harness must run from `npm`, which
-    cannot spawn Agent-tool subagents. A direct `fetch` to OpenRouter (key already in
-    `.env.local`, loaded via dotenv like `e2e-notifications.mjs`) is self-contained,
-    keeps the simulation reasoning **out of the main agent's context** (the stated goal),
-    and is conditionable on-the-fly via the policy string.
+-   **The patient-simulator is a real Claude agent, spawned via the Claude Agent SDK**
+    (`@anthropic-ai/claude-agent-sdk`) from inside `_simulator.mjs`. (Superseded the earlier
+    OpenRouter-call design after the user clarified the patient should _be_ Claude.) The SDK
+    spawns its own agent process and authenticates off the ambient Claude login — so it runs
+    from a plain `npm run` with **no extra key** in this environment. Each day is a fresh
+    single-turn agent conditioned on the policy + profile + running memory digest, keeping
+    continuity without an ever-growing context and keeping the simulation **out of the main
+    agent's context**. Default model `haiku` (cheap; override via `SIM_MODEL`).
+    -   Why not the main agent's Agent tool: a `.mjs` script can't reach it (it only exists in
+        the live conversation). The SDK is the way to get a real Claude patient runnable via npm.
+    -   Why not OpenRouter: it isn't Anthropic-Messages-API compatible, and the patient should be
+        Claude. (The OpenRouter version is preserved in git history if ever wanted.)
 -   **Continuity without context blowup**: each session writes a running markdown memory
     at `.dev/policy-sessions/<timestamp>.md`. Each day appends a 1–2 line summary; the
     simulator is fed a compact digest, not the full transcript.
@@ -48,30 +54,38 @@ Invocation target: `npm run harness:trajectory policy="LENGTHY_POLICY_STRING"`
 -   NOTE: live DB-persistence path verified in item 8 (needs server restarted after the
     prisma regen so the running client has `prisma.dailyMetric`).
 
-### 7 — Policy harness infrastructure ☐ TODO
+### 7 — Policy harness infrastructure ✅ DONE (committed)
 
--   [ ] `scripts/harness/_simulator.mjs`: OpenRouter client + `decidePatientActions({
-policy, profile, plan, memoryDigest })` → structured per-task decisions + pain.
--   [ ] `scripts/harness/_policy-memory.mjs`: read/append the session markdown memory.
--   [ ] Arg parsing: `policy="..."` (and optional `days=`, `complianceThreshold=`).
--   [ ] Succinct per-task logging: `day 3 · leglifts 7/10 · walk 12/20min · pain 6/10`.
--   [ ] `/api/dev/state` already exposes fetch/log/history/flags — extend if needed for
-        DailyMetric + notification verification.
+-   [x] `scripts/harness/_simulator.mjs`: Claude-agent patient via Agent SDK,
+        `decidePatientActions({policy, profile, memoryDigest, tasks})` → per-task values + pain.
+-   [x] `scripts/harness/_policy-memory.mjs`: session markdown memory (create/append/readDigest).
+-   [x] `scripts/harness/_plan.mjs`: extractTasks / buildUpdates / formatTaskLog.
+-   [x] Arg parsing: `policy=` (+ `days=`, `complianceThreshold=`, `name=`, `model=`).
+-   [x] Succinct per-task logging (`exercise:Ankle Pumps 6/20repetitions · … · pain 6/10`).
+-   [x] `/api/dev/state` extended: `metrics`, `profile`, `reset` ops; compliance in `flags`.
 
-### 8 — 14-day policy trajectory test (replaces e2e-trajectory) ☐ TODO
+### 8 — 14-day policy trajectory test (replaces e2e-trajectory) ✅ DONE
 
--   [ ] `npm run harness:trajectory policy="..."` runs 14 simulated days via the 7 infra.
--   [ ] After the run: evaluate flags from persisted DailyMetric series.
--   [ ] Assert flag⟺notification consistency (no fixed prior): if `low_compliance` or
-        `pain_stagnation` fires, the matching email/push must have been attempted (verify
-        via cron endpoint result / notification log).
--   [ ] Keep the old deterministic trajectory assertions available or fold them in.
+-   [x] `npm run harness:trajectory -- policy="..." [days= complianceThreshold= name= model=]`.
+-   [x] After the run: persisted DailyMetric rows asserted; flags from the series.
+-   [x] Asserts flag⟺notification consistency (no fixed prior) via the user-scoped cron.
+-   [x] OpenRouter 14-day run: 24/24 green (pain_stagnation + low_compliance both fired+notified).
+-   [x] SDK-patient 14-day run: both flags fired + both notifications sent; 13 DailyMetric rows.
+        23/24 — the 1 miss was a transient app-side state-gen LLM error on day 1 ("Failed to
+        process successful response"), which the harness tolerated (under the 3-fail abort) and
+        continued past. Not a harness defect.
 
-## Open questions (ask only if truly blocked)
+## Known limitations / follow-ups
 
--   Model slug for the simulator (default to a cheap one, e.g. `deepseek/deepseek-chat`,
-    overridable by `SIM_MODEL` env). No new key needed — OpenRouter already configured.
+-   App-side state generation occasionally returns schema-invalid LLM output ("Failed to process
+    successful response"); over a 14-day run this trips ~1 day. The harness is resilient (aborts
+    only after 3 consecutive failures). A retry on state-gen would make long runs fully green.
+-   `force`-regenerating a state for a date that already has a chain collides on
+    `State.causalStateId` (unique). The harness sidesteps this with the `reset` op; production
+    never force-regens, so it's harness-only.
 
 ## Status log
 
--   2026-06-28: branch `loop/policy-harness` cut; plan written; starting 7.5.
+-   2026-06-28: branch `loop/policy-harness`; 7.5 + 7 + 8 built. OpenRouter 14-day 24/24 green;
+    patient then rewired to Claude Agent SDK (days=1 11/11; days=14 23/24, both flags fired).
+    All of items 5, 6, 7, 7.5, 8 complete.

@@ -1,76 +1,88 @@
 // Patient-simulator "subagent" for the policy-driven harness.
 //
-// This is the OpenRouter LLM call that PLAYS THE PATIENT. Given a natural-language
-// `policy`, the patient's onboarding profile, a running memory digest, and the tasks the
-// app prescribed for the day, it decides — in character, per the policy — how much of each
-// task to actually complete and what pain to report. Returns structured JSON the harness
-// applies via the log op.
+// The patient is a REAL Claude agent, spawned via the Claude Agent SDK (@anthropic-ai/
+// claude-agent-sdk) — not an OpenRouter completion. Given a natural-language `policy`, the
+// patient's onboarding profile, and a running memory digest, the agent decides — in character,
+// per the policy — how much of each prescribed task to actually complete and what pain to
+// report. Returns structured JSON the harness applies via the log op.
 //
-// Kept as a direct fetch (no AI-SDK / no Prisma) so it runs from a plain node .mjs and keeps
-// the simulation reasoning OUT of the main agent's context. Caller must have loaded
-// .env.local (for OPENROUTER_API_KEY) before importing/using this.
+// Runs from a plain `npm run` because the SDK spawns its own agent process; it authenticates
+// off the ambient Claude login (no extra key needed in this environment). Each day is a fresh
+// single-turn agent conditioned on the policy + the patient's own recent history (the memory
+// digest), which keeps continuity without an ever-growing context.
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+import { query } from "@anthropic-ai/claude-agent-sdk";
 
-// Cheap model by default — the patient side doesn't need a frontier model. Override per run.
-export const SIM_MODEL =
-    process.env.SIM_MODEL ?? "deepseek/deepseek-chat";
+// Patient model. A frontier model isn't needed to role-play a patient, so default to a cheap
+// fast one; override per run with SIM_MODEL (alias like "sonnet"/"opus" or a full model id).
+export const SIM_MODEL = process.env.SIM_MODEL ?? "haiku";
+
+const PER_DAY_TIMEOUT_MS = Number(process.env.SIM_TIMEOUT_MS ?? 120_000);
 
 function extractJson(text) {
-    // Models sometimes wrap JSON in prose or ```json fences. Grab the outermost object.
     const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
     const candidate = fenced ? fenced[1] : text;
     const start = candidate.indexOf("{");
     const end = candidate.lastIndexOf("}");
-    if (start < 0 || end < 0) throw new Error(`no JSON object in: ${text.slice(0, 200)}`);
+    if (start < 0 || end < 0)
+        throw new Error(`no JSON object in: ${text.slice(0, 200)}`);
     return JSON.parse(candidate.slice(start, end + 1));
 }
 
-async function callOpenRouter(messages, { model = SIM_MODEL, temperature = 0.7 } = {}) {
-    const key = process.env.OPENROUTER_API_KEY;
-    if (!key) throw new Error("OPENROUTER_API_KEY not set (load .env.local first)");
-
-    const res = await fetch(OPENROUTER_URL, {
-        method: "POST",
-        headers: {
-            authorization: `Bearer ${key}`,
-            "content-type": "application/json",
-        },
-        body: JSON.stringify({
-            model,
-            temperature,
-            messages,
-            // Nudge structured output where supported; we still defensively parse.
-            response_format: { type: "json_object" },
-        }),
-    });
-    if (!res.ok) {
-        const body = await res.text().catch(() => "");
-        throw new Error(`OpenRouter ${res.status}: ${body.slice(0, 300)}`);
-    }
-    const data = await res.json();
-    const content = data?.choices?.[0]?.message?.content ?? "";
-    return content;
-}
-
 const SYSTEM = `You are simulating a real post-operative recovery patient interacting with a recovery app.
-You are NOT an assistant — you are the patient. Each day the app gives you a plan (a list of tasks
+You are NOT an assistant — you ARE the patient. Each day the app gives you a plan (a list of tasks
 with targets) and asks you to log how much you actually did, plus your pain level (0-10).
 
 You must behave according to the POLICY you are given. The policy describes your tendencies
 (e.g. how diligently you follow the plan, how your pain behaves). Stay in character and be
 internally consistent with your prior days (given as memory).
 
-Respond with ONLY a JSON object of this exact shape:
+Respond with ONLY a JSON object of this exact shape, no prose around it:
 {
   "pain": <integer 0-10>,
   "note": "<one short sentence, in the patient's voice>",
-  "actions": [ { "n": <task number>, "value": <number you actually did, 0..goal or beyond> } ]
+  "actions": [ { "n": <task number>, "value": <number you actually did, 0..target or beyond> } ]
 }
-Include one action per task number you were given. Do not add commentary outside the JSON.`;
+Include exactly one action per task number you were given.`;
+
+/** Run the patient agent for one day; returns the final assistant text. */
+async function runPatientAgent(userPrompt, { model }) {
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), PER_DAY_TIMEOUT_MS);
+    try {
+        const response = query({
+            prompt: userPrompt,
+            options: {
+                model,
+                systemPrompt: SYSTEM,
+                maxTurns: 1,
+                allowedTools: [], // pure decision — the patient has no tools
+                abortController: ac,
+            },
+        });
+        let text = "";
+        for await (const m of response) {
+            if (m.type === "result" && m.subtype === "success") {
+                text = m.result ?? "";
+            } else if (m.type === "assistant" && !text) {
+                // fallback: pull text from the assistant message if no result arrives
+                const content = m.message?.content;
+                if (Array.isArray(content)) {
+                    text = content
+                        .filter((c) => c.type === "text")
+                        .map((c) => c.text)
+                        .join("");
+                }
+            }
+        }
+        return text;
+    } finally {
+        clearTimeout(timer);
+    }
+}
 
 /**
- * Ask the simulated patient to respond to today's plan.
+ * Ask the simulated patient (a Claude agent) to respond to today's plan.
  *
  * @param {object} p
  * @param {string} p.policy        natural-language conditioning for the patient
@@ -86,7 +98,7 @@ export async function decidePatientActions(p) {
         .map((t) => `  #${t.n} ${t.label} — target ${t.goal} ${t.unit}`)
         .join("\n");
 
-    const user = `POLICY (how you, the patient, behave):
+    const userPrompt = `POLICY (how you, the patient, behave):
 ${p.policy}
 
 YOUR PROFILE (from onboarding):
@@ -102,19 +114,23 @@ ${taskLines || "  (no tasks today)"}
 For each task #n decide the value you actually achieved (0 means skipped; meeting target means
 value >= target). Then report your pain (0-10). Respond with the JSON object only.`;
 
-    const content = await callOpenRouter([
-        { role: "system", content: SYSTEM },
-        { role: "user", content: user },
-    ]);
+    const text = await runPatientAgent(userPrompt, { model: SIM_MODEL });
+    if (!text)
+        throw new Error("patient agent returned no output (auth/timeout?)");
 
     let parsed;
     try {
-        parsed = extractJson(content);
+        parsed = extractJson(text);
     } catch (e) {
-        throw new Error(`simulator returned unparseable output: ${e.message}`);
+        throw new Error(
+            `patient agent returned unparseable output: ${e.message}`,
+        );
     }
 
-    const pain = Math.max(0, Math.min(10, Math.round(Number(parsed.pain ?? 0))));
+    const pain = Math.max(
+        0,
+        Math.min(10, Math.round(Number(parsed.pain ?? 0))),
+    );
     const actions = Array.isArray(parsed.actions)
         ? parsed.actions
               .map((a) => ({ n: Number(a.n), value: Number(a.value) }))

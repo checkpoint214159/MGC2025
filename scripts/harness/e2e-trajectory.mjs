@@ -1,7 +1,8 @@
 // Policy-driven E2E trajectory (TODO items 7 + 8).
 //
-// Simulates a multi-day patient↔app interaction. A natural-language POLICY conditions an
-// LLM "patient" (scripts/harness/_simulator.mjs) that responds to each day's generated plan —
+// Simulates a multi-day patient↔app interaction. A natural-language POLICY conditions a
+// Claude-agent "patient" (scripts/harness/_simulator.mjs, via @anthropic-ai/claude-agent-sdk)
+// that responds to each day's generated plan —
 // deciding how much of each task to complete and what pain to report. The harness logs each
 // interaction task-wise, persists a running markdown memory per session, then verifies that
 // whatever flags the policy produced (pain_stagnation / low_compliance) are matched by a
@@ -76,22 +77,29 @@ function recoveryDayOf(dateISO, surgeryDate) {
 
 async function main() {
     if (!(await c.up())) {
-        console.error(`✖ dev server not reachable at ${c.base}. Run \`npm run dev:logged\`.`);
+        console.error(
+            `✖ dev server not reachable at ${c.base}. Run \`npm run dev:logged\`.`,
+        );
         process.exit(1);
     }
-    if (!process.env.OPENROUTER_API_KEY) {
-        console.error("✖ OPENROUTER_API_KEY missing from .env.local — simulator can't run.");
-        process.exit(1);
-    }
+    // The patient simulator is a Claude Agent SDK agent (authenticates off the ambient
+    // Claude login) — no OpenRouter key needed here.
     if (logSize() === 0)
-        console.log("⚠️  no .dev/server.log — log scanning OFF (run `npm run dev:logged`).\n");
+        console.log(
+            "⚠️  no .dev/server.log — log scanning OFF (run `npm run dev:logged`).\n",
+        );
 
     console.log(`\n━━ Policy trajectory: "${NAME}" ━━`);
-    console.log(`   days=${DAYS}  complianceThreshold=${COMPLIANCE_THRESHOLD}%  sim=${SIM_MODEL}`);
+    console.log(
+        `   days=${DAYS}  complianceThreshold=${COMPLIANCE_THRESHOLD}%  sim=${SIM_MODEL}`,
+    );
     console.log(`   policy: ${POLICY}\n`);
 
     // 1. Seed + login the standard harness patient (fully onboarded, no LLM onboarding).
-    const { res: seedRes, body: seed } = await c.postJson("/api/dev/seed-patient", {});
+    const { res: seedRes, body: seed } = await c.postJson(
+        "/api/dev/seed-patient",
+        {},
+    );
     record("seed harness patient", seedRes.ok && !!seed?.email, seed?.error);
     if (!seedRes.ok) process.exit(1);
     record("login", await c.login(seed.email, seed.password));
@@ -101,10 +109,23 @@ async function main() {
     const userId = sess.user.id;
 
     // 2. Patient conditioning: onboarding profile + surgery date.
-    const { body: prof } = await c.postJson("/api/dev/state", { op: "profile" });
-    const profileText = [prof?.profile, prof?.semantic].filter(Boolean).join("\n\n");
+    const { body: prof } = await c.postJson("/api/dev/state", {
+        op: "profile",
+    });
+    const profileText = [prof?.profile, prof?.semantic]
+        .filter(Boolean)
+        .join("\n\n");
     const surgeryDate = prof?.surgeryDate ?? null;
     record("loaded patient profile", !!prof, prof?.treatment ?? "");
+
+    // Clean slate so force-regen can't collide on the causal-state chain from prior runs,
+    // and so the metric/flag assertions reflect ONLY this run.
+    const { body: reset } = await c.postJson("/api/dev/state", { op: "reset" });
+    record(
+        "reset patient state",
+        reset?.ok === true,
+        `cleared ${reset?.deletedStates ?? "?"} states`,
+    );
 
     const session = createSession({
         name: NAME,
@@ -123,14 +144,22 @@ async function main() {
         const date = dateStr(i);
         const recoveryDay = recoveryDayOf(date, surgeryDate);
 
-        const { res, body: state, findings } = await stateOp({
+        const {
+            res,
+            body: state,
+            findings,
+        } = await stateOp({
             op: "fetch",
             date,
             force: true,
         });
         const modules = state?.modules ?? [];
         if (!res.ok || state?.error || modules.length < 3) {
-            record(`day ${day}: state generated`, false, state?.error ?? `${modules.length} modules`);
+            record(
+                `day ${day}: state generated`,
+                false,
+                state?.error ?? `${modules.length} modules`,
+            );
             simFailures++;
             if (simFailures >= 3) {
                 record("aborting — 3 day failures", false);
@@ -160,7 +189,12 @@ async function main() {
         }
 
         // Apply the decision via per-module log ops.
-        const updates = buildUpdates(state, decision.actions, { tasks, index }, decision.pain);
+        const updates = buildUpdates(
+            state,
+            decision.actions,
+            { tasks, index },
+            decision.pain,
+        );
         let logErr = null;
         for (const u of updates) {
             const { body: lb, findings: lf } = await stateOp({
@@ -176,24 +210,42 @@ async function main() {
         const line = `Day ${day} (rec ${recoveryDay ?? "?"}) · ${taskLog} · pain ${decision.pain}/10 · "${decision.note}"`;
         appendDay(session, line);
         console.log(`   ${line}`);
-        record(`day ${day}: logged ${tasks.length} task(s)`, !logErr && !findings.length, logErr ?? undefined);
+        record(
+            `day ${day}: logged ${tasks.length} task(s)`,
+            !logErr && !findings.length,
+            logErr ?? undefined,
+        );
 
         if (i < DAYS - 1) await sleep(800);
     }
 
     // 4. Post-run: history + persisted metrics (verifies 7.5 end-to-end).
     console.log("\n── assertions ──");
-    const { body: history } = await c.postJson("/api/dev/state", { op: "history" });
-    const traj = (Array.isArray(history) ? history : []).filter((s) => stateIds.includes(s.id));
-    record(`history has ${stateIds.length} trajectory states`, traj.length === stateIds.length, `found ${traj.length}`);
+    const { body: history } = await c.postJson("/api/dev/state", {
+        op: "history",
+    });
+    const traj = (Array.isArray(history) ? history : []).filter((s) =>
+        stateIds.includes(s.id),
+    );
+    record(
+        `history has ${stateIds.length} trajectory states`,
+        traj.length === stateIds.length,
+        `found ${traj.length}`,
+    );
 
-    const { body: metrics } = await c.postJson("/api/dev/state", { op: "metrics" });
+    const { body: metrics } = await c.postJson("/api/dev/state", {
+        op: "metrics",
+    });
     const metricRows = Array.isArray(metrics) ? metrics : [];
-    const withCompliance = metricRows.filter((m) => m.compliancePct !== null).length;
+    const withCompliance = metricRows.filter(
+        (m) => m.compliancePct !== null,
+    ).length;
     const withPain = metricRows.filter((m) => m.painScore !== null).length;
     record(
         "DailyMetric rows persisted (compliance + pain)",
-        metricRows.length >= stateIds.length && withCompliance > 0 && withPain > 0,
+        metricRows.length >= stateIds.length &&
+            withCompliance > 0 &&
+            withPain > 0,
         `${metricRows.length} rows, ${withCompliance} w/ compliance, ${withPain} w/ pain`,
     );
 
@@ -221,17 +273,31 @@ async function main() {
 
     // 6. Trigger the cron scoped to this patient and verify FLAG ⟺ NOTIFICATION consistency.
     if (!CRON_SECRET) {
-        record("cron notifications", false, "CRON_SECRET missing from .env.local");
+        record(
+            "cron notifications",
+            false,
+            "CRON_SECRET missing from .env.local",
+        );
         return finish(session);
     }
     const cronCall = await fetch(`${c.base}/api/notifications/cron`, {
         method: "POST",
-        headers: { authorization: `Bearer ${CRON_SECRET}`, "content-type": "application/json" },
-        body: JSON.stringify({ complianceThreshold: COMPLIANCE_THRESHOLD, userId }),
+        headers: {
+            authorization: `Bearer ${CRON_SECRET}`,
+            "content-type": "application/json",
+        },
+        body: JSON.stringify({
+            complianceThreshold: COMPLIANCE_THRESHOLD,
+            userId,
+        }),
     });
     const cronBody = await cronCall.json().catch(() => ({}));
     const mine = (cronBody?.results ?? []).find((r) => r.userId === userId);
-    record("cron ran for patient", cronCall.ok && !!mine, mine ? `sent [${mine.sent.join(", ")}]` : `status ${cronCall.status}`);
+    record(
+        "cron ran for patient",
+        cronCall.ok && !!mine,
+        mine ? `sent [${mine.sent.join(", ")}]` : `status ${cronCall.status}`,
+    );
 
     if (mine) {
         const attempted = (label) =>
@@ -247,7 +313,9 @@ async function main() {
         record(
             `compliance flag ⟺ notification (flag=${compFired})`,
             compFired === attempted("low-compliance"),
-            compFired ? "expected compliance alert" : "expected no compliance alert",
+            compFired
+                ? "expected compliance alert"
+                : "expected no compliance alert",
         );
 
         appendBlock(
@@ -268,7 +336,9 @@ async function main() {
 
 function finish(session) {
     const failed = results.filter((r) => !r.ok).length;
-    console.log(`\n── policy trajectory: ${results.length - failed}/${results.length} green ──`);
+    console.log(
+        `\n── policy trajectory: ${results.length - failed}/${results.length} green ──`,
+    );
     if (session) console.log(`   full session log: ${session}`);
     process.exit(failed ? 1 : 0);
 }
