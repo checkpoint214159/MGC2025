@@ -7,12 +7,15 @@ import {
     getLowComplianceSignal,
 } from "@/lib/engagement/flags";
 import { createLogger } from "@/lib/logger";
+import { getPatientMemory } from "@/lib/memory/service";
+import { renderMemoryForPrompt } from "@/lib/memory/transforms";
 import {
     sendEmail,
     dailyNudgeEmail,
     painAlertEmail,
     lowComplianceEmail,
     complianceAlertEmail,
+    type EmailPayload,
 } from "./email";
 import {
     sendPush,
@@ -20,9 +23,62 @@ import {
     painAlertPush,
     lowCompliancePush,
     complianceAlertPush,
+    type PushPayload,
 } from "./push";
+import {
+    generateNotificationContent,
+    notificationLLMEnabled,
+    type NotificationKind,
+} from "./generate";
 
 const log = createLogger("cron");
+
+/**
+ * Contextualize a notification (TODO item 11): generate personalized copy from the patient's
+ * memory + situation, falling back to the static template on any failure (or when disabled).
+ */
+async function contextualizedPayloads(
+    kind: NotificationKind,
+    name: string,
+    situation: string,
+    memoryBlock: string,
+    templateEmail: EmailPayload,
+    templatePush: PushPayload,
+): Promise<{ email: EmailPayload; push: PushPayload; generated: boolean }> {
+    if (!notificationLLMEnabled() || !memoryBlock) {
+        return { email: templateEmail, push: templatePush, generated: false };
+    }
+    try {
+        const c = await generateNotificationContent({
+            kind,
+            name,
+            memoryBlock,
+            situation,
+        });
+        const appUrl =
+            process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+        return {
+            email: {
+                to: "",
+                subject: c.subject,
+                html: `<p>${c.body}</p>\n<p><a href="${appUrl}/patient/dashboard">Open your dashboard →</a></p>`,
+            },
+            push: {
+                title: c.pushTitle,
+                body: c.pushBody,
+                url: "/patient/dashboard",
+            },
+            generated: true,
+        };
+    } catch (e: unknown) {
+        log.warn(
+            `contextualized ${kind} failed, using template: ${
+                (e as Error).message
+            }`,
+        );
+        return { email: templateEmail, push: templatePush, generated: false };
+    }
+}
 
 // How many consecutive days without any state before "low compliance" fires.
 const LOW_COMPLIANCE_THRESHOLD_DAYS = 2;
@@ -34,6 +90,7 @@ interface NotificationResult {
     sent: string[];
     skipped: string[];
     errors: string[];
+    generated: string[]; // kinds whose copy was LLM-contextualized (vs template fallback)
 }
 
 async function notify(
@@ -95,6 +152,7 @@ async function processPatient(
         sent: [],
         skipped: [],
         errors: [],
+        generated: [],
     };
 
     if (!email) {
@@ -105,17 +163,30 @@ async function processPatient(
     const history = await getStateHistory(userId);
     const today = new Date().toISOString().slice(0, 10);
 
+    // Patient memory → the conditioning for contextualized notification copy (item 11).
+    const memory = await getPatientMemory(userId);
+    const memoryBlock = renderMemoryForPrompt(memory);
+
     // ── 1. Daily nudge: no state logged for today ──
     const loggedToday = history.some(
         (s) => new Date(s.dateCreated).toISOString().slice(0, 10) === today,
     );
     if (!loggedToday) {
+        const p = await contextualizedPayloads(
+            "daily-nudge",
+            name,
+            "They have not logged any recovery progress yet today.",
+            memoryBlock,
+            dailyNudgeEmail(name),
+            dailyNudgePush(),
+        );
+        if (p.generated) result.generated.push("daily-nudge");
         const r = await notify(
             userId,
             email,
             name,
-            dailyNudgeEmail(name),
-            dailyNudgePush(),
+            p.email,
+            p.push,
             "daily-nudge",
         );
         result.sent.push(...r.sent);
@@ -134,12 +205,21 @@ async function processPatient(
             (Date.now() - new Date(latestDate).getTime()) / 86400000,
         );
         if (daysSinceLast >= LOW_COMPLIANCE_THRESHOLD_DAYS) {
+            const p = await contextualizedPayloads(
+                "inactivity",
+                name,
+                `They have not logged any recovery progress for ${daysSinceLast} day(s).`,
+                memoryBlock,
+                lowComplianceEmail(name, daysSinceLast),
+                lowCompliancePush(daysSinceLast),
+            );
+            if (p.generated) result.generated.push("inactivity");
             const r = await notify(
                 userId,
                 email,
                 name,
-                lowComplianceEmail(name, daysSinceLast),
-                lowCompliancePush(daysSinceLast),
+                p.email,
+                p.push,
                 "inactivity",
             );
             result.sent.push(...r.sent);
@@ -162,12 +242,21 @@ async function processPatient(
 
         const painFlag = flags.find((f) => f.kind === "pain_stagnation");
         if (painFlag) {
+            const p = await contextualizedPayloads(
+                "pain-stagnation",
+                name,
+                painFlag.detail,
+                memoryBlock,
+                painAlertEmail(name, painFlag.detail),
+                painAlertPush(),
+            );
+            if (p.generated) result.generated.push("pain-stagnation");
             const r = await notify(
                 userId,
                 email,
                 name,
-                painAlertEmail(name, painFlag.detail),
-                painAlertPush(),
+                p.email,
+                p.push,
                 "pain-stagnation",
             );
             result.sent.push(...r.sent);
@@ -183,12 +272,21 @@ async function processPatient(
                 complianceThreshold,
             );
             const mean = signal.mean ?? 0;
+            const p = await contextualizedPayloads(
+                "low-compliance",
+                name,
+                `Average daily plan completion has been about ${mean}% over the last few days (below the ${signal.threshold}% target).`,
+                memoryBlock,
+                complianceAlertEmail(name, mean, signal.threshold),
+                complianceAlertPush(mean),
+            );
+            if (p.generated) result.generated.push("low-compliance");
             const r = await notify(
                 userId,
                 email,
                 name,
-                complianceAlertEmail(name, mean, signal.threshold),
-                complianceAlertPush(mean),
+                p.email,
+                p.push,
                 "low-compliance",
             );
             result.sent.push(...r.sent);
@@ -225,7 +323,12 @@ export async function runNotificationCron(opts?: {
             const r = await processPatient(id, opts?.complianceThreshold);
             results.push(r);
             if (r.sent.length > 0)
-                log.info(`✓ ${id}: sent [${r.sent.join(", ")}]`);
+                log.info(
+                    `✓ ${id}: sent [${r.sent.join(", ")}]` +
+                        (r.generated.length
+                            ? ` · contextualized [${r.generated.join(", ")}]`
+                            : ""),
+                );
             if (r.errors.length > 0)
                 log.error(`✗ ${id}: errors [${r.errors.join(", ")}]`);
         } catch (e: unknown) {
@@ -237,6 +340,7 @@ export async function runNotificationCron(opts?: {
                 sent: [],
                 skipped: [],
                 errors: [(e as Error).message],
+                generated: [],
             });
         }
     }

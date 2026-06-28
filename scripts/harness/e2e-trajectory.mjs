@@ -328,7 +328,9 @@ async function main() {
     record(
         "cron ran for patient",
         cronCall.ok && !!mine,
-        mine ? `sent [${mine.sent.join(", ")}]` : `status ${cronCall.status}`,
+        mine
+            ? `sent [${mine.sent.join(", ")}]${mine.generated?.length ? ` · contextualized [${mine.generated.join(", ")}]` : ""}`
+            : `status ${cronCall.status}`,
     );
 
     if (mine) {
