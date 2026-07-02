@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import {
     User, CalendarDays, ClipboardCheck, Target, Footprints, Dumbbell, Mountain, Apple,
     Activity, Wind, Bike, Clock, Salad, Flame, Beef, Carrot, Droplets, TriangleAlert,
-    Thermometer, HeartPulse, Ban, ArrowRight,
+    Thermometer, HeartPulse, Ban, ArrowRight, BadgeCheck,
 } from "lucide-react";
 import { PhaseScope } from "@/components/wally/PhaseScope";
 import { Button } from "@/components/ui/primitives";
@@ -49,8 +49,13 @@ const REDFLAGS = [
 export function WallyPlan() {
     return (
         <div className="mx-auto max-w-4xl px-5 py-8">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-attention-soft px-4 py-2 text-[14px] font-semibold text-attention-ink">
-                <ClipboardCheck size={16} /> Goals &amp; Personalised Plan Generated
+            <div className="mb-4 flex flex-wrap gap-2">
+                <span className="inline-flex items-center gap-2 rounded-full bg-attention-soft px-4 py-2 text-[14px] font-semibold text-attention-ink">
+                    <ClipboardCheck size={16} /> Goals &amp; Personalised Plan Generated
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-progress-soft px-4 py-2 text-[14px] font-semibold text-progress-ink">
+                    <BadgeCheck size={16} /> Verified by your Physiotherapist &amp; Dietitian
+                </span>
             </div>
 
             <article className="overflow-hidden rounded-2xl border border-border bg-surface">
