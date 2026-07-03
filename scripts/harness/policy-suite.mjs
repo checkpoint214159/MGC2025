@@ -64,6 +64,8 @@ function runPolicy(name) {
                 `days=${DAYS}`,
                 `name=${name}`,
                 `complianceThreshold=${THRESHOLD}`,
+                // Persona passthrough: run the same policy matrix across different patients
+                ...(args.preset ? [`preset=${args.preset}`] : []),
                 `policy=${policy}`,
             ],
             { env: process.env },

@@ -48,6 +48,8 @@ const POLICY = args.policy ?? process.env.POLICY ?? DEFAULT_POLICY;
 const DAYS = Number(args.days ?? 14);
 const COMPLIANCE_THRESHOLD = Number(args.complianceThreshold ?? 50);
 const NAME = args.name ?? "trajectory";
+// Patient persona: colostomy-default (M,45) | acl-young (F,25) | hip-elderly (F,72)
+const PRESET = args.preset ?? "colostomy-default";
 if (args.model) process.env.SIM_MODEL = args.model;
 
 const CRON_SECRET = process.env.CRON_SECRET ?? "";
@@ -91,16 +93,20 @@ async function main() {
 
     console.log(`\n━━ Policy trajectory: "${NAME}" ━━`);
     console.log(
-        `   days=${DAYS}  complianceThreshold=${COMPLIANCE_THRESHOLD}%  sim=${SIM_MODEL}`,
+        `   days=${DAYS}  preset=${PRESET}  complianceThreshold=${COMPLIANCE_THRESHOLD}%  sim=${SIM_MODEL}`,
     );
     console.log(`   policy: ${POLICY}\n`);
 
-    // 1. Seed + login the standard harness patient (fully onboarded, no LLM onboarding).
+    // 1. Seed + login the harness persona (fully onboarded, no LLM onboarding).
     const { res: seedRes, body: seed } = await c.postJson(
         "/api/dev/seed-patient",
-        {},
+        { preset: PRESET },
     );
-    record("seed harness patient", seedRes.ok && !!seed?.email, seed?.error);
+    record(
+        "seed harness patient",
+        seedRes.ok && !!seed?.email,
+        seed?.error ?? `${seed?.email} (${seed?.preset})`,
+    );
     if (!seedRes.ok) process.exit(1);
     record("login", await c.login(seed.email, seed.password));
     const sess = await c.session();
@@ -370,6 +376,7 @@ async function main() {
     console.log(
         `[[RESULT]] ${JSON.stringify({
             name: NAME,
+            preset: PRESET,
             days: DAYS,
             green: results.length - failedCount,
             total: results.length,
