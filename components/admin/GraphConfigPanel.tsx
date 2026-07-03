@@ -60,12 +60,12 @@ export default function GraphConfigPanel() {
     });
 
     if (isLoading)
-        return <div className="text-gray-500">Loading config...</div>;
+        return <div className="text-ink-subtle">Loading config...</div>;
     if (!config)
-        return <div className="text-red-500">Failed to load config</div>;
+        return <div className="text-critical-ink">Failed to load config</div>;
 
     return (
-        <div className="border rounded p-4 bg-gray-50">
+        <div className="rounded-lg border border-border bg-surface-sunken/40 p-4">
             <button
                 onClick={() => setExpanded(!expanded)}
                 className="font-bold text-sm cursor-pointer flex items-center gap-2"
@@ -78,11 +78,11 @@ export default function GraphConfigPanel() {
                 <div className="mt-4 space-y-4">
                     {/* Context Window */}
                     <div>
-                        <label className="block text-sm font-semibold text-gray-900 mb-2">
+                        <label className="block text-sm font-semibold text-ink mb-2">
                             Context Window: Load Previous States
                         </label>
                         <div className="space-y-2">
-                            <p className="text-xs text-gray-600">
+                            <p className="text-xs text-ink-muted">
                                 Current:{" "}
                                 <strong>
                                     {formatContextWindowDays(
@@ -108,15 +108,15 @@ export default function GraphConfigPanel() {
                                         className={`px-3 py-1 rounded text-sm font-medium transition ${
                                             config.contextWindowDays ===
                                             option.value
-                                                ? "bg-blue-600 text-white"
-                                                : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-100"
+                                                ? "bg-accent text-ink-inverse"
+                                                : "bg-surface border border-border-strong text-ink-muted hover:bg-surface-sunken"
                                         } disabled:opacity-50`}
                                     >
                                         {option.label}
                                     </button>
                                 ))}
                             </div>
-                            <p className="text-xs text-gray-600">
+                            <p className="text-xs text-ink-muted">
                                 ⓘ Sets how much historical state (from previous
                                 days) to include in context: 1 = fastest
                                 (Yesterday only) | N = balanced | -1 = slowest
@@ -127,7 +127,7 @@ export default function GraphConfigPanel() {
 
                     {/* Smart Filtering */}
                     <div>
-                        <label className="block text-sm font-semibold text-gray-900 mb-2">
+                        <label className="block text-sm font-semibold text-ink mb-2">
                             Smart Filtering
                         </label>
                         <div className="flex items-center gap-2">
@@ -140,13 +140,13 @@ export default function GraphConfigPanel() {
                                 disabled={updateMutation.isPending}
                                 className={`px-4 py-1 rounded font-medium transition ${
                                     config.smartFiltering
-                                        ? "bg-green-600 text-white"
-                                        : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-100"
+                                        ? "bg-progress text-ink-inverse"
+                                        : "bg-surface border border-border-strong text-ink-muted hover:bg-surface-sunken"
                                 } disabled:opacity-50`}
                             >
                                 {config.smartFiltering ? "Enabled" : "Disabled"}
                             </button>
-                            <span className="text-xs text-gray-600">
+                            <span className="text-xs text-ink-muted">
                                 ⓘ When enabled, skips states with no significant
                                 changes (reduces context overload)
                             </span>
@@ -155,7 +155,7 @@ export default function GraphConfigPanel() {
 
                     {/* Max Context Tokens */}
                     <div>
-                        <label className="block text-sm font-semibold text-gray-900 mb-2">
+                        <label className="block text-sm font-semibold text-ink mb-2">
                             Max Context Tokens
                         </label>
                         <div className="flex gap-2 items-center">
@@ -169,9 +169,9 @@ export default function GraphConfigPanel() {
                                     })
                                 }
                                 disabled={updateMutation.isPending}
-                                className="px-2 py-1 border border-gray-300 rounded w-32 text-sm"
+                                className="px-2 py-1 border border-border-strong bg-surface rounded-md w-32 text-sm text-ink"
                             />
-                            <span className="text-xs text-gray-600">
+                            <span className="text-xs text-ink-muted">
                                 ⓘ Soft limit on LLM context size. Higher = more
                                 history sent to LLM (may increase latency)
                             </span>
@@ -180,7 +180,7 @@ export default function GraphConfigPanel() {
 
                     {/* Include Trajectory */}
                     <div>
-                        <label className="block text-sm font-semibold text-gray-900 mb-2">
+                        <label className="block text-sm font-semibold text-ink mb-2">
                             Include Trajectory Summary
                         </label>
                         <div className="flex items-center gap-2">
@@ -194,15 +194,15 @@ export default function GraphConfigPanel() {
                                 disabled={updateMutation.isPending}
                                 className={`px-4 py-1 rounded font-medium transition ${
                                     config.includeTrajectory
-                                        ? "bg-green-600 text-white"
-                                        : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-100"
+                                        ? "bg-progress text-ink-inverse"
+                                        : "bg-surface border border-border-strong text-ink-muted hover:bg-surface-sunken"
                                 } disabled:opacity-50`}
                             >
                                 {config.includeTrajectory
                                     ? "Enabled"
                                     : "Disabled"}
                             </button>
-                            <span className="text-xs text-gray-600">
+                            <span className="text-xs text-ink-muted">
                                 ⓘ When enabled, includes a text summary of
                                 recovery trajectory instead of full states
                             </span>
@@ -214,28 +214,28 @@ export default function GraphConfigPanel() {
                         <button
                             onClick={() => resetMutation.mutate()}
                             disabled={resetMutation.isPending}
-                            className="px-4 py-2 bg-red-100 text-red-700 border border-red-300 rounded font-medium hover:bg-red-200 transition disabled:opacity-50 text-sm"
+                            className="px-4 py-2 bg-critical-soft text-critical-ink border border-critical/30 rounded-md font-medium hover:opacity-80 transition disabled:opacity-50 text-sm"
                         >
                             {resetMutation.isPending
                                 ? "Resetting..."
                                 : "Reset to Defaults"}
                         </button>
-                        <p className="text-xs text-gray-600 mt-2">
+                        <p className="text-xs text-ink-muted mt-2">
                             ⓘ Rolls back all changes to built-in defaults
                         </p>
                     </div>
 
                     {/* Status */}
                     {updateMutation.isPending && (
-                        <p className="text-sm text-blue-600">Updating...</p>
+                        <p className="text-sm text-accent-ink">Updating...</p>
                     )}
                     {updateMutation.isSuccess && (
-                        <p className="text-sm text-green-600">
+                        <p className="text-sm text-progress-ink">
                             Configuration updated successfully
                         </p>
                     )}
                     {updateMutation.isError && (
-                        <p className="text-sm text-red-600">
+                        <p className="text-sm text-critical-ink">
                             Error: {updateMutation.error?.message}
                         </p>
                     )}

@@ -1,14 +1,20 @@
 import { ArrowRight, LucideIcon } from "lucide-react";
 import { ReactNode } from "react";
 
+/**
+ * ModuleCard-family primitives (DESIGN.md): surface card with a warm hairline border,
+ * radius-lg, quiet hover shadow when tappable. No side-stripe accents, no lift-translates —
+ * the icon chip's soft tint is the only per-module color.
+ */
 interface DashboardCardProps {
     title: string;
     subtitle?: string;
     icon: LucideIcon;
-    iconColorClass: string; // e.g., "text-orange-600 bg-orange-100"
-    accentColorClass: string; // e.g., "border-l-orange-500"
+    /** Token pair for the icon chip, e.g. "bg-accent-soft text-accent-ink". */
+    iconColorClass: string;
     onClick: () => void;
-    children: ReactNode; // This is where the specific "Slider" or "Macros" go
+    children?: ReactNode;
+    headerBadge?: ReactNode;
     footer?: ReactNode;
 }
 
@@ -17,42 +23,27 @@ export function DashboardCard({
     subtitle,
     icon: Icon,
     iconColorClass,
-    accentColorClass,
     onClick,
     children,
-    headerBadge, // Extra slot for a "Status" pill
+    headerBadge,
     footer,
-}: any) {
+}: DashboardCardProps) {
     return (
         <div
             onClick={onClick}
-            className={`
-        bg-white border border-slate-200 p-5 rounded-xl cursor-pointer group
-        border-l-4 ${accentColorClass}
-        -translate-y-2 shadow-xl
-        hover:-translate-y-3 hover:shadow-2xl
-        transition-all duration-300 ease-out
-        cursor-pointer group border-l-4 ${accentColorClass} inline-flex flex-col h-fit w-full max-w-md
-        overflow-hidden relative`}
+            className="group inline-flex h-fit w-full max-w-md cursor-pointer flex-col overflow-hidden rounded-lg border border-border bg-surface p-5 transition-shadow hover:shadow-md"
         >
-            <Icon
-                className="absolute -right-4 -top-4 text-slate-50 opacity-0 group-hover:opacity-100 transition-opacity"
-                size={100}
-            />
-
-            <div className="flex items-start justify-between mb-6 relative z-10">
+            <div className="mb-6 flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                    <div
-                        className={`p-2.5 rounded-xl shadow-inner ${iconColorClass}`}
-                    >
-                        <Icon size={22} />
+                    <div className={`rounded-md p-2.5 ${iconColorClass}`}>
+                        <Icon size={22} strokeWidth={1.75} />
                     </div>
                     <div>
-                        <h3 className="font-extrabold text-slate-900 tracking-tight text-lg">
+                        <h3 className="text-lg font-semibold tracking-tight text-ink">
                             {title}
                         </h3>
                         {subtitle && (
-                            <p className="text-xs text-slate-500 font-medium">
+                            <p className="text-xs font-medium text-ink-muted">
                                 {subtitle}
                             </p>
                         )}
@@ -60,18 +51,17 @@ export function DashboardCard({
                 </div>
                 {headerBadge || (
                     <ArrowRight
-                        className="text-slate-300 group-hover:text-slate-900 group-hover:translate-x-1 transition-all"
+                        className="text-ink-subtle transition-all group-hover:translate-x-1 group-hover:text-ink"
                         size={20}
+                        strokeWidth={1.75}
                     />
                 )}
             </div>
 
-            <div className="space-y-4 relative z-10 flex-grow">{children}</div>
+            <div className="flex-grow space-y-4">{children}</div>
 
             {footer && (
-                <div className="mt-4 pt-2 border-t border-slate-50">
-                    {footer}
-                </div>
+                <div className="mt-4 border-t border-border pt-2">{footer}</div>
             )}
         </div>
     );
@@ -81,7 +71,7 @@ export function CardSlider({
     label,
     current,
     target,
-    colorClass = "bg-blue-600",
+    colorClass = "bg-accent",
     size = "md", // "sm" | "md" | "lg"
 }: {
     label?: string;
@@ -96,7 +86,7 @@ export function CardSlider({
     return (
         <div className="w-full">
             {label && (
-                <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase mb-1">
+                <div className="mb-1 flex justify-between text-[11px] font-medium text-ink-subtle">
                     <span>{label}</span>
                     <span>
                         {current}/{target}
@@ -104,7 +94,7 @@ export function CardSlider({
                 </div>
             )}
             <div
-                className={`w-full bg-slate-100 ${height} rounded-full overflow-hidden`}
+                className={`w-full bg-surface-sunken ${height} overflow-hidden rounded-full`}
             >
                 <div
                     className={`${colorClass} h-full transition-all duration-1000 ease-out`}
@@ -115,7 +105,7 @@ export function CardSlider({
     );
 }
 
-// 2. A flexible Stat Badge
+// A flexible stat badge
 export function CardStat({
     label,
     value,
@@ -123,15 +113,21 @@ export function CardStat({
 }: {
     label: string;
     value: string | number;
-    icon?: any;
+    icon?: LucideIcon;
 }) {
     return (
         <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+            <span className="text-[11px] font-medium text-ink-subtle">
                 {label}
             </span>
-            <div className="flex items-center gap-1 font-black text-slate-900">
-                {Icon && <Icon size={12} className="text-slate-400" />}
+            <div className="flex items-center gap-1 font-semibold text-ink">
+                {Icon && (
+                    <Icon
+                        size={12}
+                        strokeWidth={1.75}
+                        className="text-ink-subtle"
+                    />
+                )}
                 {value}
             </div>
         </div>

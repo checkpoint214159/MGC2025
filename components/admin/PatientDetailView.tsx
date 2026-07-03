@@ -53,43 +53,33 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
     });
 
     if (patientLoading) {
+        // Skeleton, not a spinner (DESIGN.md)
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <svg
-                    className="animate-spin h-10 w-10 text-blue-600"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                >
-                    <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                    />
-                    <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                </svg>
+            <div className="mx-auto max-w-6xl p-8">
+                <div className="mb-10 space-y-3">
+                    <div className="h-11 w-40 animate-pulse rounded-md bg-surface-sunken" />
+                    <div className="h-8 w-72 animate-pulse rounded-md bg-surface-sunken" />
+                </div>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div className="h-48 animate-pulse rounded-lg bg-surface-sunken" />
+                    <div className="h-48 animate-pulse rounded-lg bg-surface-sunken" />
+                </div>
             </div>
         );
     }
 
     if (patientError || !patient) {
         return (
-            <div className="p-8 max-w-6xl mx-auto">
+            <div className="mx-auto max-w-6xl p-8">
                 <Button
+                    variant="outline"
                     onClick={() => router.back()}
-                    className="mb-6 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
+                    className="mb-6"
                 >
                     ← Back
                 </Button>
-                <div className="bg-red-50 border border-red-200 p-6 rounded-lg">
-                    <p className="text-red-700 font-semibold">
+                <div className="rounded-lg border border-critical/30 bg-critical-soft p-6">
+                    <p className="font-semibold text-critical-ink">
                         Error loading patient details
                     </p>
                 </div>
@@ -106,27 +96,28 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
             {/* Header */}
             <div className="mb-10">
                 <Button
+                    variant="outline"
                     onClick={() => router.back()}
-                    className="mb-4 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
+                    className="mb-4"
                 >
                     ← Back to Dashboard
                 </Button>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-semibold text-ink">
                     {patient.name}
                 </h1>
-                <p className="text-gray-600 mt-2">Patient ID: {patient.id}</p>
+                <p className="mt-2 text-ink-muted">Patient ID: {patient.id}</p>
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex gap-4 mb-8 border-b">
+            <div className="mb-8 flex gap-4 border-b border-border">
                 {tabs.map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={`px-4 py-2 font-medium border-b-2 transition-colors ${
+                        className={`border-b-2 px-4 py-2 font-medium transition-colors ${
                             activeTab === tab
-                                ? "border-blue-600 text-blue-600"
-                                : "border-transparent text-gray-600 hover:text-gray-900"
+                                ? "border-accent text-accent-ink"
+                                : "border-transparent text-ink-muted hover:text-ink"
                         }`}
                     >
                         {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -173,7 +164,7 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
                                     </p>
                                 </div>
                             ) : (
-                                <p className="text-gray-500">
+                                <p className="text-ink-subtle">
                                     No biometric data available
                                 </p>
                             )}
@@ -184,11 +175,11 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
                                 Profile Summary
                             </h2>
                             {patient.profile ? (
-                                <p className="text-gray-700 leading-relaxed">
+                                <p className="text-ink-muted leading-relaxed">
                                     {patient.profile}
                                 </p>
                             ) : (
-                                <p className="text-gray-500">
+                                <p className="text-ink-subtle">
                                     No profile summary available
                                 </p>
                             )}
@@ -207,7 +198,7 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
                                 config={patient.states[0] as unknown as State}
                             />
                         ) : (
-                            <p className="text-gray-500">
+                            <p className="text-ink-subtle">
                                 No active recovery state found
                             </p>
                         )}
@@ -221,36 +212,22 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
                             Onboarding Conversation
                         </h2>
                         {threadsLoading ? (
-                            <div className="text-center py-8">
-                                <svg
-                                    className="animate-spin h-8 w-8 text-blue-600"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
+                            <div className="space-y-3 py-2">
+                                {[0, 1, 2].map((i) => (
+                                    <div
+                                        key={i}
+                                        className="h-16 w-full animate-pulse rounded-md bg-surface-sunken"
                                     />
-                                    <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                    />
-                                </svg>
+                                ))}
                             </div>
                         ) : threads && threads.length > 0 ? (
                             <div className="space-y-4">
                                 {threads.map((thread) => (
                                     <div
                                         key={thread.id}
-                                        className="rounded-lg bg-gray-50 px-4 py-3"
+                                        className="rounded-lg bg-surface-sunken/50 px-4 py-3"
                                     >
-                                        <h3 className="font-semibold text-gray-900 mb-3">
+                                        <h3 className="font-semibold text-ink mb-3">
                                             {thread.title}
                                         </h3>
                                         <div className="space-y-3">
@@ -260,21 +237,21 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
                                                     className={`p-3 rounded-md ${
                                                         message.role ===
                                                         "assistant"
-                                                            ? "bg-blue-50"
-                                                            : "bg-white"
+                                                            ? "bg-accent-soft/60"
+                                                            : "bg-surface"
                                                     }`}
                                                 >
-                                                    <p className="text-sm font-semibold text-gray-700 mb-1">
+                                                    <p className="text-sm font-medium text-ink-muted mb-1">
                                                         {message.role ===
                                                         "assistant"
                                                             ? "Doctor"
                                                             : "Patient"}
                                                     </p>
-                                                    <p className="text-gray-800">
+                                                    <p className="text-ink">
                                                         {message.content}
                                                     </p>
                                                     {message.reasoning && (
-                                                        <p className="text-sm text-gray-600 mt-2 italic">
+                                                        <p className="text-sm text-ink-muted mt-2 italic">
                                                             Reasoning:{" "}
                                                             {message.reasoning}
                                                         </p>
@@ -286,7 +263,7 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-gray-500">
+                            <p className="text-ink-subtle">
                                 No conversation history available
                             </p>
                         )}
@@ -302,7 +279,7 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
                         {patient.screening &&
                         (patient.screening as { data?: unknown }).data ? (
                             <div className="space-y-6">
-                                <pre className="text-gray-600 whitespace-pre-wrap text-sm">
+                                <pre className="text-ink-muted whitespace-pre-wrap text-sm">
                                     {JSON.stringify(
                                         (
                                             patient.screening as {
@@ -315,7 +292,7 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
                                 </pre>
                             </div>
                         ) : (
-                            <p className="text-gray-500">
+                            <p className="text-ink-subtle">
                                 No screening on record
                             </p>
                         )}

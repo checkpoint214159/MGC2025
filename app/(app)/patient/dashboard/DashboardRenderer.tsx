@@ -15,9 +15,10 @@ export default function DashboardRenderer({
     const pathname = usePathname(); // Current path: /patient/dashboard
 
     if (!config) {
+        // EmptyCard idiom: dashed border, ink-subtle copy
         return (
-            <div className="p-6 border-2 border-dashed border-slate-200 rounded-xl text-center">
-                <p className="text-slate-500 italic">
+            <div className="rounded-lg border-2 border-dashed border-border p-6 text-center">
+                <p className="text-ink-subtle">
                     No recovery plan found. Please generate one to begin.
                 </p>
             </div>

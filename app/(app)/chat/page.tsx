@@ -8,7 +8,7 @@ import { useChat } from "@ai-sdk/react";
 
 export default function ChatComponent() {
     const router = useRouter();
-    const { data: session, status } = useSession();
+    const { status } = useSession();
     const [input, setInput] = useState("");
     const { messages, sendMessage } = useChat();
 
@@ -20,33 +20,44 @@ export default function ChatComponent() {
 
     if (status === "loading") {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                Checking Authentication...
+            <div className="flex min-h-screen items-center justify-center text-ink-muted">
+                Checking authentication…
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col w-full max-w-md mx-auto h-screen stretch p-4">
-            <h1 className="text-3xl font-extrabold my-6 text-center text-blue-600">
-                Witty DeepSeek Assistant 🤖
-            </h1>
+        <div className="stretch mx-auto flex h-screen w-full max-w-md flex-col bg-bg p-4">
+            <div className="my-6 text-center">
+                <h1 className="text-xl font-semibold text-ink">
+                    Chat with Wally
+                </h1>
+                <p className="mt-1 text-sm text-ink-muted">
+                    Questions about your recovery, any time
+                </p>
+            </div>
 
-            <div className="flex-1 overflow-y-auto space-y-4 pb-20">
-                {/* Display Streaming Messages */}
+            <div className="flex-1 space-y-4 overflow-y-auto pb-24">
+                {/* Streaming messages */}
                 {messages.map((m) => (
                     <div
                         key={m.id}
-                        className={`p-4 rounded-xl shadow-md ${
+                        className={`max-w-[85%] rounded-lg border p-4 ${
                             m.role === "user"
-                                ? "bg-blue-50 text-right ml-auto"
-                                : "bg-gray-50 text-left mr-auto"
+                                ? "ml-auto border-transparent bg-accent-soft text-right"
+                                : "mr-auto border-border bg-surface text-left"
                         }`}
                     >
-                        <span className="font-bold block mb-1 text-sm text-gray-700">
-                            {m.role === "user" ? "You" : "AI"}
+                        <span
+                            className={`mb-1 block text-sm font-medium ${
+                                m.role === "user"
+                                    ? "text-accent-ink"
+                                    : "text-ink-muted"
+                            }`}
+                        >
+                            {m.role === "user" ? "You" : "Wally"}
                         </span>
-                        <div className="whitespace-pre-wrap text-gray-900">
+                        <div className="whitespace-pre-wrap text-ink">
                             {m.parts?.map(
                                 (part, i) =>
                                     part.type === "text" && (
@@ -60,7 +71,7 @@ export default function ChatComponent() {
                 ))}
             </div>
 
-            {/* Input Form at the bottom */}
+            {/* Input form at the bottom */}
             <form
                 onSubmit={async (e) => {
                     e.preventDefault();
@@ -71,21 +82,19 @@ export default function ChatComponent() {
                         setInput("");
                     } catch (error) {
                         console.error("Failed to send message:", error);
-                        // TODO: Show user-friendly error message
-                        // You could add a toast notification here
                     }
                 }}
-                className="fixed bottom-0 left-0 right-0 w-full max-w-md mx-auto p-4 bg-white border-t"
+                className="fixed bottom-0 left-0 right-0 mx-auto w-full max-w-md border-t border-border bg-surface p-4"
             >
                 <input
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="h-11 w-full rounded-md border border-border-strong bg-surface px-3 text-ink placeholder:text-ink-subtle focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     value={input}
-                    placeholder="Ask me anything code related..."
+                    placeholder="Ask Wally about your recovery…"
                     onChange={(e) => setInput(e.target.value)}
                 />
                 <button
                     type="submit"
-                    className="mt-3 w-full p-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                    className="mt-3 h-11 w-full rounded-md bg-accent font-medium text-ink-inverse transition-colors hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                     Send
                 </button>

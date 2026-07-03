@@ -17,7 +17,7 @@ const INNER_H = H - PAD.top - PAD.bottom;
 function PainChart({ series }: { series: { day: number; pain: number }[] }) {
     if (series.length < 2) {
         return (
-            <p className="text-sm text-gray-400 italic">
+            <p className="text-sm text-ink-subtle italic">
                 Not enough pain data to plot (need ≥ 2 days).
             </p>
         );
@@ -53,7 +53,7 @@ function PainChart({ series }: { series: { day: number; pain: number }[] }) {
                             x2={INNER_W}
                             y1={yScale(v)}
                             y2={yScale(v)}
-                            stroke="#e5e7eb"
+                            stroke="var(--border)"
                             strokeWidth={1}
                         />
                         <text
@@ -61,7 +61,7 @@ function PainChart({ series }: { series: { day: number; pain: number }[] }) {
                             y={yScale(v) + 4}
                             fontSize={9}
                             textAnchor="end"
-                            fill="#9ca3af"
+                            fill="var(--ink-subtle)"
                         >
                             {v}
                         </text>
@@ -76,7 +76,7 @@ function PainChart({ series }: { series: { day: number; pain: number }[] }) {
                         y={INNER_H + 16}
                         fontSize={9}
                         textAnchor="middle"
-                        fill="#9ca3af"
+                        fill="var(--ink-subtle)"
                     >
                         d{p.day}
                     </text>
@@ -87,7 +87,7 @@ function PainChart({ series }: { series: { day: number; pain: number }[] }) {
                     x={-PAD.left + 6}
                     y={INNER_H / 2}
                     fontSize={9}
-                    fill="#6b7280"
+                    fill="var(--ink-muted)"
                     transform={`rotate(-90, ${-PAD.left + 6}, ${INNER_H / 2})`}
                     textAnchor="middle"
                 >
@@ -97,7 +97,7 @@ function PainChart({ series }: { series: { day: number; pain: number }[] }) {
                     x={INNER_W / 2}
                     y={INNER_H + 26}
                     fontSize={9}
-                    fill="#6b7280"
+                    fill="var(--ink-muted)"
                     textAnchor="middle"
                 >
                     recovery day
@@ -107,7 +107,7 @@ function PainChart({ series }: { series: { day: number; pain: number }[] }) {
                 <polyline
                     points={points}
                     fill="none"
-                    stroke="#ef4444"
+                    stroke="var(--critical)"
                     strokeWidth={2}
                     strokeLinejoin="round"
                 />
@@ -119,7 +119,7 @@ function PainChart({ series }: { series: { day: number; pain: number }[] }) {
                         cx={xScale(p.day)}
                         cy={yScale(p.pain)}
                         r={3}
-                        fill="#ef4444"
+                        fill="var(--critical)"
                     />
                 ))}
             </g>
@@ -135,7 +135,7 @@ function ComplianceChart({
     const withData = data.filter((d) => d.pct !== null);
     if (withData.length === 0) {
         return (
-            <p className="text-sm text-gray-400 italic">
+            <p className="text-sm text-ink-subtle italic">
                 No compliance data logged yet.
             </p>
         );
@@ -145,7 +145,11 @@ function ComplianceChart({
     const gap = INNER_W / withData.length;
 
     const barColor = (pct: number) =>
-        pct >= 80 ? "#22c55e" : pct >= 50 ? "#f59e0b" : "#ef4444";
+        pct >= 80
+            ? "var(--progress)"
+            : pct >= 50
+              ? "var(--attention)"
+              : "var(--critical)";
 
     const yTicks = [0, 25, 50, 75, 100];
 
@@ -164,7 +168,7 @@ function ComplianceChart({
                             x2={INNER_W}
                             y1={INNER_H - (v / 100) * INNER_H}
                             y2={INNER_H - (v / 100) * INNER_H}
-                            stroke="#e5e7eb"
+                            stroke="var(--border)"
                             strokeWidth={1}
                         />
                         <text
@@ -172,7 +176,7 @@ function ComplianceChart({
                             y={INNER_H - (v / 100) * INNER_H + 4}
                             fontSize={9}
                             textAnchor="end"
-                            fill="#9ca3af"
+                            fill="var(--ink-subtle)"
                         >
                             {v}%
                         </text>
@@ -201,7 +205,7 @@ function ComplianceChart({
                                     y={INNER_H + 14}
                                     fontSize={8}
                                     textAnchor="middle"
-                                    fill="#9ca3af"
+                                    fill="var(--ink-subtle)"
                                 >
                                     {label}
                                 </text>
@@ -215,7 +219,7 @@ function ComplianceChart({
                     x={-PAD.left + 6}
                     y={INNER_H / 2}
                     fontSize={9}
-                    fill="#6b7280"
+                    fill="var(--ink-muted)"
                     transform={`rotate(-90, ${-PAD.left + 6}, ${INNER_H / 2})`}
                     textAnchor="middle"
                 >
@@ -250,10 +254,10 @@ export function ReportTab({ patientId }: { patientId: string }) {
         return (
             <Card className="p-8 flex flex-col items-center gap-4 text-center">
                 <div>
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    <h2 className="text-xl font-semibold text-ink mb-2">
                         Patient Report
                     </h2>
-                    <p className="text-gray-500 max-w-md">
+                    <p className="text-ink-muted max-w-md">
                         Generates a summary of recovery signals, pain/compliance
                         trends, and AI memory insights. No LLM call — computed
                         from stored data.
@@ -262,11 +266,11 @@ export function ReportTab({ patientId }: { patientId: string }) {
                 <Button
                     onClick={handleGenerate}
                     disabled={loading}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded disabled:opacity-50"
+                    className="bg-accent hover:bg-accent-hover text-ink-inverse px-6 py-2 rounded-md disabled:opacity-50"
                 >
                     {loading ? "Generating…" : "Generate Report"}
                 </Button>
-                {error && <p className="text-red-600 text-sm">{error}</p>}
+                {error && <p className="text-critical-ink text-sm">{error}</p>}
             </Card>
         );
     }
@@ -276,10 +280,10 @@ export function ReportTab({ patientId }: { patientId: string }) {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-xl font-semibold text-gray-900">
+                    <h2 className="text-xl font-semibold text-ink">
                         Recovery Report — {report.patientName}
                     </h2>
-                    <p className="text-sm text-gray-400 mt-1">
+                    <p className="text-sm text-ink-subtle mt-1">
                         Generated{" "}
                         {new Date(report.generatedAt).toLocaleString(
                             undefined,
@@ -293,7 +297,7 @@ export function ReportTab({ patientId }: { patientId: string }) {
                 <Button
                     onClick={handleGenerate}
                     disabled={loading}
-                    className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:opacity-50"
+                    className="text-sm bg-surface-sunken hover:bg-border text-ink-muted px-4 py-2 rounded-md disabled:opacity-50"
                 >
                     {loading ? "Refreshing…" : "Refresh"}
                 </Button>
@@ -301,13 +305,16 @@ export function ReportTab({ patientId }: { patientId: string }) {
 
             {/* Active flags */}
             {report.flags.length > 0 && (
-                <Card className="p-4 border-amber-300 bg-amber-50">
-                    <h3 className="font-semibold text-amber-800 mb-2">
+                <Card className="p-4 border-attention/40 bg-attention-soft">
+                    <h3 className="font-semibold text-attention-ink mb-2">
                         ⚠ Active Recovery Flags
                     </h3>
                     <ul className="space-y-1">
                         {report.flags.map((f) => (
-                            <li key={f.kind} className="text-sm text-amber-700">
+                            <li
+                                key={f.kind}
+                                className="text-sm text-attention-ink"
+                            >
                                 <span className="font-medium">{f.title}:</span>{" "}
                                 {f.detail}
                             </li>
@@ -318,10 +325,10 @@ export function ReportTab({ patientId }: { patientId: string }) {
 
             {/* Heuristic digest */}
             <Card className="p-5">
-                <h3 className="font-semibold text-gray-800 mb-3">
+                <h3 className="font-semibold text-ink mb-3">
                     Recovery Signals (computed)
                 </h3>
-                <pre className="text-xs text-gray-600 whitespace-pre-wrap font-mono leading-relaxed bg-gray-50 rounded p-3">
+                <pre className="text-xs text-ink-muted whitespace-pre-wrap font-mono leading-relaxed bg-surface-sunken/50 rounded-md p-3">
                     {report.digestText}
                 </pre>
             </Card>
@@ -329,18 +336,16 @@ export function ReportTab({ patientId }: { patientId: string }) {
             {/* Charts */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="p-5">
-                    <h3 className="font-semibold text-gray-800 mb-3">
-                        Pain Trend
-                    </h3>
+                    <h3 className="font-semibold text-ink mb-3">Pain Trend</h3>
                     <PainChart series={report.painSeries} />
                 </Card>
 
                 <Card className="p-5">
-                    <h3 className="font-semibold text-gray-800 mb-3">
+                    <h3 className="font-semibold text-ink mb-3">
                         Daily Plan Completion
                     </h3>
                     <ComplianceChart data={report.compliancePerDay} />
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-xs text-ink-subtle mt-2">
                         Green ≥ 80% · Amber ≥ 50% · Red &lt; 50%
                     </p>
                 </Card>
@@ -349,16 +354,16 @@ export function ReportTab({ patientId }: { patientId: string }) {
             {/* Memory */}
             {report.memory && (
                 <Card className="p-5">
-                    <h3 className="font-semibold text-gray-800 mb-4">
+                    <h3 className="font-semibold text-ink mb-4">
                         AI Memory Insights
                     </h3>
 
                     {report.memory.semantic && (
                         <div className="mb-5">
-                            <h4 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                            <h4 className="text-sm font-semibold text-ink-muted uppercase tracking-wide mb-2">
                                 Stable Clinical Facts
                             </h4>
-                            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                            <p className="text-sm text-ink-muted leading-relaxed whitespace-pre-wrap">
                                 {report.memory.semantic}
                             </p>
                         </div>
@@ -366,7 +371,7 @@ export function ReportTab({ patientId }: { patientId: string }) {
 
                     {report.memory.episodic.length > 0 && (
                         <div>
-                            <h4 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-3">
+                            <h4 className="text-sm font-semibold text-ink-muted uppercase tracking-wide mb-3">
                                 Recovery Narrative
                             </h4>
                             <div className="space-y-4">
@@ -375,25 +380,25 @@ export function ReportTab({ patientId }: { patientId: string }) {
                                         key={section.phase}
                                         className={`rounded-md px-4 py-3 ${
                                             section.closed
-                                                ? "bg-gray-50"
-                                                : "bg-blue-50"
+                                                ? "bg-surface-sunken/50"
+                                                : "bg-accent-soft/60"
                                         }`}
                                     >
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-xs font-semibold text-gray-500 uppercase">
+                                            <span className="text-xs font-semibold text-ink-subtle uppercase">
                                                 {section.phase}
                                             </span>
                                             {section.closed ? (
-                                                <span className="text-xs text-gray-400 bg-gray-200 rounded px-1.5 py-0.5">
+                                                <span className="text-xs text-ink-muted bg-surface-sunken rounded px-1.5 py-0.5">
                                                     closed
                                                 </span>
                                             ) : (
-                                                <span className="text-xs text-blue-700 bg-blue-100 rounded px-1.5 py-0.5">
+                                                <span className="text-xs text-accent-ink bg-accent-soft rounded px-1.5 py-0.5">
                                                     active
                                                 </span>
                                             )}
                                         </div>
-                                        <p className="text-sm text-gray-700 leading-relaxed">
+                                        <p className="text-sm text-ink-muted leading-relaxed">
                                             {section.narrative}
                                         </p>
                                     </div>
@@ -404,7 +409,7 @@ export function ReportTab({ patientId }: { patientId: string }) {
 
                     {!report.memory.semantic &&
                         report.memory.episodic.length === 0 && (
-                            <p className="text-sm text-gray-400 italic">
+                            <p className="text-sm text-ink-subtle italic">
                                 No memory consolidated yet (onboarding not
                                 complete).
                             </p>
@@ -414,10 +419,10 @@ export function ReportTab({ patientId }: { patientId: string }) {
 
             {!report.memory && (
                 <Card className="p-5">
-                    <h3 className="font-semibold text-gray-800 mb-2">
+                    <h3 className="font-semibold text-ink mb-2">
                         AI Memory Insights
                     </h3>
-                    <p className="text-sm text-gray-400 italic">
+                    <p className="text-sm text-ink-subtle italic">
                         No memory available — patient has not completed
                         onboarding.
                     </p>

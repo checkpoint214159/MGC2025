@@ -34,11 +34,11 @@ export default function SidebarSection({
             {/* The Trigger for the Collapsible section */}
             <Collapsible.Trigger asChild>
                 <button
-                    className="flex items-center justify-between w-full p-2 text-gray-400 hover:text-white rounded-lg group focus:outline-none"
+                    className="flex items-center justify-between w-full p-2 text-ink-muted hover:text-ink hover:bg-surface-sunken rounded-md group focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     aria-label={`Toggle ${title} section`}
                 >
                     <div className="flex items-center">
-                        <Icon className="w-6 h-6 shrink-0 group-hover:text-blue-400" />
+                        <Icon className="w-6 h-6 shrink-0 group-hover:text-accent-ink" />
                         {isExpanded && (
                             <span className="ml-3 text-sm font-medium whitespace-nowrap">
                                 {title}
@@ -58,7 +58,7 @@ export default function SidebarSection({
 
             {/* The Separator only appears when the Sidebar is expanded */}
             {isExpanded && (
-                <Separator.Root className="bg-gray-700 h-[1px] my-2 w-full" />
+                <Separator.Root className="bg-border h-px my-2 w-full" />
             )}
 
             {/* The Content that Collapses */}
@@ -68,7 +68,7 @@ export default function SidebarSection({
                         <button
                             key={link.path}
                             onClick={() => onNavigate(link.path)}
-                            className="block w-full text-left pl-9 pr-2 py-1 text-sm text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="block w-full text-left pl-9 pr-2 py-1.5 text-sm text-ink-muted hover:bg-surface-sunken hover:text-ink rounded-md focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                         >
                             {link.name}
                         </button>

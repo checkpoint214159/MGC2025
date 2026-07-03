@@ -69,18 +69,30 @@ export function AdminDashboard() {
     };
 
     if (idsLoading || detailsLoading) {
+        // Skeleton rows, not a spinner (DESIGN.md: skeletons over spinners-mid-content)
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="mx-auto max-w-6xl p-8">
+                <div className="mb-10 space-y-2">
+                    <div className="h-8 w-64 animate-pulse rounded-md bg-surface-sunken" />
+                    <div className="h-4 w-40 animate-pulse rounded-md bg-surface-sunken" />
+                </div>
+                <div className="space-y-2">
+                    {[0, 1, 2, 3].map((i) => (
+                        <div
+                            key={i}
+                            className="h-14 w-full animate-pulse rounded-md bg-surface-sunken"
+                        />
+                    ))}
+                </div>
             </div>
         );
     }
 
     if (idsError) {
         return (
-            <div className="p-8 max-w-5xl mx-auto">
-                <div className="bg-red-50 border border-red-200 p-6 rounded-lg">
-                    <p className="text-red-700 font-semibold">
+            <div className="mx-auto max-w-5xl p-8">
+                <div className="rounded-lg border border-critical/30 bg-critical-soft p-6">
+                    <p className="font-semibold text-critical-ink">
                         Error loading patient list
                     </p>
                 </div>
@@ -89,12 +101,12 @@ export function AdminDashboard() {
     }
 
     return (
-        <div className="p-8 max-w-6xl mx-auto">
+        <div className="mx-auto max-w-6xl p-8">
             <header className="mb-10">
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-semibold text-ink">
                     Admin Dashboard
                 </h1>
-                <p className="text-gray-600 mt-2">
+                <p className="mt-2 text-ink-muted">
                     Manage {patientIds?.length || 0} assigned patient
                     {patientIds?.length !== 1 ? "s" : ""}
                 </p>
@@ -107,29 +119,29 @@ export function AdminDashboard() {
                     placeholder="Search by patient name or surgery type..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="h-11 w-full rounded-md border border-border-strong bg-surface px-4 text-ink placeholder:text-ink-subtle focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 />
             </div>
 
             {/* Patient List */}
             {filteredPatients && filteredPatients.length > 0 ? (
-                <div className="overflow-x-auto">
-                    <table className="w-full border-collapse bg-white rounded-lg shadow">
+                <div className="overflow-x-auto rounded-lg border border-border bg-surface">
+                    <table className="w-full border-collapse">
                         <thead>
-                            <tr className="bg-gray-100 border-b">
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                            <tr className="border-b border-border bg-surface-sunken/60">
+                                <th className="px-6 py-3 text-left text-sm font-semibold text-ink">
                                     Name
                                 </th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                                <th className="px-6 py-3 text-left text-sm font-semibold text-ink">
                                     Surgery Type
                                 </th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                                <th className="px-6 py-3 text-left text-sm font-semibold text-ink">
                                     Days Since Surgery
                                 </th>
-                                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                                <th className="px-6 py-3 text-left text-sm font-semibold text-ink">
                                     Status
                                 </th>
-                                <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">
+                                <th className="px-6 py-3 text-center text-sm font-semibold text-ink">
                                     Actions
                                 </th>
                             </tr>
@@ -138,15 +150,15 @@ export function AdminDashboard() {
                             {filteredPatients.map((patient) => (
                                 <tr
                                     key={patient.id}
-                                    className="border-b hover:bg-gray-50 transition-colors"
+                                    className="border-b border-border transition-colors hover:bg-surface-sunken/40"
                                 >
-                                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                                    <td className="px-6 py-4 text-sm font-medium text-ink">
                                         {patient.name}
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">
+                                    <td className="px-6 py-4 text-sm text-ink-muted">
                                         {patient.biometric?.treatment || "N/A"}
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">
+                                    <td className="px-6 py-4 text-sm text-ink-muted">
                                         {patient.biometric
                                             ? getDaysSinceSurgery(
                                                   patient.biometric.surgeryDate,
@@ -156,10 +168,10 @@ export function AdminDashboard() {
                                     </td>
                                     <td className="px-6 py-4 text-sm">
                                         <span
-                                            className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                                            className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
                                                 patient.profile
-                                                    ? "bg-green-100 text-green-800"
-                                                    : "bg-yellow-100 text-yellow-800"
+                                                    ? "bg-progress-soft text-progress-ink"
+                                                    : "bg-attention-soft text-attention-ink"
                                             }`}
                                         >
                                             {patient.profile
@@ -169,12 +181,12 @@ export function AdminDashboard() {
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         <Button
+                                            size="sm"
                                             onClick={() =>
                                                 router.push(
                                                     `/admin/patients/${patient.id}`,
                                                 )
                                             }
-                                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
                                         >
                                             View Details
                                         </Button>
@@ -186,7 +198,7 @@ export function AdminDashboard() {
                 </div>
             ) : (
                 <Card className="p-12 text-center">
-                    <p className="text-gray-500 text-lg">
+                    <p className="text-lg text-ink-subtle">
                         {searchQuery
                             ? "No patients match your search."
                             : "No patients assigned yet."}

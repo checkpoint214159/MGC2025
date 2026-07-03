@@ -63,7 +63,7 @@ export function DevAdminPanel() {
         return (
             <button
                 onClick={() => setShowPanel(true)}
-                className="fixed bottom-4 right-4 px-3 py-2 bg-yellow-500 text-white text-xs font-bold rounded-lg hover:bg-yellow-600 transition-colors"
+                className="fixed bottom-4 right-4 px-3 py-2 bg-attention text-ink text-xs font-semibold rounded-md hover:opacity-90 transition-colors"
             >
                 [DEV] Admin Panel
             </button>
@@ -71,14 +71,14 @@ export function DevAdminPanel() {
     }
 
     return (
-        <div className="fixed bottom-4 right-4 max-w-md bg-yellow-50 border-2 border-yellow-500 rounded-lg p-4 shadow-xl z-50">
+        <div className="fixed bottom-4 right-4 max-w-md bg-attention-soft border border-attention rounded-lg p-4 shadow-lg z-50">
             <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-yellow-900">
+                <h3 className="font-semibold text-attention-ink">
                     🔧 Dev Admin Panel
                 </h3>
                 <button
                     onClick={() => setShowPanel(false)}
-                    className="text-yellow-600 hover:text-yellow-900 font-bold"
+                    className="text-attention-ink hover:opacity-70 font-semibold"
                 >
                     ✕
                 </button>
@@ -86,11 +86,11 @@ export function DevAdminPanel() {
 
             <div className="space-y-3 text-sm">
                 {/* Info section */}
-                <div className="bg-yellow-100 p-2 rounded border border-yellow-300">
-                    <p className="text-yellow-900 font-semibold">
+                <div className="bg-attention-soft p-2 rounded-md border border-attention/40">
+                    <p className="text-attention-ink font-semibold">
                         ℹ️ Dev Admin Info
                     </p>
-                    <ul className="text-yellow-800 text-xs mt-1 space-y-1">
+                    <ul className="text-attention-ink text-xs mt-1 space-y-1">
                         <li>
                             <strong>Email:</strong> dev-admin@localhost
                         </li>
@@ -105,32 +105,32 @@ export function DevAdminPanel() {
                 </div>
 
                 {/* Reload managed patients */}
-                <div className="bg-white p-2 rounded border border-yellow-200">
-                    <p className="font-semibold text-yellow-900 mb-1">
+                <div className="bg-surface p-2 rounded-md border border-border">
+                    <p className="font-semibold text-ink mb-1">
                         Managed Patients
                     </p>
                     {isLoading ? (
-                        <p className="text-yellow-700 text-xs">Loading...</p>
+                        <p className="text-ink-muted text-xs">Loading...</p>
                     ) : (
-                        <p className="text-yellow-800 text-xs">
+                        <p className="text-ink-muted text-xs">
                             {managedPatientIds?.length ?? 0} patient(s) assigned
                             to you
                         </p>
                     )}
                     <button
                         onClick={() => window.location.reload()}
-                        className="mt-1 w-full px-2 py-1 bg-yellow-200 hover:bg-yellow-300 text-yellow-900 text-xs font-bold rounded transition-colors"
+                        className="mt-1 w-full px-2 py-1 bg-surface-sunken hover:bg-border text-ink text-xs font-semibold rounded transition-colors"
                     >
                         Refresh View
                     </button>
                 </div>
 
                 {/* Reassign patient section */}
-                <div className="bg-white p-2 rounded border border-yellow-200">
-                    <p className="font-semibold text-yellow-900 mb-2">
+                <div className="bg-surface p-2 rounded-md border border-border">
+                    <p className="font-semibold text-ink mb-2">
                         📋 Reassign Patient (Dev Only)
                     </p>
-                    <p className="text-yellow-700 text-xs mb-1">
+                    <p className="text-ink-muted text-xs mb-1">
                         ⚠️ Only works in development mode
                     </p>
 
@@ -139,7 +139,7 @@ export function DevAdminPanel() {
                         placeholder="Patient ID (paste)"
                         value={selectedPatientId}
                         onChange={(e) => setSelectedPatientId(e.target.value)}
-                        className="w-full px-2 py-1 text-xs border border-yellow-300 rounded mb-1 bg-yellow-50"
+                        className="w-full px-2 py-1 text-xs border border-border-strong rounded-md mb-1 bg-surface"
                     />
 
                     <input
@@ -147,24 +147,24 @@ export function DevAdminPanel() {
                         placeholder="Target Admin ID (paste)"
                         value={targetAdminId}
                         onChange={(e) => setTargetAdminId(e.target.value)}
-                        className="w-full px-2 py-1 text-xs border border-yellow-300 rounded mb-2 bg-yellow-50"
+                        className="w-full px-2 py-1 text-xs border border-border-strong rounded-md mb-2 bg-surface"
                     />
 
                     <button
                         onClick={handleReassign}
                         disabled={isReassigning}
-                        className="w-full px-2 py-1 bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-300 text-white text-xs font-bold rounded transition-colors"
+                        className="w-full px-2 py-1 bg-accent hover:bg-accent-hover disabled:opacity-50 text-ink-inverse text-xs font-semibold rounded transition-colors"
                     >
                         {isReassigning ? "Reassigning..." : "Reassign Patient"}
                     </button>
                 </div>
 
                 {/* Help section */}
-                <div className="bg-blue-50 p-2 rounded border border-blue-200">
-                    <p className="font-semibold text-blue-900 text-xs mb-1">
+                <div className="bg-accent-soft/60 p-2 rounded-md border border-border">
+                    <p className="font-semibold text-accent-ink text-xs mb-1">
                         💡 Tips
                     </p>
-                    <ul className="text-blue-800 text-xs space-y-1">
+                    <ul className="text-ink-muted text-xs space-y-1">
                         <li>• Patients auto-assign to dev admin on signup</li>
                         <li>
                             • Use reassign tool to test multi-admin scenarios
