@@ -9,6 +9,8 @@ import {
     Phone,
     Check,
     CalendarCheck,
+    Download,
+    FileText,
 } from "lucide-react";
 import { Card, Chip, Button } from "@/components/ui/primitives";
 import { RecoveryProgressChart } from "@/components/recovery/RecoveryProgressChart";
@@ -283,13 +285,18 @@ export function MgcAdminMonitor() {
 
     return (
         <div className="mx-auto max-w-5xl space-y-6 px-5 py-10">
-            <header className="space-y-1">
-                <h1 className="text-[26px] font-semibold text-ink">
-                    Monitoring
-                </h1>
-                <p className="text-[15px] text-ink-muted">
-                    Patients you manage. Flagged recoveries float to the top.
-                </p>
+            <header className="flex flex-wrap items-start justify-between gap-3">
+                <div className="space-y-1">
+                    <h1 className="text-[26px] font-semibold text-ink">
+                        Monitoring
+                    </h1>
+                    <p className="text-[15px] text-ink-muted">
+                        Patients you manage. Flagged recoveries float to the top.
+                    </p>
+                </div>
+                <Button size="sm" variant="secondary">
+                    <Download size={15} strokeWidth={1.75} /> Export all (CSV)
+                </Button>
             </header>
 
             <div className="grid grid-cols-3 gap-3">
@@ -364,6 +371,19 @@ export function MgcAdminMonitor() {
                 </Card>
 
                 <div className="space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h2 className="text-[16px] font-semibold text-ink">{selected.name}</h2>
+                        <div className="flex gap-2">
+                            <a href="/preview/wally/report">
+                                <Button size="sm" variant="secondary">
+                                    <FileText size={15} strokeWidth={1.75} /> View report
+                                </Button>
+                            </a>
+                            <Button size="sm" variant="secondary">
+                                <Download size={15} strokeWidth={1.75} /> Export progress
+                            </Button>
+                        </div>
+                    </div>
                     <RecoveryProgressChart
                         recoveryDays={selected.recoveryDays}
                         baselinePain={selected.baselinePain}

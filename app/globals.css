@@ -63,42 +63,42 @@
 }
 
 :root {
-    /* surfaces */
-    --bg: oklch(0.985 0.003 250);
-    --surface: oklch(1 0 0);
-    --surface-sunken: oklch(0.965 0.004 250);
+    /* surfaces — warm cream/sand (palette: #F5EFE6 cream, #E8DFCA sand) */
+    --bg: oklch(0.954 0.014 78); /* #F5EFE6 cream — page background */
+    --surface: oklch(0.992 0.006 80); /* warm near-white — lifts cards above the cream */
+    --surface-sunken: oklch(0.905 0.030 88); /* #E8DFCA sand — inset / recessed */
 
-    /* ink */
-    --ink: oklch(0.22 0.02 250);
-    --ink-muted: oklch(0.46 0.015 250);
-    --ink-subtle: oklch(0.62 0.012 250);
-    --ink-inverse: oklch(0.98 0 0);
+    /* ink — deep slate with a faint blue cohesion (added: palette has no dark) */
+    --ink: oklch(0.28 0.025 258);
+    --ink-muted: oklch(0.45 0.022 258);
+    --ink-subtle: oklch(0.56 0.02 258);
+    --ink-inverse: oklch(0.98 0.008 80);
 
-    /* accent (petrol blue) */
-    --accent: oklch(0.52 0.13 235);
-    --accent-hover: oklch(0.46 0.14 235);
-    --accent-soft: oklch(0.95 0.025 235);
-    --accent-ink: oklch(0.32 0.10 235);
+    /* accent — the brand blue (#6D94C5), deepened for AA on text-bearing fills */
+    --accent: oklch(0.53 0.105 255); /* solid CTA / primary — white label clears 4.5:1 */
+    --accent-hover: oklch(0.46 0.11 255);
+    --accent-soft: oklch(0.886 0.028 245); /* #CBDCEB light blue — chips, selection, soft fills */
+    --accent-ink: oklch(0.40 0.10 255); /* links + text on soft */
 
-    /* progress (muted forest) */
-    --progress: oklch(0.62 0.12 155);
-    --progress-soft: oklch(0.94 0.03 155);
-    --progress-ink: oklch(0.34 0.08 155);
+    /* progress (muted green — harmonized softer for the warm surface) */
+    --progress: oklch(0.60 0.12 155);
+    --progress-soft: oklch(0.92 0.045 150);
+    --progress-ink: oklch(0.36 0.08 155);
 
     /* attention (warm amber) */
-    --attention: oklch(0.72 0.13 75);
-    --attention-soft: oklch(0.95 0.04 75);
-    --attention-ink: oklch(0.4 0.09 75);
+    --attention: oklch(0.74 0.13 78);
+    --attention-soft: oklch(0.93 0.05 80);
+    --attention-ink: oklch(0.42 0.09 70);
 
     /* critical (controlled red) */
     --critical: oklch(0.55 0.18 25);
-    --critical-soft: oklch(0.95 0.04 25);
-    --critical-ink: oklch(0.36 0.13 25);
+    --critical-soft: oklch(0.93 0.045 28);
+    --critical-ink: oklch(0.40 0.14 25);
 
-    /* structural */
-    --border: oklch(0.92 0.005 250);
-    --border-strong: oklch(0.85 0.008 250);
-    --ring: oklch(0.52 0.13 235 / 0.35);
+    /* structural — warm sand hairlines */
+    --border: oklch(0.86 0.025 85);
+    --border-strong: oklch(0.78 0.03 85);
+    --ring: oklch(0.657 0.085 255 / 0.4); /* #6D94C5 exact — focus ring */
 }
 
 @layer base {

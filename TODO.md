@@ -57,3 +57,7 @@ Note this is somewhat distinct from "numeric increases" in the plan. E.g the ini
 
 a. Differenciation from the original plan's intention and semantics
 b. Similarity with regards to the precise numerical values proposed by the plan, but only until some extremeness factor e.g if new plan is significantly numerically different in an unexpected way.
+
+12.1.1 Implement the above researched and ideated plans for distances.
+
+12.2 Implement the resultant plan from the above, then systematically test and recursively improve upon the above distance implementation. Create a test that, for each fixture, runs a 14-day simulated recovery. You should add in each fixture in the profile of the patient, features of the profile that may result in semantic mutations to plan, which we will use to test our distance implementation for. for instance a profile that includes: "likes visits coffeeshop often", the user might occasionally tell wally that he is visiting the coffeeshop that day, and should adapt the generated plan accordingly.

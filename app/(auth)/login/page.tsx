@@ -4,7 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/primitives";
 import { AuthShell, Field, authInputClass } from "../AuthShell";
 
@@ -107,6 +107,16 @@ export default function LoginPage() {
                     Sign in
                 </Button>
             </form>
+
+            {process.env.NODE_ENV !== "production" && (
+                <Link
+                    href="/preview"
+                    className="mt-5 flex items-center justify-center gap-1.5 rounded-md border border-dashed border-border py-2.5 text-[13px] font-medium text-ink-muted hover:bg-surface-sunken hover:text-ink"
+                >
+                    <LayoutGrid size={15} strokeWidth={1.75} />
+                    Browse all pages (dev)
+                </Link>
+            )}
         </AuthShell>
     );
 }
