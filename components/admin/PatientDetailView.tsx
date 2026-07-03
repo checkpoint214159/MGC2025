@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { ensureAction } from "@/lib/utils";
 import DashboardRenderer from "@/app/(app)/patient/dashboard/DashboardRenderer";
 import { ReportTab } from "@/components/admin/ReportTab";
+import { InitialPlanTab } from "@/components/admin/InitialPlanTab";
 import type { State } from "@/lib/state/schemas/state";
 
 interface PatientDetailViewProps {
@@ -25,7 +26,12 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
     const router = useRouter();
     const { data: session } = useSession();
     const [activeTab, setActiveTab] = useState<
-        "overview" | "progress" | "threads" | "screening" | "report"
+        | "overview"
+        | "progress"
+        | "threads"
+        | "screening"
+        | "report"
+        | "initial plan"
     >("overview");
 
     // Fetch patient details
@@ -88,8 +94,20 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
     }
 
     const tabs: Array<
-        "overview" | "progress" | "threads" | "screening" | "report"
-    > = ["overview", "progress", "threads", "screening", "report"];
+        | "overview"
+        | "progress"
+        | "threads"
+        | "screening"
+        | "report"
+        | "initial plan"
+    > = [
+        "overview",
+        "initial plan",
+        "progress",
+        "threads",
+        "screening",
+        "report",
+    ];
 
     return (
         <div className="p-8 max-w-6xl mx-auto">
@@ -301,6 +319,11 @@ export function PatientDetailView({ patientId }: PatientDetailViewProps) {
 
                 {/* Report Tab */}
                 {activeTab === "report" && <ReportTab patientId={patientId} />}
+
+                {/* Initial Plan (anchor) Tab */}
+                {activeTab === "initial plan" && (
+                    <InitialPlanTab patientId={patientId} />
+                )}
             </div>
         </div>
     );

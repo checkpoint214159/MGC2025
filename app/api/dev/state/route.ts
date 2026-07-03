@@ -11,6 +11,12 @@ import { evaluateRecoveryFlags } from "@/lib/engagement/flags";
 import { getComplianceSeries } from "@/lib/engagement/compliance";
 import { getDailyMetrics } from "@/lib/metrics/service";
 import { assembleGenerationContext } from "@/lib/state/services/generation-context";
+import {
+    setInitialPlan,
+    getAnchorState,
+    DEFAULT_INITIAL_PLAN,
+    type InitialPlanInput,
+} from "@/lib/state/services/anchor";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -26,6 +32,7 @@ import { prisma } from "@/lib/prisma";
  *   metrics: {}                                       — persisted DailyMetric rows (asc by date)
  *   context: { date? }                                — assembled context observability (no gen)
  *   profile: {}                                       — name + onboarding profile/semantic memory
+ *   anchor:  { set?: "default" | InitialPlanInput }   — set/read the clinician anchor plan
  *   reset:   {}                                       — delete this patient's states + metrics
  */
 export async function POST(req: Request) {
@@ -115,6 +122,20 @@ export async function POST(req: Request) {
                     ok: true,
                     deletedStates: deleted.count,
                 });
+            }
+            case "anchor": {
+                // Set (or read) the clinician initial plan. `set: "default"` uses the
+                // built-in template; `set: {...}` a full InitialPlanInput; omitted = read.
+                if (body.set) {
+                    const input: InitialPlanInput =
+                        body.set === "default"
+                            ? DEFAULT_INITIAL_PLAN
+                            : (body.set as InitialPlanInput);
+                    const state = await setInitialPlan(userId, input);
+                    return NextResponse.json(state);
+                }
+                const anchor = await getAnchorState(userId);
+                return NextResponse.json(anchor);
             }
             case "profile": {
                 const user = await prisma.user.findUnique({

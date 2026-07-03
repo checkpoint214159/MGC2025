@@ -43,6 +43,11 @@ import {
 } from "@/lib/engagement";
 import { buildHeuristicDigest } from "@/lib/state/services/digest";
 import { getPatientMemory } from "@/lib/memory/service";
+import {
+    setInitialPlan,
+    getAnchorState,
+    type InitialPlanInput,
+} from "@/lib/state/services/anchor";
 
 // i love functors
 export async function authenticatedAction<T>(
@@ -522,5 +527,31 @@ export async function generatePatientReportAction(patientId: string) {
                 ? { semantic: memory.semantic, episodic: memory.episodic }
                 : null,
         } satisfies PatientReport;
+    });
+}
+
+// ── Clinician initial plan (anchor) ─────────────────────────────────────────
+
+/**
+ * Set the patient's day-0 initial plan (the anchor State). Admin/clinician only.
+ * The anchor is the human-expert prior plan generation regularizes against.
+ */
+export async function setInitialPlanAction(
+    patientId: string,
+    input: InitialPlanInput,
+) {
+    return authenticatedAction(async (userId) => {
+        await requireRole("admin");
+        await requirePatientAccess(userId, patientId);
+        return await setInitialPlan(patientId, input);
+    });
+}
+
+/** Read the patient's current anchor plan (or null). Admin only. */
+export async function getAnchorPlanAction(patientId: string) {
+    return authenticatedAction(async (userId) => {
+        await requireRole("admin");
+        await requirePatientAccess(userId, patientId);
+        return await getAnchorState(patientId);
     });
 }
