@@ -159,6 +159,40 @@ describe("planDistance", () => {
         expect(r.droppedTasks).toBe(3);
     });
 
+    it("sibling-metric additions (same plan item) cost half a genuinely new item", () => {
+        // Plan adds fiber ON THE SAME macro item (metric enrichment) vs a brand-new item.
+        const macroItem = task(
+            "nutrition",
+            "Daily Macro Targets",
+            "calories",
+            1800,
+        );
+        const siblingFiber = {
+            ...task("nutrition", "Daily Macro Targets", "fiber", 20),
+            itemId: macroItem.itemId, // same plan item
+        };
+        const withSibling = planDistance(
+            [macroItem],
+            [macroItem, siblingFiber],
+            CTX,
+        );
+        const newItem = task(
+            "exercise",
+            "Barbell squats",
+            "resistance",
+            20,
+            "red",
+        );
+        const withNewItem = planDistance(
+            [macroItem],
+            [macroItem, newItem],
+            CTX,
+        );
+        expect(withSibling.composition).toBeLessThan(withNewItem.composition);
+        expect(withSibling.composition).toBeCloseTo(1 - 1 / 1.5, 2); // half-weight add
+        expect(withNewItem.composition).toBeCloseTo(0.5, 2); // full-weight add
+    });
+
     it("modality/intensity shift charges the semantic axis even with sane numbers", () => {
         // Same task count, but mobility work replaced by heavy resistance at red intensity.
         const shifted = [

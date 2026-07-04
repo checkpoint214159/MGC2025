@@ -248,3 +248,31 @@ contributes a pain reading of 0 to the pain series (initialized-but-unlogged is
 indistinguishable from a logged "no pain"), which can trip pain_stagnation as pain "rises"
 from 0. Fix direction: derive the pain/compliance flag series from DailyMetric (written only
 on actual logging) instead of raw state progress.
+
+## 12. Mutation-scenario validation (TODO 12.2)
+
+**Infrastructure.** `say` dev op (patient message → chat thread → raw window → next
+generation's context — the "External" mutation channel); trajectory `events=` arg (scripted
+[{day, message}] posted BEFORE that day's plan generates) + per-day `distance` tracking +
+event-day module-summary printing (adaptation evidence); `scripts/harness/fixtures/
+colostomy-sg.mjs` — Singaporean colostomy personas with lifestyle mutation features
+(kopitiam-uncle, wet-market-auntie, polyclinic-haze); `npm run harness:distance` suite runs
+each fixture (14-day spec default, `days=`/`only=` overridable) and prints the D trajectory
+with event days marked.
+
+**Observed (kopitiam-uncle, then polyclinic-haze).** The full loop verifies the working-doc
+spec: event-day summaries read "adjusted for kopitiam breakfast request while maintaining
+tissue repair priorities… targets held within clinical range" and "accommodating zi char
+family dinner… scaled per progression curve" — the plan adapts semantically to the patient's
+day while numerics stay anchored, and D stays far under the 0.35 flag threshold.
+
+**Improvements folded back (the recursive part):**
+
+1. **Adaptation evidence surfaced** — a flat D can mean "adapted within bounds" or "ignored
+   the request"; the trajectory now prints event-day nutrition/exercise summaries so the suite
+   shows _what_ changed, not just how far.
+2. **C-axis sibling weighting** — added metrics on an already-matched plan item (fiber/sugar
+   on the macro item) are metric enrichment, not a new prescription: half weight. Removed the
+   constant ~0.18 noise floor; after the fix a quiet day reads D=0.045 and the haze-day indoor
+   walking substitution reads D=0.069 — the metric now discriminates event-day adaptation from
+   quiet days while both stay well inside the clinician's intent.

@@ -10,6 +10,7 @@ import { getPainSeries } from "@/lib/engagement/arc";
 import { evaluateRecoveryFlags } from "@/lib/engagement/flags";
 import { getComplianceSeries } from "@/lib/engagement/compliance";
 import { getDailyMetrics } from "@/lib/metrics/service";
+import { updateThread } from "@/lib/user/service";
 import { assembleGenerationContext } from "@/lib/state/services/generation-context";
 import {
     setInitialPlan,
@@ -37,6 +38,7 @@ import { prisma } from "@/lib/prisma";
  *   context: { date? }                                — assembled context observability (no gen)
  *   profile: {}                                       — name + onboarding profile/semantic memory
  *   anchor:  { set?: "default" | InitialPlanInput }   — set/read the clinician anchor plan
+ *   say:     { message }                              — post a patient chat message (mutation channel)
  *   distance:{ date? }                                — plan-distance of active state vs anchor
  *   reset:   {}                                       — delete this patient's states + metrics
  */
@@ -123,9 +125,49 @@ export async function POST(req: Request) {
                 const deleted = await prisma.state.deleteMany({
                     where: { userId },
                 });
+                // Also drop harness chat threads (say-op messages) so the raw window from a
+                // prior run can't leak into this one. Onboarding threads are preserved.
+                await prisma.thread.deleteMany({
+                    where: { userId, type: "chat" },
+                });
                 return NextResponse.json({
                     ok: true,
                     deletedStates: deleted.count,
+                });
+            }
+            case "say": {
+                // Post a PATIENT message to their chat thread — the "External" mutation
+                // channel (working-doc spec: "the patient says they want more milk/cream").
+                // The message lands in the raw window → next generation's context → the
+                // plan adapts → plan-distance measures the mutation (TODO 12.2).
+                if (typeof body.message !== "string" || !body.message.trim()) {
+                    return NextResponse.json(
+                        { error: "message required" },
+                        { status: 400 },
+                    );
+                }
+                // Reuse an existing chat thread or start one.
+                const existingThread = await prisma.thread.findFirst({
+                    where: { userId, type: "chat" },
+                    select: { id: true },
+                });
+                const thread = await updateThread(
+                    userId,
+                    existingThread?.id ?? null,
+                    "chat",
+                    [
+                        {
+                            role: "user",
+                            content: body.message,
+                            creationSource: "harness-say",
+                            threadId: existingThread?.id ?? null,
+                            createdAt: new Date(),
+                        },
+                    ],
+                );
+                return NextResponse.json({
+                    ok: true,
+                    threadId: thread?.id ?? existingThread?.id ?? null,
                 });
             }
             case "distance": {

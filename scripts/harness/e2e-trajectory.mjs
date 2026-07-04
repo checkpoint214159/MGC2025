@@ -52,6 +52,20 @@ const NAME = args.name ?? "trajectory";
 const PRESET = args.preset ?? "colostomy-default";
 if (args.model) process.env.SIM_MODEL = args.model;
 
+// Scripted life EVENTS (TODO 12.2): JSON [{day, message}] — the patient tells Wally something
+// BEFORE that day's plan generates (kopitiam visit, clinic follow-up, …). The message enters
+// the raw window → the plan adapts → plan-distance measures the semantic mutation.
+const EVENTS = (() => {
+    if (!args.events) return [];
+    try {
+        const parsed = JSON.parse(args.events);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+        console.error(`✖ bad events JSON: ${e.message}`);
+        process.exit(1);
+    }
+})();
+
 const CRON_SECRET = process.env.CRON_SECRET ?? "";
 
 const c = createClient();
@@ -160,11 +174,26 @@ async function main() {
 
     // 3. Drive DAYS simulated days.
     const stateIds = [];
+    const distanceSeries = [];
     let simFailures = 0;
     for (let i = 0; i < DAYS; i++) {
         const day = i + 1;
         const date = dateStr(i);
         const recoveryDay = recoveryDayOf(date, surgeryDate);
+
+        // Scripted life event: the patient tells Wally BEFORE today's plan generates, so the
+        // message is in the raw window and the generated plan can adapt to it.
+        const event = EVENTS.find((e) => Number(e.day) === day);
+        if (event) {
+            const { body: said } = await c.postJson("/api/dev/state", {
+                op: "say",
+                message: event.message,
+            });
+            console.log(
+                `   Day ${day} 💬 "${event.message}"${said?.ok ? "" : " (SAY FAILED)"}`,
+            );
+            record(`day ${day}: event message posted`, said?.ok === true);
+        }
 
         const {
             res,
@@ -190,6 +219,44 @@ async function main() {
             continue;
         }
         stateIds.push(state.id);
+
+        // Adaptation evidence on event days: the anchor block tells the model to explain any
+        // deviation in the module summary — surface it so D alone isn't the only signal
+        // ("adapted within bounds" vs "ignored the request" both read as low D).
+        if (event) {
+            for (const m of modules) {
+                if (
+                    m.summary &&
+                    (m.type === "nutrition" || m.type === "exercise")
+                ) {
+                    console.log(
+                        `   Day ${day} 📝 ${m.type}: ${m.summary.slice(0, 160)}`,
+                    );
+                }
+            }
+        }
+
+        // Per-day plan-distance vs the anchor (when this run set one): the drift trajectory —
+        // does it stay bounded, and how do event-day mutations move it?
+        if (args.anchor) {
+            const { body: d } = await c.postJson("/api/dev/state", {
+                op: "distance",
+                date,
+            });
+            if (d && typeof d.D === "number") {
+                distanceSeries.push({
+                    day,
+                    D: d.D,
+                    C: d.composition,
+                    S: d.semantic,
+                    N: d.numeric,
+                    event: !!event,
+                });
+                console.log(
+                    `   Day ${day} 📏 D=${d.D} (C=${d.composition} S=${d.semantic} N=${d.numeric})${event ? " ← event day" : ""}`,
+                );
+            }
+        }
 
         // Patient (LLM) decides actions for today's tasks.
         const { tasks, index } = extractTasks(state);
@@ -430,6 +497,8 @@ async function main() {
             lastPain: flagData?.painSeries?.slice(-1)[0]?.pain ?? null,
             compaction: obs?.compactionRatio ?? null,
             planDistance: planDist?.D ?? null,
+            distanceSeries,
+            eventDays: EVENTS.map((e) => Number(e.day)),
             sent: mine?.sent ?? [],
         })}`,
     );

@@ -245,8 +245,19 @@ export function planDistance(
     const { matches, added } = matchTasks(anchorTasks, planTasks);
     const matched = matches.filter((m) => m.plan !== null);
 
-    // C — composition: 1 − Jaccard(matched | anchor ∪ plan-additions)
-    const union = anchorTasks.length + added.length;
+    // C — composition: 1 − Jaccard(matched | anchor ∪ plan-additions). Additions that are
+    // SIBLING METRICS on an already-matched plan item (e.g. fiber/sugar added to the matched
+    // macro item) are metric enrichment, not a new prescription — half weight, so genuinely
+    // novel items (new exercises, new modalities) dominate the axis. (12.2 observation: the
+    // full-weight version put a constant ~0.18 noise floor under every generation.)
+    const matchedItemIds = new Set(
+        matched.map((m) => m.plan!.itemId).filter(Boolean),
+    );
+    const weightedAdded = added.reduce(
+        (s, t) => s + (matchedItemIds.has(t.itemId) ? 0.5 : 1),
+        0,
+    );
+    const union = anchorTasks.length + weightedAdded;
     const composition = union === 0 ? 0 : 1 - matched.length / union;
 
     // S — semantic: category-mix + intensity-mix divergence (cheap intent signal)
