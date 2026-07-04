@@ -133,6 +133,22 @@ async function main() {
         `cleared ${reset?.deletedStates ?? "?"} states`,
     );
 
+    // Optionally set the clinician anchor AFTER the reset (reset wipes it): anchor=default
+    // exercises the plan-distance guardrail (in-prompt anchoring + clamp + [plan-distance] log).
+    if (args.anchor) {
+        const { body: anchorState } = await c.postJson("/api/dev/state", {
+            op: "anchor",
+            set: args.anchor === "default" ? "default" : JSON.parse(args.anchor),
+        });
+        record(
+            "set clinician anchor",
+            anchorState?.isAnchor === true,
+            anchorState?.isAnchor
+                ? `arc=${anchorState.recoveryDays}d, ${anchorState.modules?.length} modules`
+                : JSON.stringify(anchorState).slice(0, 120),
+        );
+    }
+
     const session = createSession({
         name: NAME,
         policy: POLICY,
@@ -287,6 +303,35 @@ async function main() {
         record("context observability", false, "no observability returned");
     }
 
+    // 4c. Plan-distance vs the clinician anchor (docs/PLAN_DISTANCE.md) — only when this run
+    // set one. Reported, not gated on a magic value: the drift is what the policy produced.
+    let planDist = null;
+    if (args.anchor) {
+        const { body: dist } = await c.postJson("/api/dev/state", {
+            op: "distance",
+            date: lastDate,
+        });
+        planDist = dist;
+        if (dist && typeof dist.D === "number") {
+            console.log(
+                `   plan-distance@day${stateIds.length}: D=${dist.D} ` +
+                    `(composition ${dist.composition} · semantic ${dist.semantic} · numeric ${dist.numeric}) · ` +
+                    `${dist.matchedTasks} matched / ${dist.droppedTasks} dropped / ${dist.addedTasks} added`,
+            );
+            record(
+                "plan-distance computed vs anchor",
+                true,
+                `D=${dist.D}`,
+            );
+        } else {
+            record(
+                "plan-distance computed vs anchor",
+                false,
+                JSON.stringify(dist).slice(0, 120),
+            );
+        }
+    }
+
     // 5. Flags produced by THIS policy (no prior on which fire).
     const { body: flagData } = await c.postJson("/api/dev/state", {
         op: "flags",
@@ -384,6 +429,7 @@ async function main() {
             meanCompliance,
             lastPain: flagData?.painSeries?.slice(-1)[0]?.pain ?? null,
             compaction: obs?.compactionRatio ?? null,
+            planDistance: planDist?.D ?? null,
             sent: mine?.sent ?? [],
         })}`,
     );

@@ -219,3 +219,32 @@ clamp, and escalate genuine drift to clinician re-verification via the existing 
 Graduated progression costs nothing because it's subtracted out by the envelope; only drift in
 _intent_ and _unexpected extremes_ accumulate distance. Validate it as an observable in the policy
 harness.
+
+## 11. Implemented (task c — P0+P1+P2 of §8)
+
+-   `lib/state/services/plan-envelope.ts` — capacity curve (ease-in dual of getExpectedRecovery),
+    `expectedEnvelope` (±β band, default 25%), `bandDeviation`, `clampToEnvelope`. Env-tunable
+    (`PLAN_ENVELOPE_GAIN`/`_BETA`).
+-   `lib/state/services/plan-distance.ts` — pure `planDistance(anchorTasks, planTasks, ctx)`:
+    C (1−Jaccard w/ token-overlap+category matching — no embeddings in v1), S (JS divergence of
+    category + intensity mixes), N (hinged band deviation, τ=0.15, p95-aggregated), D = 0.3C +
+    0.3S + 0.4N. `clampBlueprintsToEnvelope` = the deterministic reject. 16 unit tests.
+-   **In-prompt anchoring**: `assembleGenerationContext` appends a CLINICIAN ANCHOR PLAN block
+    (per-task expected range for today) to the cached digest layer.
+-   **Save-time guardrail** (`save_state`): measures RAW drift → `[plan-distance]` structured log,
+    clamps out-of-envelope numerics before persisting, raises a deduped `plan_drift` Flag when
+    D ≥ `PLAN_DRIFT_FLAG_THRESHOLD` (0.35; severity high at ≥0.6), and links the daily state to
+    the anchor via `anchorStateId`.
+-   Harness: `anchor=default` arg on the trajectory (sets the anchor post-reset), `distance` dev
+    op, D in the `[[RESULT]]` line.
+
+**Live verification** (2-day standard-policy run, default anchor): the generated plan tracked
+the anchor's exact tasks — D=0.069, numeric axis 0 (on-envelope), 9/9 matched, 0 dropped, no
+clamps, no flag. In-prompt anchoring demonstrably constrains generation; the clamp + flag
+remain as the hard backstop.
+
+**Known artifact (follow-up):** an anchor state whose symptoms progress is never logged
+contributes a pain reading of 0 to the pain series (initialized-but-unlogged is
+indistinguishable from a logged "no pain"), which can trip pain_stagnation as pain "rises"
+from 0. Fix direction: derive the pain/compliance flag series from DailyMetric (written only
+on actual logging) instead of raw state progress.

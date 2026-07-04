@@ -15,6 +15,12 @@ import {
     getRecoveryPhase,
     type RecoveryPhase,
 } from "@/lib/engagement";
+import { getAnchorState } from "@/lib/state/services/anchor";
+import {
+    extractPlanTasks,
+    DEFAULT_DISTANCE,
+} from "@/lib/state/services/plan-distance";
+import { expectedEnvelope } from "@/lib/state/services/plan-envelope";
 
 /**
  * Assemble the COMPACTED plan-generation context for one day — the single source of truth for
@@ -44,6 +50,8 @@ export interface MemoryObservability {
     };
     digestChars: number;
     rollingTrendChars: number;
+    /** In-prompt clinician anchoring (0 chars = no anchor set). */
+    anchorBlockChars: number;
     rawWindow: {
         chars: number;
         messages: number;
@@ -101,9 +109,50 @@ export async function assembleGenerationContext(
     });
     const metrics = await getDailyMetrics(userId);
     const rollingTrends = buildRollingTrends(metrics, genDate);
-    const heuristicDigest = rollingTrends
-        ? `${digestBase}\n\n${rollingTrends}`
-        : digestBase;
+
+    // In-prompt anchoring (docs/PLAN_DISTANCE.md §6.1): when a clinician anchor exists, hand
+    // the model each anchored task's expected target band for TODAY (anchor goal scaled along
+    // the recovery arc). Deterministic + byte-identical across the parallel module calls, so
+    // it rides the cached digest layer. The save-time clamp remains the hard guarantee.
+    const anchor = await getAnchorState(userId);
+    let anchorBlock = "";
+    if (anchor) {
+        const anchorDayOffset = 0;
+        const dayOffset = Math.max(
+            0,
+            Math.floor(
+                (genDate.getTime() - new Date(anchor.dateCreated).getTime()) /
+                    86_400_000,
+            ),
+        );
+        const arcDays = anchor.recoveryDays ?? 30;
+        const lines = extractPlanTasks(anchor.modules).map((t) => {
+            const env = expectedEnvelope(
+                t.goal,
+                dayOffset,
+                anchorDayOffset,
+                arcDays,
+                DEFAULT_DISTANCE.envelope,
+            );
+            return `- [${t.module}] ${t.name} (${
+                t.category
+            }): clinician day-0 target ${t.goal} ${
+                t.unit
+            }; today's expected range ${env.lower.toFixed(
+                1,
+            )}–${env.upper.toFixed(1)} ${t.unit}`;
+        });
+        anchorBlock =
+            "CLINICIAN ANCHOR PLAN (the physio/dietitian-set day-0 plan, scaled to today along " +
+            `the ${arcDays}-day arc — day ${dayOffset} since anchor). Keep each task's target inside its ` +
+            "expected range unless the patient's notes clearly justify a change, keep the same tasks and " +
+            "intensity mix, and explain any deviation in the module summary:\n" +
+            lines.join("\n");
+    }
+
+    const heuristicDigest = [digestBase, rollingTrends, anchorBlock]
+        .filter(Boolean)
+        .join("\n\n");
 
     // Layer 2: consolidated memory. Layer 3: unconsolidated raw window since the watermark.
     const patientMemory = await getPatientMemory(userId);
@@ -151,6 +200,7 @@ export async function assembleGenerationContext(
         },
         digestChars: heuristicDigest.length,
         rollingTrendChars: rollingTrends.length,
+        anchorBlockChars: anchorBlock.length,
         rawWindow: {
             chars: rawWindow.text.length,
             messages: rawWindow.messageCount,

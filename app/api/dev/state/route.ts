@@ -17,6 +17,10 @@ import {
     DEFAULT_INITIAL_PLAN,
     type InitialPlanInput,
 } from "@/lib/state/services/anchor";
+import {
+    planDistance,
+    extractPlanTasks,
+} from "@/lib/state/services/plan-distance";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -33,6 +37,7 @@ import { prisma } from "@/lib/prisma";
  *   context: { date? }                                — assembled context observability (no gen)
  *   profile: {}                                       — name + onboarding profile/semantic memory
  *   anchor:  { set?: "default" | InitialPlanInput }   — set/read the clinician anchor plan
+ *   distance:{ date? }                                — plan-distance of active state vs anchor
  *   reset:   {}                                       — delete this patient's states + metrics
  */
 export async function POST(req: Request) {
@@ -122,6 +127,37 @@ export async function POST(req: Request) {
                     ok: true,
                     deletedStates: deleted.count,
                 });
+            }
+            case "distance": {
+                // Plan-space distance of a day's ACTIVE state vs the clinician anchor
+                // (docs/PLAN_DISTANCE.md). No LLM. Returns null when no anchor is set.
+                const anchor = await getAnchorState(userId);
+                if (!anchor) return NextResponse.json(null);
+                const date = body.date ? new Date(body.date) : new Date();
+                const target = await getActiveState(userId, date);
+                if (!target)
+                    return NextResponse.json({
+                        error: `no active state for ${date
+                            .toISOString()
+                            .slice(0, 10)}`,
+                    });
+                const dist = planDistance(
+                    extractPlanTasks(anchor.modules),
+                    extractPlanTasks(target.modules),
+                    {
+                        recoveryDay: Math.max(
+                            0,
+                            Math.floor(
+                                (date.getTime() -
+                                    new Date(anchor.dateCreated).getTime()) /
+                                    86_400_000,
+                            ),
+                        ),
+                        anchorDay: 0,
+                        arcDays: anchor.recoveryDays ?? 30,
+                    },
+                );
+                return NextResponse.json(dist);
             }
             case "anchor": {
                 // Set (or read) the clinician initial plan. `set: "default"` uses the

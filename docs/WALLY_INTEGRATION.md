@@ -11,7 +11,7 @@ loop (adjust targets, flag breached thresholds). The **agentic system** handles 
 bounds; plans that drift from the clinician's direction/intention are **rejected**.
 docs/PLAN_DISTANCE.md is the metric design implementing that rejection/regularization.
 
-## a1 — Preview UI → whole codebase ⏳
+## a1 — Preview UI → whole codebase ✅ (de99eb9)
 
 Upstream merged the Wally design suite (DESIGN.md tokens in globals.css, components/wally/_,
 app/preview/wally/_ mockups) and already migrated: auth pages, patient info pages,
@@ -37,7 +37,7 @@ Rules: DESIGN.md vocabulary only — tokens (bg/surface/ink/accent/progress/atte
 border, radius-md/lg), no side-stripe accents, no spinners-mid-content (skeletons), lucide icons
 1.75 stroke, 44px tap targets, weight-based hierarchy.
 
-## a2 — Clinician initial-plan upload (the anchor) ☐
+## a2 — Clinician initial-plan upload (the anchor) ✅ (12a2f46)
 
 -   Server action `setInitialPlanAction(patientId, blueprint)` (admin-gated): creates an
     **anchor State** (isAnchor: true, status "verified") + modules + progress via Neon-safe
@@ -47,7 +47,7 @@ border, radius-md/lg), no side-stripe accents, no spinners-mid-content (skeleton
     tasks: name, category, goal, unit, intensity) seeded from a sensible template; submit → anchor.
 -   Dev op for harness: `{op:"anchor", blueprint?}` to set/read the anchor.
 
-## b — Example test profiles ☐
+## b — Example test profiles ✅ (72ff488)
 
 lib/dev/seed-patient.ts already has presets (colostomy-default + ACL/HIP templates in
 lib/dev/templates/). Extend to named, easily loadable personas (sex × surgery), e.g.:
@@ -58,7 +58,7 @@ lib/dev/templates/). Extend to named, easily loadable personas (sex × surgery),
     Expose: seed endpoint accepts `{preset}`; trajectory harness accepts `preset=` and passes it
     through; suite can run a policy × preset matrix later.
 
-## c — Plan-distance metric (docs/PLAN_DISTANCE.md P0+P1) ☐
+## c — Plan-distance metric (docs/PLAN_DISTANCE.md P0+P1+P2) ✅ — see PLAN_DISTANCE.md §11
 
 -   `lib/state/services/plan-envelope.ts` — capacity curve (dual of getExpectedRecovery),
     expected(d) per anchor goal, tolerance band, clamp.
