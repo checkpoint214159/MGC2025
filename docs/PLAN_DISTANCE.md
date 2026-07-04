@@ -276,3 +276,12 @@ day while numerics stay anchored, and D stays far under the 0.35 flag threshold.
    constant ~0.18 noise floor; after the fix a quiet day reads D=0.045 and the haze-day indoor
    walking substitution reads D=0.069 — the metric now discriminates event-day adaptation from
    quiet days while both stay well inside the clinician's intent.
+
+**Full 14-day runs (spec length).** kopitiam-uncle 29/29: D flat at 0.045 for 14 days —
+value/summary-level nutrition adaptation, structure anchored. wet-market-auntie 29/29: the
+richest trajectory — D 0.045 → 0.11 on the wet-market event (day 4) → 0.155 while her
+errand-walking substitutions persist → 0.122 by day 14. A _persistent, legitimate_ semantic
+substitution tracked and bounded (max 0.155, threshold 0.35) — the metric follows real
+mutation pressure without flagging intent-preserving adaptation. polyclinic-haze aborted on
+day 4: the OpenRouter key exhausted its credit limit mid-suite (infra, not metric — the 2-day
+observation run of the same fixture was green, incl. the haze-day indoor substitution).
