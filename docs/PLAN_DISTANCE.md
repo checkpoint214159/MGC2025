@@ -282,6 +282,9 @@ value/summary-level nutrition adaptation, structure anchored. wet-market-auntie 
 richest trajectory — D 0.045 → 0.11 on the wet-market event (day 4) → 0.155 while her
 errand-walking substitutions persist → 0.122 by day 14. A _persistent, legitimate_ semantic
 substitution tracked and bounded (max 0.155, threshold 0.35) — the metric follows real
-mutation pressure without flagging intent-preserving adaptation. polyclinic-haze aborted on
-day 4: the OpenRouter key exhausted its credit limit mid-suite (infra, not metric — the 2-day
-observation run of the same fixture was green, incl. the haze-day indoor substitution).
+mutation pressure without flagging intent-preserving adaptation. polyclinic-haze 29/29 (re-run after
+credit top-up): haze-day indoor substitution cheap (D=0.045 — same-category swap, task still
+matched); the "keep today light" polyclinic day is the genuine deviation, peaking at D=0.111,
+then relaxing to ~0.095 by day 14. All three fixtures spec-complete at 14 days; max D across
+the suite 0.155, never approaching the 0.35 flag threshold, with every adaptation explained
+in the module summaries.
