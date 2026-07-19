@@ -8,7 +8,11 @@ import { cn } from "@/lib/utils";
 const STEPS = [
     { key: "onboarding", href: "/preview/wally/onboarding", label: "Onboard" },
     { key: "assessment", href: "/preview/wally/assessment", label: "Assess" },
-    { key: "lifestyle", href: "/preview/wally/lifestyle", label: "Preferences" },
+    {
+        key: "lifestyle",
+        href: "/preview/wally/lifestyle",
+        label: "Preferences",
+    },
     { key: "discharge", href: "/preview/wally/discharge", label: "Upload" },
     { key: "review", href: "/preview/wally/review", label: "Review" },
     { key: "plan", href: "/preview/wally/plan", label: "Plan" },
@@ -27,13 +31,15 @@ export function WallyShell({
         <div className="min-h-screen bg-bg">
             <header className="sticky top-0 z-20 border-b border-border bg-surface/90 backdrop-blur">
                 <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-5 py-2.5">
-                    <a href="/preview/wally" className="flex shrink-0 items-center gap-2">
+                    <a
+                        href="/preview/wally"
+                        className="flex shrink-0 items-center gap-2"
+                    >
                         <span className="grid size-7 place-items-center rounded-md bg-accent text-[13px] font-semibold text-ink-inverse">
                             W
                         </span>
-                        <span className="text-[14px] font-semibold text-ink">Wally</span>
-                        <span className="rounded bg-attention-soft px-1.5 py-0.5 text-[11px] text-attention-ink">
-                            mockup
+                        <span className="text-[14px] font-semibold text-ink">
+                            Wally
                         </span>
                     </a>
                     <nav className="flex items-center gap-1 overflow-x-auto">
@@ -44,7 +50,10 @@ export function WallyShell({
                             <LayoutGrid size={15} strokeWidth={1.75} />
                             All pages
                         </a>
-                        <span className="mx-0.5 h-5 w-px bg-border" aria-hidden />
+                        <span
+                            className="mx-0.5 h-5 w-px bg-border"
+                            aria-hidden
+                        />
                         {STEPS.map((s, i) => (
                             <a
                                 key={s.key}
@@ -60,7 +69,10 @@ export function WallyShell({
                                 {s.label}
                             </a>
                         ))}
-                        <span className="mx-0.5 h-5 w-px bg-border" aria-hidden />
+                        <span
+                            className="mx-0.5 h-5 w-px bg-border"
+                            aria-hidden
+                        />
                         <a
                             href="/preview/mgc/admin"
                             className="flex h-9 items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 text-[13px] font-medium text-ink-muted hover:bg-surface-sunken hover:text-ink"

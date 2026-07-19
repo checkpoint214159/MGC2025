@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Dev-only component gallery for the engagement revamp — renders the new components
- * with mock data, bypassing auth/onboarding/LLM. Gated to development by page.tsx.
+ * Component gallery for the engagement revamp — renders the new components
+ * with mock data, bypassing auth/onboarding/LLM.
  */
 
 import { TodayHero } from "@/components/recovery/TodayHero";
@@ -58,8 +58,7 @@ export function PreviewGallery() {
         <div className="mx-auto max-w-3xl space-y-12 px-5 py-12 md:px-10">
             <header className="space-y-1">
                 <div className="inline-flex items-center gap-2 rounded-md bg-attention-soft px-3 py-1.5 text-[12px] text-attention-ink">
-                    Dev preview — mock data, no backend. Dev-only route (404s in
-                    production).
+                    Component preview — mock data, no backend.
                 </div>
                 <h1 className="text-[28px] font-semibold text-ink">
                     Engagement revamp — component preview

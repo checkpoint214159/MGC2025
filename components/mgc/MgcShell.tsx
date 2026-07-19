@@ -34,9 +34,6 @@ export function MgcShell({
                         <span className="text-[14px] font-semibold text-ink">
                             Recovery
                         </span>
-                        <span className="rounded bg-attention-soft px-1.5 py-0.5 text-[11px] text-attention-ink">
-                            MGC mockup
-                        </span>
                     </a>
                     <nav className="flex items-center gap-1 overflow-x-auto">
                         <a
@@ -46,7 +43,10 @@ export function MgcShell({
                             <LayoutGrid size={15} strokeWidth={1.75} />
                             All pages
                         </a>
-                        <span className="mx-0.5 h-5 w-px bg-border" aria-hidden />
+                        <span
+                            className="mx-0.5 h-5 w-px bg-border"
+                            aria-hidden
+                        />
                         {STEPS.map((s, i) => (
                             <a
                                 key={s.key}

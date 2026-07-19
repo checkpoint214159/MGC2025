@@ -1,10 +1,8 @@
-import { notFound } from "next/navigation";
 import { MgcShell } from "@/components/mgc/MgcShell";
 import { MgcHub } from "./MgcHub";
 
-/** Dev-only MGC mockup hub. Gated to development (proxy.ts 404s /preview/* in production). */
+/** MGC mockup hub — mock data, no backend. */
 export default function Page() {
-    if (process.env.NODE_ENV === "production") notFound();
     return (
         <MgcShell>
             <MgcHub />
