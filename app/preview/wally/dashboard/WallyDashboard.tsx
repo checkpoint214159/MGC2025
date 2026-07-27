@@ -24,6 +24,9 @@ import {
     X,
     Sparkles,
     LifeBuoy,
+    MapPin,
+    Clock,
+    Stethoscope,
 } from "lucide-react";
 import { PhaseScope } from "@/components/wally/PhaseScope";
 import { DailyPlant } from "@/components/recovery/DailyPlant";
@@ -315,7 +318,9 @@ function NutritionCard({
 }
 
 export function WallyDashboard() {
-    const [tab, setTab] = useState<"home" | "support">("home");
+    const [tab, setTab] = useState<"home" | "support" | "tasks" | "profile">(
+        "home",
+    );
     const [walkDone, setWalkDone] = useState(true);
     const [sitUpsDone, setSitUpsDone] = useState(false);
     const [feedback, setFeedback] = useState<string | null>(null);
@@ -335,6 +340,9 @@ export function WallyDashboard() {
         setDisruptions((s) =>
             s.includes(d) ? s.filter((x) => x !== d) : [...s, d],
         );
+    // header + appointment interactivity
+    const [notifOpen, setNotifOpen] = useState(false);
+    const [apptOpen, setApptOpen] = useState(false);
 
     // today's tasks → the growing plant
     const total = 6;
@@ -345,6 +353,92 @@ export function WallyDashboard() {
         (sitUpsDone ? 1 : 0) +
         (glasses >= 8 ? 1 : 0) +
         1; // sleep logged
+
+    // Tasks tab — today's checklist, driven by the same state as the plant
+    const taskList = [
+        { label: "Walk 30 minutes at Bishan Park", done: walkDone, icon: <Activity size={16} /> },
+        { label: "10 sit-ups at Fitness Corner", done: sitUpsDone, icon: <Activity size={16} /> },
+        { label: `Reach ${KCAL_TARGET} kcal`, done: kcal >= KCAL_TARGET, icon: <Flame size={16} /> },
+        { label: `Reach ${PROTEIN_TARGET}g protein`, done: protein >= PROTEIN_TARGET, icon: <Beef size={16} /> },
+        { label: "Drink 8 glasses of water", done: glasses >= 8, icon: <Droplets size={16} /> },
+        { label: "Log tonight's sleep", done: true, icon: <Moon size={16} /> },
+    ];
+    const tasksView = (
+        <div className="space-y-3">
+            <div className="flex items-center justify-between">
+                <h2 className="text-[18px] font-bold text-ink">Today&apos;s Tasks</h2>
+                <Chip tone="accent">
+                    {done} / {total} done
+                </Chip>
+            </div>
+            <div className="divide-y divide-border rounded-2xl border border-border bg-surface">
+                {taskList.map((t) => (
+                    <div key={t.label} className="flex items-center gap-3 p-3.5">
+                        <span
+                            className={cn(
+                                "grid size-6 shrink-0 place-items-center rounded-full",
+                                t.done
+                                    ? "bg-accent text-ink-inverse"
+                                    : "border border-border-strong text-ink-subtle",
+                            )}
+                        >
+                            {t.done ? <Check size={14} strokeWidth={3} /> : t.icon}
+                        </span>
+                        <span
+                            className={cn(
+                                "flex-1 text-[15px]",
+                                t.done
+                                    ? "text-ink-muted line-through decoration-1"
+                                    : "text-ink",
+                            )}
+                        >
+                            {t.label}
+                        </span>
+                    </div>
+                ))}
+            </div>
+            <p className="text-center text-[13px] text-ink-muted">
+                Complete your tasks to help your plant grow 🌱
+            </p>
+        </div>
+    );
+
+    // Profile tab — a simple patient identity card + shortcuts
+    const profileView = (
+        <div className="space-y-3">
+            <div className="flex flex-col items-center rounded-2xl border border-border bg-surface p-5 text-center">
+                <span className="grid size-16 place-items-center rounded-full bg-accent-soft text-[22px] font-bold text-accent-ink">
+                    MT
+                </span>
+                <h2 className="mt-3 text-[18px] font-bold text-ink">Mr Tan</h2>
+                <p className="mt-0.5 text-[13px] text-ink-muted">
+                    Recovery Day 12 · Laparoscopic Sigmoid Colectomy
+                </p>
+                <div className="mt-3 flex gap-2">
+                    <Chip tone="accent">Age 40</Chip>
+                    <Chip tone="progress">On track</Chip>
+                </div>
+            </div>
+            <div className="divide-y divide-border rounded-2xl border border-border bg-surface">
+                {[
+                    { icon: <ClipboardList size={17} />, label: "My recovery plan" },
+                    { icon: <BarChart3 size={17} />, label: "Progress report" },
+                    { icon: <Bell size={17} />, label: "Notification settings" },
+                    { icon: <LifeBuoy size={17} />, label: "Support & help" },
+                ].map((r) => (
+                    <button
+                        key={r.label}
+                        type="button"
+                        className="flex w-full items-center gap-3 p-3.5 text-left hover:bg-surface-sunken"
+                    >
+                        <span className="text-accent-ink">{r.icon}</span>
+                        <span className="flex-1 text-[15px] text-ink">{r.label}</span>
+                        <ChevronRight size={16} className="text-ink-subtle" />
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
 
     return (
         <div className="mx-auto max-w-md px-4 py-6">
@@ -359,26 +453,74 @@ export function WallyDashboard() {
                         Let&apos;s keep up the great work today.
                     </p>
                 </div>
-                <button
-                    type="button"
-                    aria-label="Notifications"
-                    className="relative mt-1 grid size-9 shrink-0 place-items-center rounded-full hover:bg-surface-sunken"
-                >
-                    <Bell
-                        size={20}
-                        strokeWidth={1.75}
-                        className="text-ink-muted"
-                    />
-                    <span className="absolute right-1.5 top-1 size-2 rounded-full bg-critical" />
-                </button>
+                <div className="relative mt-1 shrink-0">
+                    <button
+                        type="button"
+                        aria-label="Notifications"
+                        onClick={() => setNotifOpen((o) => !o)}
+                        className="relative grid size-9 place-items-center rounded-full hover:bg-surface-sunken"
+                    >
+                        <Bell
+                            size={20}
+                            strokeWidth={1.75}
+                            className="text-ink-muted"
+                        />
+                        {!notifOpen && (
+                            <span className="absolute right-1.5 top-1 size-2 rounded-full bg-critical" />
+                        )}
+                    </button>
+                    {notifOpen && (
+                        <div className="absolute right-0 top-11 z-40 w-64 rounded-2xl border border-border bg-surface p-2 shadow-lg">
+                            <p className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-ink-subtle">
+                                Notifications
+                            </p>
+                            {[
+                                {
+                                    icon: <Sparkles size={15} />,
+                                    text: "Time for your evening walk at Bishan Park 🌳",
+                                    time: "5m ago",
+                                },
+                                {
+                                    icon: <CalendarDays size={15} />,
+                                    text: "Your physio verified your recovery plan",
+                                    time: "2h ago",
+                                },
+                                {
+                                    icon: <Droplets size={15} />,
+                                    text: "You're 3 glasses from your hydration goal",
+                                    time: "4h ago",
+                                },
+                            ].map((n, i) => (
+                                <div
+                                    key={i}
+                                    className="flex items-start gap-2.5 rounded-xl p-2 hover:bg-surface-sunken"
+                                >
+                                    <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-accent-soft text-accent-ink">
+                                        {n.icon}
+                                    </span>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-[13px] leading-snug text-ink">
+                                            {n.text}
+                                        </p>
+                                        <p className="mt-0.5 text-[11px] text-ink-subtle">
+                                            {n.time}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* search */}
-            <div className="mt-4 flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5">
+            <div className="mt-4 flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 focus-within:border-accent focus-within:ring-2 focus-within:ring-ring">
                 <Search size={18} className="text-ink-subtle" />
-                <span className="flex-1 text-[15px] text-ink-subtle">
-                    Ask a question or search…
-                </span>
+                <input
+                    type="text"
+                    placeholder="Ask a question or search…"
+                    className="flex-1 bg-transparent text-[15px] text-ink placeholder:text-ink-subtle focus:outline-none"
+                />
                 <MessageCircle size={18} className="text-accent-ink" />
             </div>
 
@@ -386,6 +528,10 @@ export function WallyDashboard() {
                 <div className="mt-4">
                     <SupportTab />
                 </div>
+            ) : tab === "tasks" ? (
+                <div className="mt-4">{tasksView}</div>
+            ) : tab === "profile" ? (
+                <div className="mt-4">{profileView}</div>
             ) : (
                 <div className="mt-4 space-y-3.5">
                     {/* daily progress — a growing plant for today's tasks */}
@@ -670,21 +816,53 @@ export function WallyDashboard() {
                     </PhaseScope>
 
                     {/* what's next */}
-                    <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-4">
-                        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-ink">
-                            <CalendarDays size={20} />
-                        </span>
-                        <div className="flex-1">
-                            <h3 className="text-[15px] font-semibold text-ink">
-                                What&apos;s Next
-                            </h3>
-                            <p className="text-[13px] text-ink-muted">
-                                Surgical Review · 28 May 2025 · 10:00 AM
-                            </p>
+                    <div className="rounded-2xl border border-border bg-surface p-4">
+                        <div className="flex items-center gap-3">
+                            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-ink">
+                                <CalendarDays size={20} />
+                            </span>
+                            <div className="flex-1">
+                                <h3 className="text-[15px] font-semibold text-ink">
+                                    What&apos;s Next
+                                </h3>
+                                <p className="text-[13px] text-ink-muted">
+                                    Surgical Review · 28 May 2025 · 10:00 AM
+                                </p>
+                            </div>
+                            <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={() => setApptOpen((o) => !o)}
+                            >
+                                {apptOpen ? "Hide" : "View Details"}
+                            </Button>
                         </div>
-                        <Button size="sm" variant="secondary">
-                            View Details
-                        </Button>
+                        {apptOpen && (
+                            <div className="mt-3 space-y-2 border-t border-border pt-3 text-[13px] text-ink-muted">
+                                <p className="flex items-center gap-2">
+                                    <MapPin
+                                        size={15}
+                                        className="shrink-0 text-accent-ink"
+                                    />
+                                    Bishan Polyclinic · Clinic 3B
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <Stethoscope
+                                        size={15}
+                                        className="shrink-0 text-accent-ink"
+                                    />
+                                    Dr Lim Wei Ming · Colorectal Surgery
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <Clock
+                                        size={15}
+                                        className="shrink-0 text-accent-ink"
+                                    />
+                                    Arrive 15 min early · bring your medication
+                                    list
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
@@ -698,7 +876,12 @@ export function WallyDashboard() {
                         onClick: () => setTab("home"),
                         active: tab === "home",
                     },
-                    { icon: <ClipboardList size={20} />, label: "Tasks" },
+                    {
+                        icon: <ClipboardList size={20} />,
+                        label: "Tasks",
+                        onClick: () => setTab("tasks"),
+                        active: tab === "tasks",
+                    },
                     {
                         icon: <BarChart3 size={20} />,
                         label: "Progress",
@@ -711,7 +894,12 @@ export function WallyDashboard() {
                         onClick: () => setTab("support"),
                         active: tab === "support",
                     },
-                    { icon: <User size={20} />, label: "Profile" },
+                    {
+                        icon: <User size={20} />,
+                        label: "Profile",
+                        onClick: () => setTab("profile"),
+                        active: tab === "profile",
+                    },
                 ].map((t) => (
                     <button
                         key={t.label}

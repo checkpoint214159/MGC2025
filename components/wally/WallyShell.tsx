@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react";
 import { LayoutGrid, Stethoscope } from "lucide-react";
+import { WallyLogo } from "@/components/wally/WallyLogo";
 import { cn } from "@/lib/utils";
 
 /** Shared nav shell linking the Wally patient-journey mockups + out to the clinician screens. */
@@ -35,9 +36,7 @@ export function WallyShell({
                         href="/preview/wally"
                         className="flex shrink-0 items-center gap-2"
                     >
-                        <span className="grid size-7 place-items-center rounded-md bg-accent text-[13px] font-semibold text-ink-inverse">
-                            W
-                        </span>
+                        <WallyLogo size={28} />
                         <span className="text-[14px] font-semibold text-ink">
                             Wally
                         </span>

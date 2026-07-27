@@ -5,7 +5,6 @@ import { Footprints, Dumbbell, CheckCircle2 } from "lucide-react";
 import { PARQ_QUESTIONS } from "@/lib/onboarding/screening";
 import { PhaseScope } from "@/components/wally/PhaseScope";
 import { StepWizard } from "@/components/wally/StepWizard";
-import { WallyMascot } from "@/components/wally/WallyMascot";
 import { cn } from "@/lib/utils";
 
 const SARCF = [
@@ -50,13 +49,23 @@ function ParqCard({ n, text }: { n: number; text: string }) {
 function SarcRow({ icon, text }: { icon: React.ReactNode; text: string }) {
     const [v, setV] = useState<string | null>(null);
     return (
-        <div className="flex items-center gap-3 rounded-xl border border-border px-3 py-2.5">
-            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent-ink">{icon}</span>
-            <p className="flex-1 text-[13px] leading-snug text-ink">{text}</p>
-            <div className="flex shrink-0 gap-2.5">
+        <div className="rounded-xl border border-border p-3">
+            <div className="flex items-start gap-2.5">
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent-ink">{icon}</span>
+                <p className="flex-1 pt-0.5 text-[14px] leading-snug text-ink">{text}</p>
+            </div>
+            <div className="mt-2.5 grid grid-cols-3 gap-2">
                 {["None", "Some", "Unable"].map((o) => (
-                    <button key={o} type="button" onClick={() => setV(o)} className="inline-flex items-center gap-1 text-[12px] text-ink-muted">
-                        <span className={cn("size-3.5 rounded-full border-2", v === o ? "border-accent bg-accent" : "border-border-strong")} />
+                    <button
+                        key={o}
+                        type="button"
+                        onClick={() => setV(o)}
+                        className={cn(
+                            "flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-[13px] font-medium transition-colors",
+                            v === o ? "border-accent bg-accent-soft/50 text-accent-ink" : "border-border text-ink-muted hover:bg-surface-sunken",
+                        )}
+                    >
+                        <span className={cn("size-3.5 shrink-0 rounded-full border-2", v === o ? "border-accent bg-accent" : "border-border-strong")} />
                         {o}
                     </button>
                 ))}
@@ -69,7 +78,10 @@ export function WallyAssessment() {
     const intro = (
         <div className="flex flex-col items-center text-center">
             <h1 className="text-[24px] font-bold text-accent-ink">Initial Recovery Assessment</h1>
-            <div className="mt-2"><WallyMascot pose="wave" size={120} /></div>
+            <div className="mt-2 flex justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/wally/wally_full.png" alt="Wally" className="h-36 w-auto mix-blend-multiply" />
+            </div>
             <p className="mt-3 max-w-[19rem] text-[14px] text-ink-muted">
                 We&apos;ll ask a few questions about your health, activity readiness and strength to support your recovery plan.
             </p>
@@ -138,7 +150,10 @@ export function WallyAssessment() {
     const summary = (
         <div className="flex flex-col items-center text-center">
             <h2 className="text-[20px] font-bold text-accent-ink">Assessment Summary</h2>
-            <div className="mt-2"><WallyMascot pose="thumbs-up" size={120} /></div>
+            <div className="mt-2 flex justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/wally/wally_full.png" alt="Wally" className="h-36 w-auto mix-blend-multiply" />
+            </div>
             <p className="mt-4 inline-flex items-center gap-2 text-[18px] font-semibold text-accent-ink">
                 <CheckCircle2 size={20} strokeWidth={2} /> Thank you!
             </p>

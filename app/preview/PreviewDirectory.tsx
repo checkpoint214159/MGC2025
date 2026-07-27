@@ -25,6 +25,7 @@ import {
     ClipboardCheck,
     ArrowRight,
     Lock,
+    Sprout,
     type LucideIcon,
 } from "lucide-react";
 import { Card } from "@/components/ui/primitives";
@@ -50,6 +51,18 @@ const GROUPS: Group[] = [
                 icon: Compass,
                 title: "Journey overview",
                 desc: "The hub — every step of the Wally flow.",
+            },
+            {
+                href: "/preview/wally/intro",
+                icon: Sprout,
+                title: "Meet Wally",
+                desc: "The 5-second overview — what Wally is, at a glance.",
+            },
+            {
+                href: "/preview/wally/login",
+                icon: LogIn,
+                title: "Sign in",
+                desc: "Phone-framed patient login with the Wally logo.",
             },
             {
                 href: "/preview/wally/onboarding",
@@ -89,6 +102,12 @@ const GROUPS: Group[] = [
                 icon: LayoutDashboard,
                 title: "Patient Dashboard",
                 desc: "Growing-plant tasks, hydration/sleep logging, feedback.",
+            },
+            {
+                href: "/preview/wally/nudges",
+                icon: Sparkles,
+                title: "Nudges",
+                desc: "Gentle, context-aware engagement notifications.",
             },
             {
                 href: "/preview/wally/report",

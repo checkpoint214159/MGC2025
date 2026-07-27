@@ -1,10 +1,10 @@
-import { WallyShell } from "@/components/wally/WallyShell";
+import { PhoneFrame } from "@/components/wally/PhoneFrame";
 import { WallyAssessment } from "./WallyAssessment";
 
 export default function Page() {
     return (
-        <WallyShell active="assessment">
+        <PhoneFrame>
             <WallyAssessment />
-        </WallyShell>
+        </PhoneFrame>
     );
 }

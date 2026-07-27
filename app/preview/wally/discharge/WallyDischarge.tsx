@@ -87,7 +87,7 @@ function UploadCard({
 
 export function WallyDischarge() {
     const [pt, setPt] = useState<Doc>({
-        uploaded: true,
+        uploaded: false,
         file: "Physiotherapy_Care_Plan_MrTan.pdf",
         size: "248 KB",
     });

@@ -64,7 +64,7 @@ const PATIENTS: Patient[] = [
     {
         id: "1",
         name: "Margaret Chen",
-        surgery: "Open colectomy",
+        surgery: "Left hemicolectomy",
         day: 8,
         recoveryDays: 28,
         baselinePain: 8,
@@ -75,7 +75,7 @@ const PATIENTS: Patient[] = [
     {
         id: "2",
         name: "Tomás Vega",
-        surgery: "Spinal fusion",
+        surgery: "Low anterior resection",
         day: 12,
         recoveryDays: 30,
         baselinePain: 7,
@@ -86,7 +86,7 @@ const PATIENTS: Patient[] = [
     {
         id: "3",
         name: "Priya Nair",
-        surgery: "Hysterectomy",
+        surgery: "Right hemicolectomy",
         day: 16,
         recoveryDays: 28,
         baselinePain: 6,
@@ -99,7 +99,7 @@ const PATIENTS: Patient[] = [
     {
         id: "4",
         name: "Arthur Lim",
-        surgery: "Knee arthroscopy",
+        surgery: "High anterior resection",
         day: 27,
         recoveryDays: 30,
         baselinePain: 6,
@@ -110,7 +110,7 @@ const PATIENTS: Patient[] = [
     {
         id: "5",
         name: "David Okafor",
-        surgery: "Hip replacement",
+        surgery: "Abdominoperineal resection",
         day: 14,
         recoveryDays: 35,
         baselinePain: 7,
@@ -120,7 +120,7 @@ const PATIENTS: Patient[] = [
     {
         id: "6",
         name: "Sofia Reyes",
-        surgery: "Hernia repair",
+        surgery: "Right hemicolectomy",
         day: 5,
         recoveryDays: 14,
         baselinePain: 5,

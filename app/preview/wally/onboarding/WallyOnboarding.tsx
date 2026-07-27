@@ -4,7 +4,6 @@ import { ReactNode, useState } from "react";
 import { Check, Mars, Venus, CircleHelp, X, Plus, ChevronDown } from "lucide-react";
 import { PhaseScope } from "@/components/wally/PhaseScope";
 import { StepWizard } from "@/components/wally/StepWizard";
-import { WallyMascot } from "@/components/wally/WallyMascot";
 import { cn } from "@/lib/utils";
 
 const inputBox = "w-full rounded-xl border border-border-strong bg-surface px-4 py-3.5 text-ink";
@@ -58,16 +57,22 @@ function RadioRow({ icon, iconClass, label, selected, onClick }: { icon: ReactNo
 }
 
 export function WallyOnboarding() {
-    const [gender, setGender] = useState("Male");
+    // Empty-state defaults for demo recording: no gender chosen, no conditions added.
+    // Unit toggles keep sensible defaults (cm/kg) since they're preferences, not entered data.
+    const [gender, setGender] = useState("");
     const [heightUnit, setHeightUnit] = useState("cm");
     const [weightUnit, setWeightUnit] = useState("kg");
-    const [conditions, setConditions] = useState(["Hypertension", "High cholesterol"]);
+    const [conditions, setConditions] = useState<string[]>([]);
 
     const intro = (
         <div className="flex flex-col items-center text-center">
-            <WallyMascot pose="wave" />
-            <h1 className="mt-3 text-[30px] font-bold text-accent-ink">Wally.</h1>
-            <p className="mt-1 text-[15px] font-medium text-ink">Your personal recovery companion.</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+                src="/wally/wally_full.png"
+                alt="Wally"
+                className="h-44 w-auto mix-blend-multiply"
+            />
+            <p className="mt-2 text-[15px] font-medium text-ink">Your personal recovery companion.</p>
             <p className="mt-2 max-w-[16rem] text-[14px] text-ink-muted">
                 I&apos;ll ask you a few questions to personalize your experience.
             </p>
@@ -78,12 +83,12 @@ export function WallyOnboarding() {
         <div>
             <StepHeader title="How old are you?" subtitle="This helps us tailor things for you." />
             <div className="flex items-center justify-between rounded-xl border border-border-strong px-5 py-4">
-                <span className="text-[34px] font-bold tabular-nums text-accent-ink">40</span>
+                <span className="text-[34px] font-bold tabular-nums text-ink-subtle">40</span>
                 <span className="text-[15px] text-ink-muted">years old</span>
             </div>
             <div className="mt-3 flex flex-col items-center gap-1 text-ink-subtle">
                 {[38, 39].map((n) => <span key={n} className="text-[15px]">{n}</span>)}
-                <span className="my-0.5 w-full rounded-full bg-accent-soft py-1 text-center text-[18px] font-semibold text-accent-ink">40</span>
+                <span className="my-0.5 w-full rounded-full bg-surface-sunken py-1 text-center text-[18px] font-semibold text-ink-subtle">40</span>
                 {[41, 42].map((n) => <span key={n} className="text-[15px]">{n}</span>)}
             </div>
         </div>
@@ -104,7 +109,7 @@ export function WallyOnboarding() {
         <div>
             <StepHeader title="What is your height?" subtitle="Please enter your height." />
             <div className="flex items-center justify-between rounded-xl border border-border-strong px-5 py-4">
-                <span className="text-[30px] font-bold tabular-nums text-accent-ink">172</span>
+                <span className="text-[30px] font-bold tabular-nums text-ink-subtle">172</span>
                 <span className="inline-flex items-center gap-1 text-[15px] text-ink-muted">{heightUnit} <ChevronDown size={16} /></span>
             </div>
             <div className="mt-4">
@@ -117,7 +122,7 @@ export function WallyOnboarding() {
         <div>
             <StepHeader title="What is your weight?" subtitle="Please enter your weight." />
             <div className="flex items-center justify-between rounded-xl border border-border-strong px-5 py-4">
-                <span className="text-[30px] font-bold tabular-nums text-accent-ink">70</span>
+                <span className="text-[30px] font-bold tabular-nums text-ink-subtle">70</span>
                 <span className="inline-flex items-center gap-1 text-[15px] text-ink-muted">{weightUnit} <ChevronDown size={16} /></span>
             </div>
             <div className="mt-4">
@@ -142,7 +147,7 @@ export function WallyOnboarding() {
                     <Plus size={13} strokeWidth={2.5} /> Add more
                 </span>
             </div>
-            <input className={cn(inputBox, "mt-3 text-[15px]")} placeholder="Type to add a condition…" readOnly />
+            <input className={cn(inputBox, "mt-3 text-[15px] placeholder:text-ink-subtle focus:border-accent focus:outline-none focus:ring-2 focus:ring-ring")} placeholder="e.g. Hypertension, high cholesterol" />
             <div className="mt-6 text-center">
                 <h3 className="text-[17px] font-semibold text-accent-ink">What surgery did you go for?</h3>
                 <p className="mt-0.5 text-[13px] text-ink-muted">Please enter if any.</p>
@@ -159,7 +164,7 @@ export function WallyOnboarding() {
             <StepHeader title="When was your surgery?" subtitle="So Wally can track your recovery day." />
             <label className="text-[13px] font-medium text-ink-muted">Date of surgery</label>
             <div className="mt-1.5 flex items-center justify-between rounded-xl border border-border-strong px-4 py-3.5 text-[16px] text-ink">
-                <span>25 May 2025</span>
+                <span>21 July 2026</span>
                 <ChevronDown size={18} className="shrink-0 text-ink-subtle" />
             </div>
             <label className="mt-4 block text-[13px] font-medium text-ink-muted">Where are you recovering?</label>

@@ -67,11 +67,9 @@ export function WallyLifestyle() {
                 </p>
             </div>
             <textarea
-                defaultValue={q.answer}
-                placeholder="Type your answer here…"
+                placeholder={q.answer || "Type your answer here…"}
                 rows={5}
-                readOnly
-                className="w-full resize-none rounded-xl border border-border-strong bg-surface px-4 py-3 text-[16px] text-ink placeholder:text-ink-subtle"
+                className="w-full resize-none rounded-xl border border-border-strong bg-surface px-4 py-3 text-[16px] text-ink placeholder:text-ink-subtle focus:border-accent focus:outline-none focus:ring-2 focus:ring-ring"
             />
         </div>
     ));

@@ -1,10 +1,10 @@
 import { PhoneFrame } from "@/components/wally/PhoneFrame";
-import { WallyDashboard } from "./WallyDashboard";
+import { WallyLogin } from "./WallyLogin";
 
 export default function Page() {
     return (
         <PhoneFrame>
-            <WallyDashboard />
+            <WallyLogin />
         </PhoneFrame>
     );
 }
